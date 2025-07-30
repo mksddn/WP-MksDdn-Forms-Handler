@@ -1,0 +1,145 @@
+/**
+ * MksDdn Forms Handler - Admin Styles
+ * 
+ * @package MksDdnFormsHandler
+ * @version 1.0.0
+ */
+
+/* Admin Form Styles */
+.mksddn-form-admin {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.mksddn-form-admin h2 {
+    margin-top: 0;
+    color: #23282d;
+    font-size: 1.3em;
+    font-weight: 600;
+}
+
+.mksddn-form-field {
+    margin-bottom: 15px;
+}
+
+.mksddn-form-field label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #23282d;
+}
+
+.mksddn-form-field input[type="text"],
+.mksddn-form-field input[type="email"],
+.mksddn-form-field textarea,
+.mksddn-form-field select {
+    width: 100%;
+    max-width: 400px;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.mksddn-form-field textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+/* Status indicators */
+.mksddn-status {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.mksddn-status.active {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.mksddn-status.inactive {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Buttons */
+.mksddn-btn {
+    display: inline-block;
+    padding: 8px 16px;
+    background: #0073aa;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 3px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.mksddn-btn:hover {
+    background: #005a87;
+    color: #fff;
+}
+
+.mksddn-btn.mksddn-btn-secondary {
+    background: #f7f7f7;
+    color: #555;
+    border: 1px solid #ccc;
+}
+
+.mksddn-btn.mksddn-btn-secondary:hover {
+    background: #eee;
+    color: #23282d;
+}
+
+/* Tables */
+.mksddn-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+.mksddn-table th,
+.mksddn-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.mksddn-table th {
+    background: #f9f9f9;
+    font-weight: 600;
+    color: #23282d;
+}
+
+.mksddn-table tr:hover {
+    background: #f9f9f9;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .mksddn-form-field input[type="text"],
+    .mksddn-form-field input[type="email"],
+    .mksddn-form-field textarea,
+    .mksddn-form-field select {
+        max-width: 100%;
+    }
+    
+    .mksddn-table {
+        font-size: 14px;
+    }
+    
+    .mksddn-table th,
+    .mksddn-table td {
+        padding: 8px;
+    }
+} 
