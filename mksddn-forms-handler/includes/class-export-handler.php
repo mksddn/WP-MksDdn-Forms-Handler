@@ -13,10 +13,26 @@ namespace MksDdn\FormsHandler;
  */
 class ExportHandler {
     
+    /**
+     * Cache for forms list
+     * @var array
+     */
+    private $forms_cache = [];
+    
+    /**
+     * Batch size for large exports
+     * @var int
+     */
+    private const BATCH_SIZE = 1000;
+    
     public function __construct() {
         add_action('admin_menu', [$this, 'add_submissions_export_menu']);
         add_action('admin_post_export_submissions_csv', [$this, 'handle_export_submissions_csv']);
         add_action('admin_post_nopriv_export_submissions_csv', [$this, 'handle_export_submissions_csv']);
+        
+        // Clear cache when forms are updated
+        add_action('save_post_forms', [$this, 'clear_forms_cache'], 10, 2);
+        add_action('deleted_post', [$this, 'clear_forms_cache'], 10, 2);
     }
     
     /**
@@ -34,7 +50,7 @@ class ExportHandler {
     }
     
     /**
-     * Handle CSV export
+     * Handle CSV export with optimized performance
      */
     public function handle_export_submissions_csv(): void {
         // Check permissions
@@ -58,7 +74,48 @@ class ExportHandler {
             wp_die('Please select a form to export.');
         }
 
-        // Build query
+        // Get form for filename
+        $form = get_post($form_filter);
+        if (!$form) {
+            wp_die('Form not found.');
+        }
+
+        // Set headers for CSV download
+        $filename = sanitize_title($form->post_title) . '_submissions_' . date('Y-m-d_H-i-s') . '.csv';
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+
+        // Create output stream
+        $output = fopen('php://output', 'w');
+        
+        // Add BOM for UTF-8
+        fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
+
+        // Get submissions with optimized query
+        $submissions = $this->get_submissions_for_export($form_filter, $date_from, $date_to);
+
+        if (empty($submissions)) {
+            fclose($output);
+            wp_die('No submissions found for the selected form and criteria.');
+        }
+
+        // Write CSV headers
+        $headers = $this->get_csv_headers($submissions);
+        fputcsv($output, $headers);
+
+        // Write data in batches for better performance
+        $this->write_csv_data($output, $submissions, $headers);
+
+        fclose($output);
+        exit;
+    }
+    
+    /**
+     * Get submissions for export with optimized query
+     */
+    private function get_submissions_for_export($form_filter, $date_from, $date_to): array {
         $args = [
             'post_type'      => 'form_submissions',
             'post_status'    => 'publish',
@@ -74,102 +131,117 @@ class ExportHandler {
             ],
         ];
 
-        // Add date filter
+        // Add date filter if specified
         if ($date_from || $date_to) {
             $date_query = [];
             if ($date_from) {
                 $date_query['after'] = $date_from;
             }
-
             if ($date_to) {
                 $date_query['before'] = $date_to . ' 23:59:59';
             }
-
             $args['date_query'] = $date_query;
         }
 
-        $submissions = get_posts($args);
+        return get_posts($args);
+    }
+    
+    /**
+     * Get CSV headers from submissions data
+     */
+    private function get_csv_headers($submissions): array {
+        $headers = ['ID', 'Date', 'Form Title'];
+        $field_names = [];
 
-        if (empty($submissions)) {
-            wp_die('No submissions found for the selected form and criteria.');
-        }
-
-        // Get form name for filename
-        $form = get_post($form_filter);
-        $form_name = $form ? sanitize_title($form->post_title) : 'form';
-
-        // Clear output buffer
-        while (ob_get_level()) {
-            ob_end_clean();
-        }
-
-        // Set headers for CSV download
-        nocache_headers();
-        header('Content-Type: text/csv; charset=utf-8');
-        header('Content-Disposition: attachment; filename="' . $form_name . '-submissions-' . date('Y-m-d-H-i-s') . '.csv"');
-        header('Pragma: no-cache');
-        header('Expires: 0');
-
-        // Create file pointer for output
-        $output = fopen('php://output', 'w');
-
-        // Add BOM for correct Cyrillic display in Excel
-        fprintf($output, chr(0xEF) . chr(0xBB) . chr(0xBF));
-
-        // CSV headers
-        $headers = [
-            'ID',
-            'Form Title',
-            'Submission Date',
-            'IP Address',
-            'User Agent',
-        ];
-
-        // Get all unique fields from submission data
-        $all_fields = [];
+        // Collect all unique field names from submissions
         foreach ($submissions as $submission) {
-            $data = get_post_meta($submission->ID, '_submission_data', true);
-            if ($data) {
-                $data_array = json_decode($data, true);
-                if ($data_array) {
-                    foreach (array_keys($data_array) as $field) {
-                        if (!in_array($field, $all_fields)) {
-                            $all_fields[] = $field;
-                        }
+            $form_data = get_post_meta($submission->ID, '_form_data', true);
+            if ($form_data && is_array($form_data)) {
+                foreach ($form_data as $field_name => $value) {
+                    if (!in_array($field_name, $field_names)) {
+                        $field_names[] = $field_name;
                     }
                 }
             }
         }
 
-        // Add data fields to headers
-        $headers = array_merge($headers, $all_fields);
+        // Add field names to headers
+        $headers = array_merge($headers, $field_names);
+        
+        return $headers;
+    }
+    
+    /**
+     * Write CSV data in batches for better performance
+     */
+    private function write_csv_data($output, $submissions, $headers): void {
+        $batch = [];
+        $count = 0;
 
-        // Write headers
-        fputcsv($output, $headers);
-
-        // Write data
         foreach ($submissions as $submission) {
             $row = [
                 $submission->ID,
-                get_post_meta($submission->ID, '_form_title', true),
-                get_post_meta($submission->ID, '_submission_date', true),
-                get_post_meta($submission->ID, '_submission_ip', true),
-                get_post_meta($submission->ID, '_submission_user_agent', true),
+                get_the_date('Y-m-d H:i:s', $submission->ID),
+                get_post_meta($submission->ID, '_form_title', true) ?: 'Unknown Form'
             ];
 
-            // Add form data
-            $data = get_post_meta($submission->ID, '_submission_data', true);
-            $data_array = json_decode($data, true) ?: [];
-
-            foreach ($all_fields as $field) {
-                $row[] = $data_array[$field] ?? '';
+            // Get form data
+            $form_data = get_post_meta($submission->ID, '_form_data', true);
+            if ($form_data && is_array($form_data)) {
+                // Add field values in the same order as headers
+                for ($i = 3; $i < count($headers); $i++) {
+                    $field_name = $headers[$i];
+                    $row[] = isset($form_data[$field_name]) ? $form_data[$field_name] : '';
+                }
+            } else {
+                // Fill empty values for missing data
+                for ($i = 3; $i < count($headers); $i++) {
+                    $row[] = '';
+                }
             }
 
             fputcsv($output, $row);
+            $count++;
+
+            // Flush output every batch to prevent memory issues
+            if ($count % self::BATCH_SIZE === 0) {
+                flush();
+            }
+        }
+    }
+    
+    /**
+     * Clear forms cache when forms are updated
+     */
+    public function clear_forms_cache($post_id, $post): void {
+        if ($post->post_type === 'forms') {
+            wp_cache_delete('forms_list', 'mksddn_forms_handler');
+        }
+    }
+    
+    /**
+     * Get cached list of all forms
+     */
+    private function get_all_forms(): array {
+        // Try to get from cache first
+        $cached_forms = wp_cache_get('forms_list', 'mksddn_forms_handler');
+        if ($cached_forms !== false) {
+            return $cached_forms;
         }
 
-        fclose($output);
-        exit;
+        // Get all forms
+        $forms = get_posts([
+            'post_type'      => 'forms',
+            'post_status'    => 'publish',
+            'posts_per_page' => -1,
+            'orderby'        => 'title',
+            'order'          => 'ASC',
+        ]);
+
+        // Cache the result for 1 hour
+        wp_cache_set('forms_list', $forms, 'mksddn_forms_handler', 3600);
+
+        return $forms;
     }
     
     /**
@@ -297,18 +369,5 @@ class ExportHandler {
             </script>
         </div>
         <?php
-    }
-    
-    /**
-     * Get all forms
-     */
-    private function get_all_forms() {
-        return get_posts([
-            'post_type'      => 'forms',
-            'post_status'    => 'publish',
-            'posts_per_page' => -1,
-            'orderby'        => 'title',
-            'order'          => 'ASC',
-        ]);
     }
 } 

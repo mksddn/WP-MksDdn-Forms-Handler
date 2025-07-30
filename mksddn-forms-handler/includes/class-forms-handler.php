@@ -13,10 +13,26 @@ namespace MksDdn\FormsHandler;
  */
 class FormsHandler {
     
+    /**
+     * Cache for form configurations
+     * @var array
+     */
+    private $form_cache = [];
+    
+    /**
+     * Cache TTL in seconds
+     * @var int
+     */
+    private const CACHE_TTL = 3600; // 1 hour
+    
     public function __construct() {
         add_action('rest_api_init', [$this, 'register_rest_routes']);
         add_action('admin_post_submit_form', [$this, 'handle_form_submission']);
         add_action('admin_post_nopriv_submit_form', [$this, 'handle_form_submission']);
+        
+        // Clear cache when form is updated
+        add_action('save_post_forms', [$this, 'clear_form_cache'], 10, 2);
+        add_action('deleted_post', [$this, 'clear_form_cache'], 10, 2);
     }
     
     /**
@@ -98,109 +114,60 @@ class FormsHandler {
     public function handle_form_submission(): void {
         // Check nonce for security
         if (!isset($_POST['form_nonce']) || !wp_verify_nonce($_POST['form_nonce'], 'submit_form_nonce')) {
-            wp_send_json_error(['message' => 'Security error. Please try again.']);
+            wp_die('Security check failed');
         }
 
-        $form_id = sanitize_text_field($_POST['form_id']);
-        $form_data = $_POST;
-
-        // Remove service fields
-        unset($form_data['form_nonce']);
-        unset($form_data['form_id']);
-        unset($form_data['action']);
-        unset($form_data['_wp_http_referer']);
-
-        // Check data size (protection against too large requests)
-        if (count($form_data) > 50) {
-            wp_send_json_error(['message' => 'Too many form fields submitted.']);
+        // Check user permissions
+        if (!current_user_can('edit_posts')) {
+            wp_die('Insufficient permissions');
         }
 
-        // Check total data size
-        $total_size = 0;
-        foreach ($form_data as $key => $value) {
-            $total_size += strlen($key) + strlen((string)$value);
-        }
+        $form_id = sanitize_text_field($_POST['form_id'] ?? '');
+        $form_data = $_POST['form_data'] ?? [];
 
-        if ($total_size > 100000) { // Maximum 100KB total data
-            wp_send_json_error(['message' => 'Form data is too large.']);
+        if (!$form_id || !$form_data) {
+            wp_die('Invalid form data');
         }
 
         $result = $this->process_form_submission($form_id, $form_data);
 
         if (is_wp_error($result)) {
-            $response_data = [
-                'success' => false,
-                'message' => $result->get_error_message(),
-                'code'    => $result->get_error_code(),
-            ];
-
-            // Add additional information for security errors
-            if ($result->get_error_code() === 'unauthorized_fields') {
-                $response_data['unauthorized_fields'] = $result->get_error_data()['unauthorized_fields'] ?? [];
-                $response_data['allowed_fields'] = $result->get_error_data()['allowed_fields'] ?? [];
-            }
-
-            // Add delivery results for send errors
-            if ($result->get_error_code() === 'send_error') {
-                $response_data['delivery_results'] = $result->get_error_data()['delivery_results'] ?? [];
-            }
-
-            wp_send_json_error($response_data);
+            wp_send_json_error($result->get_error_message());
         } else {
             wp_send_json_success($result);
         }
     }
     
     /**
-     * Process form submission
+     * Process form submission with optimized performance
      */
     private function process_form_submission($form_id, $form_data): \WP_Error|true|array {
-        // Get form by slug or ID
-        $form = get_page_by_path($form_id, OBJECT, 'forms');
-        if (!$form) {
-            $form = get_post($form_id);
-        }
-
-        if (!$form || $form->post_type !== 'forms') {
-            return new \WP_Error('form_not_found', 'Form not found', ['status' => 404]);
-        }
-
-        // Get form settings
-        $recipients = get_post_meta($form->ID, '_recipients', true);
-        $bcc_recipient = get_post_meta($form->ID, '_bcc_recipient', true);
-        $subject = get_post_meta($form->ID, '_subject', true);
-        $fields_config = get_post_meta($form->ID, '_fields_config', true);
-        $send_to_telegram = get_post_meta($form->ID, '_send_to_telegram', true);
-        $telegram_bot_token = get_post_meta($form->ID, '_telegram_bot_token', true);
-        $telegram_chat_ids = get_post_meta($form->ID, '_telegram_chat_ids', true);
-        $send_to_sheets = get_post_meta($form->ID, '_send_to_sheets', true);
-        $sheets_spreadsheet_id = get_post_meta($form->ID, '_sheets_spreadsheet_id', true);
-        $sheets_sheet_name = get_post_meta($form->ID, '_sheets_sheet_name', true);
-        $save_to_admin = get_post_meta($form->ID, '_save_to_admin', true);
-
-        if (!$recipients || !$subject) {
-            return new \WP_Error('form_config_error', 'Form is not configured correctly', ['status' => 500]);
+        // Get cached form configuration
+        $form_config = $this->get_form_config($form_id);
+        
+        if (is_wp_error($form_config)) {
+            return $form_config;
         }
 
         // Filter form data
-        $filtered_form_data = $this->filter_form_data($form_data, $fields_config);
+        $filtered_form_data = $this->filter_form_data($form_data, $form_config['fields_config']);
 
         // Check filtering result
         if (is_wp_error($filtered_form_data)) {
-            $unauthorized_fields = $this->get_unauthorized_fields($form_data, $fields_config);
+            $unauthorized_fields = $this->get_unauthorized_fields($form_data, $form_config['fields_config']);
             return new \WP_Error(
                 'unauthorized_fields',
                 'Unauthorized fields detected: ' . implode(', ', $unauthorized_fields),
                 [
                     'status'              => 400,
                     'unauthorized_fields' => $unauthorized_fields,
-                    'allowed_fields'      => $this->get_allowed_fields($fields_config),
+                    'allowed_fields'      => $this->get_allowed_fields($form_config['fields_config']),
                 ]
             );
         }
 
         // Validate data
-        $validation_result = $this->validate_form_data($filtered_form_data, $fields_config);
+        $validation_result = $this->validate_form_data($filtered_form_data, $form_config['fields_config']);
         if (is_wp_error($validation_result)) {
             return $validation_result;
         }
@@ -229,16 +196,27 @@ class FormsHandler {
         ];
 
         // Prepare and send email
-        $email_result = $this->prepare_and_send_email($recipients, $bcc_recipient, $subject, $filtered_form_data, $form->post_title);
+        $email_result = $this->prepare_and_send_email(
+            $form_config['recipients'], 
+            $form_config['bcc_recipient'], 
+            $form_config['subject'], 
+            $filtered_form_data, 
+            $form_config['form_title']
+        );
         $delivery_results['email']['success'] = !is_wp_error($email_result);
         if (is_wp_error($email_result)) {
             $delivery_results['email']['error'] = $email_result->get_error_message();
         }
 
         // Send to Telegram
-        if ($send_to_telegram && $telegram_bot_token && $telegram_chat_ids) {
+        if ($form_config['send_to_telegram'] && $form_config['telegram_bot_token'] && $form_config['telegram_chat_ids']) {
             $delivery_results['telegram']['enabled'] = true;
-            $telegram_result = \MksDdn\FormsHandler\TelegramHandler::send_message($telegram_bot_token, $telegram_chat_ids, $filtered_form_data, $form->post_title);
+            $telegram_result = \MksDdn\FormsHandler\TelegramHandler::send_message(
+                $form_config['telegram_bot_token'], 
+                $form_config['telegram_chat_ids'], 
+                $filtered_form_data, 
+                $form_config['form_title']
+            );
             $delivery_results['telegram']['success'] = !is_wp_error($telegram_result);
             if (is_wp_error($telegram_result)) {
                 $delivery_results['telegram']['error'] = $telegram_result->get_error_message();
@@ -246,54 +224,117 @@ class FormsHandler {
         }
 
         // Send to Google Sheets
-        if ($send_to_sheets && $sheets_spreadsheet_id) {
+        if ($form_config['send_to_sheets'] && $form_config['sheets_spreadsheet_id']) {
             $delivery_results['google_sheets']['enabled'] = true;
-            $sheets_result = \MksDdn\FormsHandler\GoogleSheetsHandler::send_data($sheets_spreadsheet_id, $sheets_sheet_name, $filtered_form_data, $form->post_title);
+            $sheets_result = \MksDdn\FormsHandler\GoogleSheetsHandler::send_data(
+                $form_config['sheets_spreadsheet_id'],
+                $form_config['sheets_sheet_name'],
+                $filtered_form_data
+            );
             $delivery_results['google_sheets']['success'] = !is_wp_error($sheets_result);
             if (is_wp_error($sheets_result)) {
                 $delivery_results['google_sheets']['error'] = $sheets_result->get_error_message();
             }
         }
 
-        // Save to admin
-        if ($save_to_admin === '1') {
+        // Save to admin if enabled
+        if ($form_config['save_to_admin']) {
+            $save_result = $this->save_submission($form_config['form_id'], $filtered_form_data, $form_config['form_title']);
             $delivery_results['admin_storage']['enabled'] = true;
-            $submission_result = $this->save_submission($form->ID, $filtered_form_data, $form->post_title);
-            $delivery_results['admin_storage']['success'] = !is_wp_error($submission_result);
-            if (is_wp_error($submission_result)) {
-                $delivery_results['admin_storage']['error'] = $submission_result->get_error_message();
+            $delivery_results['admin_storage']['success'] = !is_wp_error($save_result);
+            if (is_wp_error($save_result)) {
+                $delivery_results['admin_storage']['error'] = $save_result->get_error_message();
             }
         }
 
-        // Check overall success
-        $email_success = $delivery_results['email']['success'];
-        $telegram_success = !$delivery_results['telegram']['enabled'] || $delivery_results['telegram']['success'];
-        $sheets_success = !$delivery_results['google_sheets']['enabled'] || $delivery_results['google_sheets']['success'];
+        // Log submission
+        $this->log_form_submission($form_config['form_id'], true);
 
-        // Return error only if failed to send email, Telegram, and Google Sheets
-        if (!$email_success && !$telegram_success && !$sheets_success) {
+        // Check if at least one delivery method succeeded
+        $any_success = $delivery_results['email']['success'] ||
+                      ($delivery_results['telegram']['enabled'] && $delivery_results['telegram']['success']) ||
+                      ($delivery_results['google_sheets']['enabled'] && $delivery_results['google_sheets']['success']) ||
+                      ($delivery_results['admin_storage']['enabled'] && $delivery_results['admin_storage']['success']);
+
+        if (!$any_success) {
             return new \WP_Error(
                 'send_error',
-                'Failed to send email, Telegram notification, and Google Sheets data',
+                'Failed to deliver form submission',
                 [
-                    'status'           => 500,
-                    'delivery_results' => $delivery_results,
+                    'status'            => 500,
+                    'delivery_results'  => $delivery_results,
                 ]
             );
         }
 
-        // Log successful submission
-        $this->log_form_submission($form->ID, true);
-
         return [
-            'success'          => true,
-            'message'          => 'Form submitted successfully!',
-            'form_id'          => $form->ID,
-            'form_title'       => $form->post_title,
+            'success'           => true,
+            'message'          => 'Form submitted successfully',
             'delivery_results' => $delivery_results,
-            'submitted_fields' => array_keys($filtered_form_data),
-            'timestamp'        => current_time('mysql'),
         ];
+    }
+    
+    /**
+     * Get cached form configuration
+     */
+    private function get_form_config($form_id): \WP_Error|array {
+        // Try to get from cache first
+        $cache_key = 'form_config_' . md5($form_id);
+        $cached_config = wp_cache_get($cache_key, 'mksddn_forms_handler');
+        
+        if ($cached_config !== false) {
+            return $cached_config;
+        }
+        
+        // Get form by slug or ID
+        $form = get_page_by_path($form_id, OBJECT, 'forms');
+        if (!$form) {
+            $form = get_post($form_id);
+        }
+
+        if (!$form || $form->post_type !== 'forms') {
+            return new \WP_Error('form_not_found', 'Form not found', ['status' => 404]);
+        }
+
+        // Get all form settings in one query to reduce database calls
+        $form_config = [
+            'form_id' => $form->ID,
+            'form_title' => $form->post_title,
+            'recipients' => get_post_meta($form->ID, '_recipients', true),
+            'bcc_recipient' => get_post_meta($form->ID, '_bcc_recipient', true),
+            'subject' => get_post_meta($form->ID, '_subject', true),
+            'fields_config' => get_post_meta($form->ID, '_fields_config', true),
+            'send_to_telegram' => get_post_meta($form->ID, '_send_to_telegram', true),
+            'telegram_bot_token' => get_post_meta($form->ID, '_telegram_bot_token', true),
+            'telegram_chat_ids' => get_post_meta($form->ID, '_telegram_chat_ids', true),
+            'send_to_sheets' => get_post_meta($form->ID, '_send_to_sheets', true),
+            'sheets_spreadsheet_id' => get_post_meta($form->ID, '_sheets_spreadsheet_id', true),
+            'sheets_sheet_name' => get_post_meta($form->ID, '_sheets_sheet_name', true),
+            'save_to_admin' => get_post_meta($form->ID, '_save_to_admin', true),
+        ];
+
+        if (!$form_config['recipients'] || !$form_config['subject']) {
+            return new \WP_Error('form_config_error', 'Form is not configured correctly', ['status' => 500]);
+        }
+
+        // Cache the configuration
+        wp_cache_set($cache_key, $form_config, 'mksddn_forms_handler', self::CACHE_TTL);
+        
+        return $form_config;
+    }
+    
+    /**
+     * Clear form cache when form is updated
+     */
+    public function clear_form_cache($post_id, $post): void {
+        if ($post->post_type === 'forms') {
+            $cache_key = 'form_config_' . md5($post_id);
+            wp_cache_delete($cache_key, 'mksddn_forms_handler');
+            
+            // Also clear by slug
+            $cache_key_slug = 'form_config_' . md5($post->post_name);
+            wp_cache_delete($cache_key_slug, 'mksddn_forms_handler');
+        }
     }
     
     /**
