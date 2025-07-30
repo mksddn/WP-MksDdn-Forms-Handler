@@ -18,7 +18,7 @@
  * @version 1.0.0
  * @author mksddn
  * @license GPL v2 or later
- */
+*/
 
 // Prevent direct access
 if (!defined('ABSPATH')) {
