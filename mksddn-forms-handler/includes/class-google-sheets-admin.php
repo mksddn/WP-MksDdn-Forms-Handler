@@ -1,5 +1,12 @@
 <?php
-namespace FormsHandler;
+/**
+ * @file: class-google-sheets-admin.php
+ * @description: Google Sheets admin functionality and OAuth handling
+ * @dependencies: WordPress core, Google Sheets API
+ * @created: 2025-07-30
+ */
+
+namespace MksDdn\FormsHandler;
 
 /**
  * Google Sheets Admin functionality

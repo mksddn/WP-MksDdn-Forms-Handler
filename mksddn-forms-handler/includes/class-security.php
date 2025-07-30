@@ -1,5 +1,12 @@
 <?php
-namespace FormsHandler;
+/**
+ * @file: class-security.php
+ * @description: Handles security restrictions for form submissions
+ * @dependencies: WordPress core
+ * @created: 2025-07-30
+ */
+
+namespace MksDdn\FormsHandler;
 
 /**
  * Handles security restrictions for submissions

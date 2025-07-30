@@ -49,15 +49,15 @@ require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/handlers/class-google-sheets-ha
 
 // Initialize plugin
 add_action('plugins_loaded', function() {
-    new FormsHandler\PostTypes();
-    new FormsHandler\MetaBoxes();
-    new FormsHandler\FormsHandler();
-    new FormsHandler\Shortcodes();
-    new FormsHandler\AdminColumns();
-    new FormsHandler\ExportHandler();
-    new FormsHandler\Security();
-    new FormsHandler\GoogleSheetsAdmin();
+    new MksDdn\FormsHandler\PostTypes();
+    new MksDdn\FormsHandler\MetaBoxes();
+    new MksDdn\FormsHandler\FormsHandler();
+    new MksDdn\FormsHandler\Shortcodes();
+    new MksDdn\FormsHandler\AdminColumns();
+    new MksDdn\FormsHandler\ExportHandler();
+    new MksDdn\FormsHandler\Security();
+    new MksDdn\FormsHandler\GoogleSheetsAdmin();
     
     // Create default form on theme activation
-    add_action('after_switch_theme', 'FormsHandler\Utilities::create_default_contact_form');
+    add_action('after_switch_theme', 'MksDdn\FormsHandler\Utilities::create_default_contact_form');
 });

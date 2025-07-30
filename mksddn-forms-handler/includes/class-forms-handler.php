@@ -1,5 +1,12 @@
 <?php
-namespace FormsHandler;
+/**
+ * @file: class-forms-handler.php
+ * @description: Main forms handler class with REST API support
+ * @dependencies: WordPress core, REST API
+ * @created: 2025-07-30
+ */
+
+namespace MksDdn\FormsHandler;
 
 /**
  * Main forms handler class

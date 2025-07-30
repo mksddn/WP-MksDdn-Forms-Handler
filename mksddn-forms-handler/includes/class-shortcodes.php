@@ -1,5 +1,12 @@
 <?php
-namespace FormsHandler;
+/**
+ * @file: class-shortcodes.php
+ * @description: Handles form shortcodes rendering
+ * @dependencies: WordPress core, jQuery
+ * @created: 2025-07-30
+ */
+
+namespace MksDdn\FormsHandler;
 
 /**
  * Handles form shortcodes

@@ -1,5 +1,12 @@
 <?php
-namespace FormsHandler;
+/**
+ * @file: class-post-types.php
+ * @description: Handles custom post types registration for forms and submissions
+ * @dependencies: WordPress core
+ * @created: 2025-07-30
+ */
+
+namespace MksDdn\FormsHandler;
 
 /**
  * Handles custom post types registration

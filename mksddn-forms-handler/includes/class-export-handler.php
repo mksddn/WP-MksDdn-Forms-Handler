@@ -1,5 +1,12 @@
 <?php
-namespace FormsHandler;
+/**
+ * @file: class-export-handler.php
+ * @description: Handles CSV export functionality for form submissions
+ * @dependencies: WordPress core
+ * @created: 2025-07-30
+ */
+
+namespace MksDdn\FormsHandler;
 
 /**
  * Handles CSV export functionality

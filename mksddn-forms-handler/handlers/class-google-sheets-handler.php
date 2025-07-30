@@ -1,5 +1,12 @@
 <?php
-namespace FormsHandler;
+/**
+ * @file: class-google-sheets-handler.php
+ * @description: Google Sheets integration for form submissions
+ * @dependencies: WordPress core, Google Sheets API
+ * @created: 2025-07-30
+ */
+
+namespace MksDdn\FormsHandler;
 
 /**
  * Google Sheets Handler for Forms Handler Plugin

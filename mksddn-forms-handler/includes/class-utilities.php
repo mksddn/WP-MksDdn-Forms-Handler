@@ -1,5 +1,12 @@
 <?php
-namespace FormsHandler;
+/**
+ * @file: class-utilities.php
+ * @description: Utility functions for forms handler
+ * @dependencies: WordPress core
+ * @created: 2025-07-30
+ */
+
+namespace MksDdn\FormsHandler;
 
 /**
  * Utility functions for forms handler

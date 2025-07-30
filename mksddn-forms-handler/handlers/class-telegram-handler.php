@@ -1,5 +1,12 @@
 <?php
-namespace FormsHandler;
+/**
+ * @file: class-telegram-handler.php
+ * @description: Handles Telegram notifications for form submissions
+ * @dependencies: WordPress core, Telegram Bot API
+ * @created: 2025-07-30
+ */
+
+namespace MksDdn\FormsHandler;
 
 /**
  * Handles Telegram notifications

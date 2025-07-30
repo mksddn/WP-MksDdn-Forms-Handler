@@ -1,5 +1,12 @@
 <?php
-namespace FormsHandler;
+/**
+ * @file: class-admin-columns.php
+ * @description: Handles admin columns customization for forms and submissions
+ * @dependencies: WordPress core
+ * @created: 2025-07-30
+ */
+
+namespace MksDdn\FormsHandler;
 
 /**
  * Handles admin columns for forms and submissions
