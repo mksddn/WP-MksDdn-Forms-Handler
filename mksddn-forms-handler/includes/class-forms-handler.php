@@ -238,7 +238,7 @@ class FormsHandler {
         // Send to Telegram
         if ($send_to_telegram && $telegram_bot_token && $telegram_chat_ids) {
             $delivery_results['telegram']['enabled'] = true;
-            $telegram_result = \FormsHandler\TelegramHandler::send_message($telegram_bot_token, $telegram_chat_ids, $filtered_form_data, $form->post_title);
+            $telegram_result = \MksDdn\FormsHandler\TelegramHandler::send_message($telegram_bot_token, $telegram_chat_ids, $filtered_form_data, $form->post_title);
             $delivery_results['telegram']['success'] = !is_wp_error($telegram_result);
             if (is_wp_error($telegram_result)) {
                 $delivery_results['telegram']['error'] = $telegram_result->get_error_message();
@@ -248,7 +248,7 @@ class FormsHandler {
         // Send to Google Sheets
         if ($send_to_sheets && $sheets_spreadsheet_id) {
             $delivery_results['google_sheets']['enabled'] = true;
-            $sheets_result = \FormsHandler\GoogleSheetsHandler::send_data($sheets_spreadsheet_id, $sheets_sheet_name, $filtered_form_data, $form->post_title);
+            $sheets_result = \MksDdn\FormsHandler\GoogleSheetsHandler::send_data($sheets_spreadsheet_id, $sheets_sheet_name, $filtered_form_data, $form->post_title);
             $delivery_results['google_sheets']['success'] = !is_wp_error($sheets_result);
             if (is_wp_error($sheets_result)) {
                 $delivery_results['google_sheets']['error'] = $sheets_result->get_error_message();
