@@ -99,7 +99,7 @@ class Security {
      * Disable submission creation via REST API
      */
     public function disable_submission_creation_via_rest($prepared, $request) {
-        return new \WP_Error('rest_forbidden', 'Creating submissions manually is not allowed', ['status' => 403]);
+        return new \WP_Error('rest_forbidden', __( 'Creating submissions manually is not allowed', 'mksddn-forms-handler' ), ['status' => 403]);
     }
     
     /**
@@ -112,10 +112,10 @@ class Security {
             $message = '';
             switch ($_GET['message']) {
                 case '1':
-                    $message = 'Editing submissions is not allowed. Submissions can only be created automatically when forms are submitted.';
+                    $message = __( 'Editing submissions is not allowed. Submissions can only be created automatically when forms are submitted.', 'mksddn-forms-handler' );
                     break;
                 case '2':
-                    $message = 'Creating submissions manually is not allowed. Submissions are created automatically when forms are submitted.';
+                    $message = __( 'Creating submissions manually is not allowed. Submissions are created automatically when forms are submitted.', 'mksddn-forms-handler' );
                     break;
             }
 

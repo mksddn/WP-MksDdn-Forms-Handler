@@ -55,13 +55,13 @@ class ExportHandler {
     public function handle_export_submissions_csv(): void {
         // Check permissions
         if (!current_user_can('manage_options')) {
-            wp_die('Access denied');
+            wp_die( esc_html__( 'Access denied', 'mksddn-forms-handler' ) );
         }
 
         // Check nonce (for POST and GET requests)
         $nonce = $_POST['export_nonce'] ?? $_GET['export_nonce'] ?? '';
         if (!$nonce || !wp_verify_nonce($nonce, 'export_submissions_csv')) {
-            wp_die('Security check failed');
+            wp_die( esc_html__( 'Security check failed', 'mksddn-forms-handler' ) );
         }
 
         // Get filter parameters (from POST or GET)
@@ -71,17 +71,17 @@ class ExportHandler {
 
         // Check if form is selected
         if ($form_filter === 0) {
-            wp_die('Please select a form to export.');
+            wp_die( esc_html__( 'Please select a form to export.', 'mksddn-forms-handler' ) );
         }
 
         // Get form for filename
         $form = get_post($form_filter);
         if (!$form) {
-            wp_die('Form not found.');
+            wp_die( esc_html__( 'Form not found.', 'mksddn-forms-handler' ) );
         }
 
         // Set headers for CSV download
-        $filename = sanitize_title($form->post_title) . '_submissions_' . date('Y-m-d_H-i-s') . '.csv';
+        $filename = sanitize_title($form->post_title) . '_submissions_' . gmdate('Y-m-d_H-i-s') . '.csv';
         header('Content-Type: text/csv; charset=utf-8');
         header('Content-Disposition: attachment; filename="' . $filename . '"');
         header('Pragma: no-cache');
@@ -98,7 +98,7 @@ class ExportHandler {
 
         if (empty($submissions)) {
             fclose($output);
-            wp_die('No submissions found for the selected form and criteria.');
+            wp_die( esc_html__( 'No submissions found for the selected form and criteria.', 'mksddn-forms-handler' ) );
         }
 
         // Write CSV headers

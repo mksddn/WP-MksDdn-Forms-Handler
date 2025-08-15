@@ -8,6 +8,9 @@
 
 namespace MksDdn\FormsHandler;
 
+if (!defined('ABSPATH')) {
+    exit;
+}
 /**
  * Google Sheets Handler for Forms Handler Plugin
  *
@@ -20,7 +23,7 @@ class GoogleSheetsHandler {
      */
     public static function send_data(?string $spreadsheet_id, ?string $sheet_name, $form_data, $form_title) {
         if (!$spreadsheet_id) {
-            return new \WP_Error('sheets_config_error', 'Google Sheets spreadsheet ID not configured');
+            return new \WP_Error('sheets_config_error', __( 'Google Sheets spreadsheet ID not configured', 'mksddn-forms-handler' ));
         }
 
         $access_token = self::get_access_token();
@@ -58,7 +61,7 @@ class GoogleSheetsHandler {
         );
 
         if (is_wp_error($response)) {
-            return new \WP_Error('sheets_request_error', 'Failed to send data to Google Sheets: ' . $response->get_error_message());
+            return new \WP_Error('sheets_request_error', __( 'Failed to send data to Google Sheets:', 'mksddn-forms-handler' ) . ' ' . $response->get_error_message());
         }
 
         $body = wp_remote_retrieve_body($response);
@@ -66,7 +69,7 @@ class GoogleSheetsHandler {
 
         if (!$data || isset($data['error'])) {
             $error_message = isset($data['error']['message']) ? $data['error']['message'] : 'Unknown error';
-            return new \WP_Error('sheets_api_error', 'Google Sheets API error: ' . $error_message);
+            return new \WP_Error('sheets_api_error', __( 'Google Sheets API error:', 'mksddn-forms-handler' ) . ' ' . $error_message);
         }
 
         return true;
@@ -81,7 +84,7 @@ class GoogleSheetsHandler {
         $client_secret = get_option('google_sheets_client_secret');
 
         if (!$refresh_token || !$client_id || !$client_secret) {
-            return new \WP_Error('sheets_auth_error', 'Google Sheets authentication not configured');
+            return new \WP_Error('sheets_auth_error', __( 'Google Sheets authentication not configured', 'mksddn-forms-handler' ));
         }
 
         $response = wp_remote_post(
@@ -98,7 +101,7 @@ class GoogleSheetsHandler {
         );
 
         if (is_wp_error($response)) {
-            return new \WP_Error('token_request_error', 'Failed to get access token: ' . $response->get_error_message());
+            return new \WP_Error('token_request_error', __( 'Failed to get access token:', 'mksddn-forms-handler' ) . ' ' . $response->get_error_message());
         }
 
         $body = wp_remote_retrieve_body($response);
@@ -106,7 +109,7 @@ class GoogleSheetsHandler {
 
         if (!$data || !isset($data['access_token'])) {
             $error_message = isset($data['error_description']) ? $data['error_description'] : 'Unknown error';
-            return new \WP_Error('token_error', 'Failed to get access token: ' . $error_message);
+            return new \WP_Error('token_error', __( 'Failed to get access token:', 'mksddn-forms-handler' ) . ' ' . $error_message);
         }
 
         return $data['access_token'];
@@ -117,7 +120,7 @@ class GoogleSheetsHandler {
      */
     public static function validate_config(?string $spreadsheet_id, $sheet_name = ''): \WP_Error|true {
         if (!$spreadsheet_id) {
-            return new \WP_Error('sheets_config_error', 'Spreadsheet ID is required');
+            return new \WP_Error('sheets_config_error', __( 'Spreadsheet ID is required', 'mksddn-forms-handler' ));
         }
 
         $refresh_token = get_option('google_sheets_refresh_token');
@@ -125,7 +128,7 @@ class GoogleSheetsHandler {
         $client_secret = get_option('google_sheets_client_secret');
 
         if (!$refresh_token || !$client_id || !$client_secret) {
-            return new \WP_Error('sheets_auth_error', 'Google Sheets authentication not configured');
+            return new \WP_Error('sheets_auth_error', __( 'Google Sheets authentication not configured', 'mksddn-forms-handler' ));
         }
 
         return true;

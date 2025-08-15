@@ -38,12 +38,12 @@ class AdminColumns {
         foreach ($columns as $key => $value) {
             $new_columns[$key] = $value;
             if ($key === 'title') {
-                $new_columns['recipients'] = 'Recipients';
-                $new_columns['telegram'] = 'Telegram';
-                $new_columns['sheets'] = 'Google Sheets';
-                $new_columns['admin_storage'] = 'Admin Storage';
-                $new_columns['shortcode'] = 'Shortcode';
-                $new_columns['export'] = 'Export';
+                $new_columns['recipients'] = __( 'Recipients', 'mksddn-forms-handler' );
+                $new_columns['telegram'] = __( 'Telegram', 'mksddn-forms-handler' );
+                $new_columns['sheets'] = __( 'Google Sheets', 'mksddn-forms-handler' );
+                $new_columns['admin_storage'] = __( 'Admin Storage', 'mksddn-forms-handler' );
+                $new_columns['shortcode'] = __( 'Shortcode', 'mksddn-forms-handler' );
+                $new_columns['export'] = __( 'Export', 'mksddn-forms-handler' );
             }
         }
 
@@ -61,30 +61,30 @@ class AdminColumns {
                 break;
             case 'telegram':
                 $telegram_enabled = get_post_meta($post_id, '_send_to_telegram', true) === '1';
-                echo $telegram_enabled ? '<span style="color: green;">✓ Enabled</span>' : '<span style="color: #999;">✗ Disabled</span>';
+                echo $telegram_enabled ? '<span style="color: green;">' . esc_html__( '✓ Enabled', 'mksddn-forms-handler' ) . '</span>' : '<span style="color: #999;">' . esc_html__( '✗ Disabled', 'mksddn-forms-handler' ) . '</span>';
                 break;
             case 'sheets':
                 $sheets_enabled = get_post_meta($post_id, '_send_to_sheets', true) === '1';
-                echo $sheets_enabled ? '<span style="color: green;">✓ Enabled</span>' : '<span style="color: #999;">✗ Disabled</span>';
+                echo $sheets_enabled ? '<span style="color: green;">' . esc_html__( '✓ Enabled', 'mksddn-forms-handler' ) . '</span>' : '<span style="color: #999;">' . esc_html__( '✗ Disabled', 'mksddn-forms-handler' ) . '</span>';
                 break;
             case 'admin_storage':
                 $save_to_admin = get_post_meta($post_id, '_save_to_admin', true) === '1';
-                echo $save_to_admin ? '<span style="color: green;">✓ Enabled</span>' : '<span style="color: #999;">✗ Disabled</span>';
+                echo $save_to_admin ? '<span style="color: green;">' . esc_html__( '✓ Enabled', 'mksddn-forms-handler' ) . '</span>' : '<span style="color: #999;">' . esc_html__( '✗ Disabled', 'mksddn-forms-handler' ) . '</span>';
                 break;
             case 'export':
                 $count = $this->get_submissions_count($post_id);
                 if ($count > 0) {
                     $export_url = admin_url('admin-post.php?action=export_submissions_csv&form_filter=' . $post_id . '&export_nonce=' . wp_create_nonce('export_submissions_csv'));
-                    echo '<a href="' . esc_url($export_url) . '" target="_blank" class="button button-small">Export (' . $count . ')</a>';
+                    echo '<a href="' . esc_url($export_url) . '" target="_blank" class="button button-small">' . esc_html__( 'Export', 'mksddn-forms-handler' ) . ' (' . intval($count) . ')</a>';
                 } else {
-                    echo '<span style="color: #999;">No submissions</span>';
+                    echo '<span style="color: #999;">' . esc_html__( 'No submissions', 'mksddn-forms-handler' ) . '</span>';
                 }
                 break;
             case 'shortcode':
                 $post = get_post($post_id);
                 if ($post) {
                     echo '<code>[form id="' . esc_attr($post->post_name) . '"]</code>';
-                    echo '<br><small style="color: #666;">Copy to clipboard</small>';
+                    echo '<br><small style="color: #666;">' . esc_html__( 'Copy to clipboard', 'mksddn-forms-handler' ) . '</small>';
                 }
                 break;
         }
@@ -146,10 +146,10 @@ class AdminColumns {
         foreach ($columns as $key => $value) {
             $new_columns[$key] = $value;
             if ($key === 'title') {
-                $new_columns['form_name'] = 'Form';
-                $new_columns['submission_date'] = 'Date';
-                $new_columns['submission_data'] = 'Data';
-                $new_columns['delivery_status'] = 'Delivery Status';
+                $new_columns['form_name'] = __( 'Form', 'mksddn-forms-handler' );
+                $new_columns['submission_date'] = __( 'Date', 'mksddn-forms-handler' );
+                $new_columns['submission_data'] = __( 'Data', 'mksddn-forms-handler' );
+                $new_columns['delivery_status'] = __( 'Delivery Status', 'mksddn-forms-handler' );
             }
         }
 
@@ -168,10 +168,10 @@ class AdminColumns {
                     if ($form) {
                         echo '<a href="' . get_edit_post_link($form_id) . '">' . esc_html($form->post_title) . '</a>';
                     } else {
-                        echo '<span style="color: #999;">Form deleted</span>';
+                        echo '<span style="color: #999;">' . esc_html__( 'Form deleted', 'mksddn-forms-handler' ) . '</span>';
                     }
                 } else {
-                    echo '<span style="color: #999;">Unknown form</span>';
+                    echo '<span style="color: #999;">' . esc_html__( 'Unknown form', 'mksddn-forms-handler' ) . '</span>';
                 }
                 break;
             case 'submission_date':
@@ -181,7 +181,8 @@ class AdminColumns {
                 }
                 break;
             case 'submission_data':
-                $form_data = get_post_meta($post_id, '_form_data', true);
+                $raw = get_post_meta($post_id, '_submission_data', true);
+                $form_data = is_string($raw) ? json_decode($raw, true) : (is_array($raw) ? $raw : []);
                 if ($form_data && is_array($form_data)) {
                     $preview = [];
                     $count = 0;
@@ -195,7 +196,7 @@ class AdminColumns {
                         echo '<br><small style="color: #666;">+' . (count($form_data) - 3) . ' more fields</small>';
                     }
                 } else {
-                    echo '<span style="color: #999;">No data</span>';
+                    echo '<span style="color: #999;">' . esc_html__( 'No data', 'mksddn-forms-handler' ) . '</span>';
                 }
                 break;
             case 'delivery_status':
@@ -211,7 +212,7 @@ class AdminColumns {
                     }
                     echo implode('<br>', $statuses);
                 } else {
-                    echo '<span style="color: #999;">Unknown</span>';
+                    echo '<span style="color: #999;">' . esc_html__( 'Unknown', 'mksddn-forms-handler' ) . '</span>';
                 }
                 break;
         }

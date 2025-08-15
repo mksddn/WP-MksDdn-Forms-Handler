@@ -40,7 +40,7 @@ class FormsHandler {
      */
     public function register_rest_routes(): void {
         register_rest_route(
-            'wp/v2',
+            'mksddn-forms-handler/v1',
             '/forms/(?P<slug>[a-zA-Z0-9-]+)/submit',
             [
                 'methods'             => 'POST',
@@ -63,12 +63,12 @@ class FormsHandler {
         $form_data = $request->get_json_params();
 
         if (!$form_data) {
-            return new \WP_Error('invalid_data', 'Invalid form data', ['status' => 400]);
+            return new \WP_Error('invalid_data', __( 'Invalid form data', 'mksddn-forms-handler' ), ['status' => 400]);
         }
 
         // Check data size (protection against too large requests)
         if (count($form_data) > 50) {
-            return new \WP_Error('too_many_fields', 'Too many form fields submitted', ['status' => 400]);
+            return new \WP_Error('too_many_fields', __( 'Too many form fields submitted', 'mksddn-forms-handler' ), ['status' => 400]);
         }
 
         // Check total data size
@@ -78,7 +78,7 @@ class FormsHandler {
         }
 
         if ($total_size > 100000) { // Maximum 100KB total data
-            return new \WP_Error('data_too_large', 'Form data is too large', ['status' => 400]);
+            return new \WP_Error('data_too_large', __( 'Form data is too large', 'mksddn-forms-handler' ), ['status' => 400]);
         }
 
         $result = $this->process_form_submission($slug, $form_data);
@@ -117,13 +117,15 @@ class FormsHandler {
             wp_die('Security check failed');
         }
 
-        // Check user permissions
-        if (!current_user_can('edit_posts')) {
-            wp_die('Insufficient permissions');
-        }
-
         $form_id = sanitize_text_field($_POST['form_id'] ?? '');
-        $form_data = $_POST['form_data'] ?? [];
+
+        // Collect posted fields excluding service fields
+        $raw_post = wp_unslash($_POST);
+        unset($raw_post['action'], $raw_post['form_id'], $raw_post['form_nonce']);
+        $form_data = [];
+        foreach ($raw_post as $key => $value) {
+            $form_data[$key] = is_array($value) ? array_map('sanitize_text_field', $value) : sanitize_text_field((string)$value);
+        }
 
         if (!$form_id || !$form_data) {
             wp_die('Invalid form data');
@@ -157,7 +159,7 @@ class FormsHandler {
             $unauthorized_fields = $this->get_unauthorized_fields($form_data, $form_config['fields_config']);
             return new \WP_Error(
                 'unauthorized_fields',
-                'Unauthorized fields detected: ' . implode(', ', $unauthorized_fields),
+                sprintf( /* translators: %s: field names */ __( 'Unauthorized fields detected: %s', 'mksddn-forms-handler' ), implode(', ', $unauthorized_fields) ),
                 [
                     'status'              => 400,
                     'unauthorized_fields' => $unauthorized_fields,
@@ -259,7 +261,7 @@ class FormsHandler {
         if (!$any_success) {
             return new \WP_Error(
                 'send_error',
-                'Failed to deliver form submission',
+                __( 'Failed to deliver form submission', 'mksddn-forms-handler' ),
                 [
                     'status'            => 500,
                     'delivery_results'  => $delivery_results,
@@ -269,7 +271,7 @@ class FormsHandler {
 
         return [
             'success'           => true,
-            'message'          => 'Form submitted successfully',
+            'message'          => __( 'Form submitted successfully', 'mksddn-forms-handler' ),
             'delivery_results' => $delivery_results,
         ];
     }
@@ -314,7 +316,7 @@ class FormsHandler {
         ];
 
         if (!$form_config['recipients'] || !$form_config['subject']) {
-            return new \WP_Error('form_config_error', 'Form is not configured correctly', ['status' => 500]);
+            return new \WP_Error('form_config_error', __( 'Form is not configured correctly', 'mksddn-forms-handler' ), ['status' => 500]);
         }
 
         // Cache the configuration
@@ -445,22 +447,22 @@ class FormsHandler {
      */
     private function validate_form_data(\WP_Error|array $form_data, $fields_config): \WP_Error|true {
         if (!$fields_config) {
-            return new \WP_Error('validation_error', 'Form fields configuration is missing', ['status' => 400]);
+            return new \WP_Error('validation_error', __( 'Form fields configuration is missing', 'mksddn-forms-handler' ), ['status' => 400]);
         }
 
         $fields = json_decode((string)$fields_config, true);
         if (!$fields || !is_array($fields)) {
-            return new \WP_Error('validation_error', 'Invalid form fields configuration', ['status' => 400]);
+            return new \WP_Error('validation_error', __( 'Invalid form fields configuration', 'mksddn-forms-handler' ), ['status' => 400]);
         }
 
         // Check if there's at least one field
         if ($fields === []) {
-            return new \WP_Error('validation_error', 'No fields configured for this form', ['status' => 400]);
+            return new \WP_Error('validation_error', __( 'No fields configured for this form', 'mksddn-forms-handler' ), ['status' => 400]);
         }
 
         // Check if there's any data
         if (empty($form_data)) {
-            return new \WP_Error('validation_error', 'No form data provided', ['status' => 400]);
+            return new \WP_Error('validation_error', __( 'No form data provided', 'mksddn-forms-handler' ), ['status' => 400]);
         }
 
         foreach ($fields as $field) {
@@ -473,23 +475,23 @@ class FormsHandler {
             if ($is_required) {
                 if ($field_type === 'checkbox') {
                     if (!isset($form_data[$field_name]) || $form_data[$field_name] != '1') {
-                        return new \WP_Error('validation_error', sprintf("Field '%s' is required for agreement", $field_label), ['status' => 400]);
+                        return new \WP_Error('validation_error', sprintf( /* translators: %s: field label */ __( "Field '%s' is required for agreement", 'mksddn-forms-handler' ), $field_label), ['status' => 400]);
                     }
                 } elseif (!isset($form_data[$field_name]) || $form_data[$field_name] === '' || $form_data[$field_name] === null) {
-                    return new \WP_Error('validation_error', sprintf("Field '%s' is required", $field_label), ['status' => 400]);
+                    return new \WP_Error('validation_error', sprintf( /* translators: %s: field label */ __( "Field '%s' is required", 'mksddn-forms-handler' ), $field_label), ['status' => 400]);
                 }
             }
 
             // Check email
             if ($field_type === 'email' && isset($form_data[$field_name]) && !empty($form_data[$field_name]) && !is_email($form_data[$field_name])) {
-                return new \WP_Error('validation_error', sprintf("Field '%s' must contain a valid email address", $field_label), ['status' => 400]);
+                return new \WP_Error('validation_error', sprintf( /* translators: %s: field label */ __( "Field '%s' must contain a valid email address", 'mksddn-forms-handler' ), $field_label), ['status' => 400]);
             }
 
             // Check field length
             if (isset($form_data[$field_name]) && !empty($form_data[$field_name]) && $field_type !== 'checkbox') {
                 $value_length = strlen((string)$form_data[$field_name]);
                 if ($value_length > 10000) {
-                    return new \WP_Error('validation_error', sprintf("Field '%s' is too long (maximum 10,000 characters)", $field_label), ['status' => 400]);
+                    return new \WP_Error('validation_error', sprintf( /* translators: %s: field label */ __( "Field '%s' is too long (maximum 10,000 characters)", 'mksddn-forms-handler' ), $field_label), ['status' => 400]);
                 }
             }
         }

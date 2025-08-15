@@ -31,7 +31,7 @@ class Shortcodes {
 
         $form_id = $atts['id'] ?: $atts['slug'];
         if (!$form_id) {
-            return '<p>Error: form ID or slug not specified</p>';
+            return '<p>' . esc_html__( 'Error: form ID or slug not specified', 'mksddn-forms-handler' ) . '</p>';
         }
 
         // Get form
@@ -41,7 +41,7 @@ class Shortcodes {
         }
 
         if (!$form || $form->post_type !== 'forms') {
-            return '<p>Form not found</p>';
+            return '<p>' . esc_html__( 'Form not found', 'mksddn-forms-handler' ) . '</p>';
         }
 
         $fields_config = get_post_meta($form->ID, '_fields_config', true);
@@ -91,7 +91,7 @@ class Shortcodes {
                 <?php endforeach; ?>
                 
                 <div class="form-submit">
-                    <button type="submit" class="submit-button">Send</button>
+                    <button type="submit" class="submit-button"><?php echo esc_html__( 'Send', 'mksddn-forms-handler' ); ?></button>
                 </div>
             </form>
             
@@ -107,7 +107,7 @@ class Shortcodes {
                 var $message = $form.siblings('.form-message');
                 var $submitButton = $form.find('.submit-button');
                 
-                $submitButton.prop('disabled', true).text('Sending...');
+                $submitButton.prop('disabled', true).text('<?php echo esc_js( __( 'Sending...', 'mksddn-forms-handler' ) ); ?>');
                 $message.hide();
                 
                 $.ajax({
@@ -203,10 +203,10 @@ class Shortcodes {
                         }
                     },
                     error: function() {
-                        $message.removeClass('success').addClass('error').html('An error occurred while sending the form').show();
+                        $message.removeClass('success').addClass('error').html('<?php echo esc_js( __( 'An error occurred while sending the form', 'mksddn-forms-handler' ) ); ?>').show();
                     },
                     complete: function() {
-                        $submitButton.prop('disabled', false).text('Send');
+                        $submitButton.prop('disabled', false).text('<?php echo esc_js( __( 'Send', 'mksddn-forms-handler' ) ); ?>');
                     }
                 });
             });

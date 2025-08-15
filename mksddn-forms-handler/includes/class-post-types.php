@@ -23,9 +23,6 @@ class PostTypes {
     public function register_post_types(): void {
         $this->register_forms_post_type();
         $this->register_submissions_post_type();
-        
-        // Flush rewrite rules for REST API
-        flush_rewrite_rules();
     }
     
     /**
@@ -36,17 +33,17 @@ class PostTypes {
             'forms',
             [
                 'labels'              => [
-                    'name'               => 'Forms',
-                    'singular_name'      => 'Form',
-                    'menu_name'          => 'Forms',
-                    'add_new'            => 'Add Form',
-                    'add_new_item'       => 'Add New Form',
-                    'edit_item'          => 'Edit Form',
-                    'new_item'           => 'New Form',
-                    'view_item'          => 'View Form',
-                    'search_items'       => 'Search Forms',
-                    'not_found'          => 'No forms found',
-                    'not_found_in_trash' => 'No forms found in trash',
+                    'name'               => __( 'Forms', 'mksddn-forms-handler' ),
+                    'singular_name'      => __( 'Form', 'mksddn-forms-handler' ),
+                    'menu_name'          => __( 'Forms', 'mksddn-forms-handler' ),
+                    'add_new'            => __( 'Add Form', 'mksddn-forms-handler' ),
+                    'add_new_item'       => __( 'Add New Form', 'mksddn-forms-handler' ),
+                    'edit_item'          => __( 'Edit Form', 'mksddn-forms-handler' ),
+                    'new_item'           => __( 'New Form', 'mksddn-forms-handler' ),
+                    'view_item'          => __( 'View Form', 'mksddn-forms-handler' ),
+                    'search_items'       => __( 'Search Forms', 'mksddn-forms-handler' ),
+                    'not_found'          => __( 'No forms found', 'mksddn-forms-handler' ),
+                    'not_found_in_trash' => __( 'No forms found in trash', 'mksddn-forms-handler' ),
                 ],
                 'public'              => true,
                 'show_ui'             => true,
@@ -86,17 +83,17 @@ class PostTypes {
             'form_submissions',
             [
                 'labels'              => [
-                    'name'               => 'Form Submissions',
-                    'singular_name'      => 'Submission',
-                    'menu_name'          => 'Submissions',
-                    'add_new'            => 'Add Submission',
-                    'add_new_item'       => 'Add New Submission',
-                    'edit_item'          => 'Edit Submission',
-                    'new_item'           => 'New Submission',
-                    'view_item'          => 'View Submission',
-                    'search_items'       => 'Search Submissions',
-                    'not_found'          => 'No submissions found',
-                    'not_found_in_trash' => 'No submissions found in trash',
+                    'name'               => __( 'Form Submissions', 'mksddn-forms-handler' ),
+                    'singular_name'      => __( 'Submission', 'mksddn-forms-handler' ),
+                    'menu_name'          => __( 'Submissions', 'mksddn-forms-handler' ),
+                    'add_new'            => __( 'Add Submission', 'mksddn-forms-handler' ),
+                    'add_new_item'       => __( 'Add New Submission', 'mksddn-forms-handler' ),
+                    'edit_item'          => __( 'Edit Submission', 'mksddn-forms-handler' ),
+                    'new_item'           => __( 'New Submission', 'mksddn-forms-handler' ),
+                    'view_item'          => __( 'View Submission', 'mksddn-forms-handler' ),
+                    'search_items'       => __( 'Search Submissions', 'mksddn-forms-handler' ),
+                    'not_found'          => __( 'No submissions found', 'mksddn-forms-handler' ),
+                    'not_found_in_trash' => __( 'No submissions found in trash', 'mksddn-forms-handler' ),
                 ],
                 'public'              => false,
                 'show_ui'             => true,

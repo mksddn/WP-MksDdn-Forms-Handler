@@ -25,7 +25,7 @@ class MetaBoxes {
     public function add_forms_meta_boxes(): void {
         add_meta_box(
             'form_settings',
-            'Form Settings',
+            __( 'Form Settings', 'mksddn-forms-handler' ),
             [$this, 'render_form_settings_meta_box'],
             'forms',
             'normal',
@@ -39,7 +39,7 @@ class MetaBoxes {
     public function add_submissions_meta_boxes(): void {
         add_meta_box(
             'submission_data',
-            'Submission Data',
+            __( 'Submission Data', 'mksddn-forms-handler' ),
             [$this, 'render_submission_data_meta_box'],
             'form_submissions',
             'normal',
@@ -48,7 +48,7 @@ class MetaBoxes {
 
         add_meta_box(
             'submission_info',
-            'Submission Info',
+            __( 'Submission Info', 'mksddn-forms-handler' ),
             [$this, 'render_submission_info_meta_box'],
             'form_submissions',
             'side',
@@ -107,7 +107,7 @@ class MetaBoxes {
 
         // Show error notification if invalid JSON
         if ($json_error) {
-            echo '<div class="notice notice-error"><p>Error: Invalid JSON in Fields Configuration! Check syntax.</p></div>';
+            echo '<div class="notice notice-error"><p>' . esc_html__( 'Error: Invalid JSON in Fields Configuration! Check syntax.', 'mksddn-forms-handler' ) . '</p></div>';
             delete_transient('fields_config_json_error_' . get_current_user_id());
             delete_transient('fields_config_json_value_' . get_current_user_id());
         }
@@ -123,7 +123,7 @@ class MetaBoxes {
         $data_array = json_decode($submission_data, true);
 
         if (!$data_array) {
-            echo '<p>No data available</p>';
+            echo '<p>' . esc_html__( 'No data available', 'mksddn-forms-handler' ) . '</p>';
             return;
         }
 
@@ -147,10 +147,10 @@ class MetaBoxes {
         $user_agent = get_post_meta($post->ID, '_submission_user_agent', true);
 
         echo '<table class="form-table">';
-        echo '<tr><th>Form:</th><td>' . esc_html($form_title ?: 'Unknown') . '</td></tr>';
-        echo '<tr><th>Date:</th><td>' . esc_html($submission_date ? date('d.m.Y H:i:s', strtotime($submission_date)) : 'Unknown') . '</td></tr>';
-        echo '<tr><th>IP Address:</th><td>' . esc_html($submission_ip ?: 'Unknown') . '</td></tr>';
-        echo '<tr><th>User Agent:</th><td>' . esc_html($user_agent ?: 'Unknown') . '</td></tr>';
+        echo '<tr><th>' . esc_html__( 'Form:', 'mksddn-forms-handler' ) . '</th><td>' . esc_html($form_title ?: __( 'Unknown', 'mksddn-forms-handler' )) . '</td></tr>';
+        echo '<tr><th>' . esc_html__( 'Date:', 'mksddn-forms-handler' ) . '</th><td>' . esc_html($submission_date ? date('d.m.Y H:i:s', strtotime($submission_date)) : __( 'Unknown', 'mksddn-forms-handler' )) . '</td></tr>';
+        echo '<tr><th>' . esc_html__( 'IP Address:', 'mksddn-forms-handler' ) . '</th><td>' . esc_html($submission_ip ?: __( 'Unknown', 'mksddn-forms-handler' )) . '</td></tr>';
+        echo '<tr><th>' . esc_html__( 'User Agent:', 'mksddn-forms-handler' ) . '</th><td>' . esc_html($user_agent ?: __( 'Unknown', 'mksddn-forms-handler' )) . '</td></tr>';
         echo '</table>';
     }
     

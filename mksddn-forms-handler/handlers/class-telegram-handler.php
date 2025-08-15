@@ -8,6 +8,9 @@
 
 namespace MksDdn\FormsHandler;
 
+if (!defined('ABSPATH')) {
+    exit;
+}
 /**
  * Handles Telegram notifications
  */
@@ -18,7 +21,7 @@ class TelegramHandler {
      */
     public static function send_message($bot_token, $chat_ids, $form_data, $form_title): \WP_Error|true {
         if (!$bot_token || !$chat_ids) {
-            return new \WP_Error('telegram_config_error', 'Telegram bot token or chat IDs not configured');
+            return new \WP_Error('telegram_config_error', __( 'Telegram bot token or chat IDs not configured', 'mksddn-forms-handler' ));
         }
 
         $chat_ids_array = array_map('trim', explode(',', $chat_ids));
@@ -42,7 +45,7 @@ class TelegramHandler {
         }
 
         if ($success_count === 0) {
-            return new \WP_Error('telegram_send_error', 'Failed to send to any Telegram chat: ' . implode(', ', $error_messages));
+            return new \WP_Error('telegram_send_error', __( 'Failed to send to any Telegram chat:', 'mksddn-forms-handler' ) . ' ' . implode(', ', $error_messages));
         }
 
         return true;

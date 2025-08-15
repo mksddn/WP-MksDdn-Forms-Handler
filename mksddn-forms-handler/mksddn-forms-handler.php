@@ -5,12 +5,13 @@
  * Description: Advanced form processing system with REST API support, Telegram notifications, and Google Sheets integration. Create and manage forms with multiple delivery methods including email, Telegram, Google Sheets, and admin storage.
  * Version: 1.0.0
  * Requires at least: 5.0
- * Requires PHP: 7.4
+ * Requires PHP: 8.0
  * Author: mksddn
  * Author URI: https://github.com/mksddn
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: mksddn-forms-handler
+ * Domain Path: /languages
  * 
  * @package MksDdnFormsHandler
  * @version 1.0.0
@@ -47,6 +48,9 @@ require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/handlers/class-google-sheets-ha
 
 // Initialize plugin
 add_action('plugins_loaded', function() {
+    // Load plugin textdomain for translations
+    load_plugin_textdomain('mksddn-forms-handler', false, dirname(MKSDDN_FORMS_HANDLER_PLUGIN_BASENAME) . '/languages');
+
     new MksDdn\FormsHandler\PostTypes();
     new MksDdn\FormsHandler\MetaBoxes();
     new MksDdn\FormsHandler\FormsHandler();
@@ -56,6 +60,16 @@ add_action('plugins_loaded', function() {
     new MksDdn\FormsHandler\Security();
     new MksDdn\FormsHandler\GoogleSheetsAdmin();
     
-    // Create default form on theme activation
-    add_action('after_switch_theme', 'MksDdn\FormsHandler\Utilities::create_default_contact_form');
+    // Nothing else here
+});
+
+// Run tasks on plugin activation
+register_activation_hook(MKSDDN_FORMS_HANDLER_PLUGIN_FILE, function () {
+    // Register post types so rewrite rules are aware of them, then flush
+    $post_types = new MksDdn\FormsHandler\PostTypes();
+    $post_types->register_post_types();
+    flush_rewrite_rules();
+
+    // Create a default contact form
+    MksDdn\FormsHandler\Utilities::create_default_contact_form();
 });
