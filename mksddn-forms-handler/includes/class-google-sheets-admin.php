@@ -63,15 +63,15 @@ class GoogleSheetsAdmin {
 
                     if (isset($result['refresh_token'])) {
                         update_option('google_sheets_refresh_token', $result['refresh_token']);
-                        wp_redirect(admin_url('options-general.php?page=google-sheets-settings&success=1'));
+                        wp_redirect( esc_url_raw( admin_url('options-general.php?page=google-sheets-settings&success=1') ) );
                         exit;
                     }
 
-                    wp_redirect(admin_url('options-general.php?page=google-sheets-settings&error=1'));
+                    wp_redirect( esc_url_raw( admin_url('options-general.php?page=google-sheets-settings&error=1') ) );
                     exit;
                 }
 
-                wp_redirect(admin_url('options-general.php?page=google-sheets-settings&error=1'));
+                wp_redirect( esc_url_raw( admin_url('options-general.php?page=google-sheets-settings&error=1') ) );
                 exit;
             }
         }
@@ -90,14 +90,14 @@ class GoogleSheetsAdmin {
                 update_option('google_sheets_client_secret', sanitize_text_field($_POST['google_sheets_client_secret']));
             }
 
-            wp_redirect(admin_url('options-general.php?page=google-sheets-settings&saved=1'));
+            wp_redirect( esc_url_raw( admin_url('options-general.php?page=google-sheets-settings&saved=1') ) );
             exit;
         }
 
         // Handle authentication revocation
         if (isset($_POST['revoke_auth_nonce']) && wp_verify_nonce($_POST['revoke_auth_nonce'], 'revoke_google_sheets_auth')) {
             delete_option('google_sheets_refresh_token');
-            wp_redirect(admin_url('options-general.php?page=google-sheets-settings&revoked=1'));
+            wp_redirect( esc_url_raw( admin_url('options-general.php?page=google-sheets-settings&revoked=1') ) );
             exit;
         }
 
@@ -107,7 +107,7 @@ class GoogleSheetsAdmin {
             delete_option('google_sheets_client_secret');
             delete_option('google_sheets_refresh_token');
 
-            wp_redirect(admin_url('options-general.php?page=google-sheets-settings&cleared=1'));
+            wp_redirect( esc_url_raw( admin_url('options-general.php?page=google-sheets-settings&cleared=1') ) );
             exit;
         }
     }
@@ -126,16 +126,16 @@ class GoogleSheetsAdmin {
 
         $spreadsheet_id = sanitize_text_field($_POST['spreadsheet_id'] ?? '');
         if (!$spreadsheet_id) {
-            wp_redirect(admin_url('options-general.php?page=google-sheets-settings&error=no_spreadsheet_id'));
+            wp_redirect( esc_url_raw( admin_url('options-general.php?page=google-sheets-settings&error=no_spreadsheet_id') ) );
             exit;
         }
 
         $result = GoogleSheetsHandler::test_connection($spreadsheet_id);
 
         if ($result['success']) {
-            wp_redirect(admin_url('options-general.php?page=google-sheets-settings&test_success=1&details=' . urlencode(json_encode($result['details']))));
+            wp_redirect( esc_url_raw( admin_url('options-general.php?page=google-sheets-settings&test_success=1&details=' . urlencode(json_encode($result['details']))) ) );
         } else {
-            wp_redirect(admin_url('options-general.php?page=google-sheets-settings&test_error=' . urlencode($result['message'])));
+            wp_redirect( esc_url_raw( admin_url('options-general.php?page=google-sheets-settings&test_error=' . urlencode($result['message'])) ) );
         }
         exit;
     }
@@ -225,7 +225,7 @@ class GoogleSheetsAdmin {
                             <li>Go to "APIs &amp; Services" → "Credentials"</li>
                             <li>Click "Create Credentials" → "OAuth 2.0 Client IDs"</li>
                             <li>Choose "Web application"</li>
-                            <li>Add authorized redirect URI: <code><?php echo admin_url('options-general.php?page=google-sheets-settings'); ?></code></li>
+                            <li>Add authorized redirect URI: <code><?php echo esc_html( admin_url('options-general.php?page=google-sheets-settings') ); ?></code></li>
                             <li><strong>Important:</strong> Make sure this exact URL is added to your Google Cloud Console OAuth credentials</li>
                             <li>Save Client ID and Client Secret</li>
                         </ul>
@@ -268,7 +268,7 @@ class GoogleSheetsAdmin {
                 <?php if ($refresh_token) : ?>
                     <div class="notice notice-success">
                         <p>✅ <strong>Authenticated!</strong> Google Sheets integration is ready to use.</p>
-                        <p>Refresh Token: <code><?php echo substr($refresh_token, 0, 20) . '...'; ?></code></p>
+                        <p>Refresh Token: <code><?php echo esc_html( substr($refresh_token, 0, 20) . '...' ); ?></code></p>
                     </div>
                     
                     <div style="margin-top: 15px; padding: 15px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px;">
@@ -286,7 +286,7 @@ class GoogleSheetsAdmin {
                     </div>
                 <?php elseif ($client_id && $client_secret) : ?>
                     <p>Click the button below to authorize access to Google Sheets:</p>
-                    <a href="<?php echo GoogleSheetsHandler::get_auth_url(); ?>" class="button button-primary">
+                    <a href="<?php echo esc_url( \MksDdn\FormsHandler\GoogleSheetsHandler::get_auth_url() ); ?>" class="button button-primary">
                         🔐 Authorize Google Sheets Access
                     </a>
                 <?php else : ?>
@@ -336,7 +336,7 @@ class GoogleSheetsAdmin {
                             method: 'POST',
                             data: {
                                 action: 'test_google_sheets_connection',
-                                nonce: '<?php echo wp_create_nonce('test_sheets_nonce'); ?>',
+                                nonce: '<?php echo esc_js( wp_create_nonce('test_sheets_nonce') ); ?>',
                                 spreadsheet_id: spreadsheetId // Pass spreadsheet_id to AJAX
                             },
                             success: function(response) {

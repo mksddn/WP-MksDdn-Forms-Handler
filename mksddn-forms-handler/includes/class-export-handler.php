@@ -97,7 +97,11 @@ class ExportHandler {
         $submissions = $this->get_submissions_for_export($form_filter, $date_from, $date_to);
 
         if (empty($submissions)) {
-            fclose($output);
+            // Close output stream before exiting
+            if (is_resource($output)) {
+                // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
+                fclose($output);
+            }
             wp_die( esc_html__( 'No submissions found for the selected form and criteria.', 'mksddn-forms-handler' ) );
         }
 
@@ -108,7 +112,10 @@ class ExportHandler {
         // Write data in batches for better performance
         $this->write_csv_data($output, $submissions, $headers);
 
-        fclose($output);
+        if (is_resource($output)) {
+            // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
+            fclose($output);
+        }
         exit;
     }
     
@@ -278,11 +285,11 @@ class ExportHandler {
                 <?php foreach ($forms as $form) : ?>
                     <div class="form-export-card" style="border: 1px solid #ddd; padding: 20px; border-radius: 5px; background: #fff;">
                         <h3><?php echo esc_html($form->post_title); ?></h3>
-                        <p><strong>Submissions:</strong> <?php echo $form_stats[$form->ID]; ?></p>
+                        <p><strong><?php echo esc_html__( 'Submissions:', 'mksddn-forms-handler' ); ?></strong> <?php echo intval($form_stats[$form->ID]); ?></p>
                         <p><strong>Slug:</strong> <code><?php echo esc_html($form->post_name); ?></code></p>
                         
                         <div style="margin-top: 15px;">
-                            <a href="<?php echo admin_url('admin-post.php?action=export_submissions_csv&form_filter=' . $form->ID . '&export_nonce=' . wp_create_nonce('export_submissions_csv')); ?>" 
+                            <a href="<?php echo esc_url( admin_url('admin-post.php?action=export_submissions_csv&form_filter=' . $form->ID . '&export_nonce=' . wp_create_nonce('export_submissions_csv')) ); ?>" 
                                 class="button button-primary" 
                                 target="_blank"
                                 style="margin-right: 10px;">
@@ -291,7 +298,7 @@ class ExportHandler {
                             
                             <button type="button" 
                                     class="button button-secondary export-with-filters" 
-                                    data-form-id="<?php echo $form->ID; ?>"
+                                    data-form-id="<?php echo intval($form->ID); ?>"
                                     data-form-name="<?php echo esc_attr($form->post_title); ?>">
                                 Export by Date
                             </button>
@@ -305,9 +312,9 @@ class ExportHandler {
                 <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 5px; min-width: 400px;">
                     <h2 id="modal-title">Export by Date</h2>
                     
-                    <form id="export-filters-form" method="post" action="<?php echo admin_url('admin-post.php'); ?>" target="_blank">
+                    <form id="export-filters-form" method="post" action="<?php echo esc_url( admin_url('admin-post.php') ); ?>" target="_blank">
                         <input type="hidden" name="action" value="export_submissions_csv">
-                        <input type="hidden" name="export_nonce" value="<?php echo wp_create_nonce('export_submissions_csv'); ?>">
+                        <input type="hidden" name="export_nonce" value="<?php echo esc_attr( wp_create_nonce('export_submissions_csv') ); ?>">
                         <input type="hidden" name="form_filter" id="modal-form-filter">
                         
                         <table class="form-table">

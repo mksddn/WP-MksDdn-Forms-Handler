@@ -48,9 +48,6 @@ require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/handlers/class-google-sheets-ha
 
 // Initialize plugin
 add_action('plugins_loaded', function() {
-    // Load plugin textdomain for translations
-    load_plugin_textdomain('mksddn-forms-handler', false, dirname(MKSDDN_FORMS_HANDLER_PLUGIN_BASENAME) . '/languages');
-
     new MksDdn\FormsHandler\PostTypes();
     new MksDdn\FormsHandler\MetaBoxes();
     new MksDdn\FormsHandler\FormsHandler();

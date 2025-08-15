@@ -113,11 +113,11 @@ class FormsHandler {
      */
     public function handle_form_submission(): void {
         // Check nonce for security
-        if (!isset($_POST['form_nonce']) || !wp_verify_nonce($_POST['form_nonce'], 'submit_form_nonce')) {
+        if (!isset($_POST['form_nonce']) || !wp_verify_nonce( wp_unslash($_POST['form_nonce']), 'submit_form_nonce')) {
             wp_die('Security check failed');
         }
 
-        $form_id = sanitize_text_field($_POST['form_id'] ?? '');
+        $form_id = isset($_POST['form_id']) ? sanitize_text_field( wp_unslash($_POST['form_id']) ) : '';
 
         // Collect posted fields excluding service fields
         $raw_post = wp_unslash($_POST);
@@ -423,8 +423,8 @@ class FormsHandler {
         if ($unauthorized_fields !== []) {
             $log_entry = [
                 'timestamp'               => current_time('mysql'),
-                'ip'                      => $_SERVER['REMOTE_ADDR'] ?? 'unknown',
-                'user_agent'              => $_SERVER['HTTP_USER_AGENT'] ?? 'unknown',
+                'ip'                      => sanitize_text_field( wp_unslash($_SERVER['REMOTE_ADDR'] ?? 'unknown') ),
+                'user_agent'              => sanitize_text_field( wp_unslash($_SERVER['HTTP_USER_AGENT'] ?? 'unknown') ),
                 'unauthorized_fields'     => $unauthorized_fields,
                 'total_fields_submitted'  => count($form_data),
                 'authorized_fields_count' => count($filtered_data),
@@ -564,7 +564,7 @@ class FormsHandler {
             'form_id'   => $form_id,
             'success'   => $success,
             'timestamp' => current_time('mysql'),
-            'ip'        => $_SERVER['REMOTE_ADDR'] ?? 'unknown',
+            'ip'        => sanitize_text_field( wp_unslash($_SERVER['REMOTE_ADDR'] ?? 'unknown') ),
         ];
 
         error_log('Form submission: ' . json_encode($log_entry));
@@ -602,8 +602,8 @@ class FormsHandler {
         update_post_meta($submission_id, '_form_title', $form_title);
         update_post_meta($submission_id, '_submission_data', json_encode($form_data));
         update_post_meta($submission_id, '_submission_date', current_time('mysql'));
-        update_post_meta($submission_id, '_submission_ip', $_SERVER['REMOTE_ADDR'] ?? 'unknown');
-        update_post_meta($submission_id, '_submission_user_agent', $_SERVER['HTTP_USER_AGENT'] ?? 'unknown');
+        update_post_meta($submission_id, '_submission_ip', sanitize_text_field( wp_unslash($_SERVER['REMOTE_ADDR'] ?? 'unknown') ) );
+        update_post_meta($submission_id, '_submission_user_agent', sanitize_text_field( wp_unslash($_SERVER['HTTP_USER_AGENT'] ?? 'unknown') ) );
 
         return $submission_id;
     }

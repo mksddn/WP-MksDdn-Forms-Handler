@@ -166,7 +166,7 @@ class AdminColumns {
                 if ($form_id) {
                     $form = get_post($form_id);
                     if ($form) {
-                        echo '<a href="' . get_edit_post_link($form_id) . '">' . esc_html($form->post_title) . '</a>';
+                        echo '<a href="' . esc_url( get_edit_post_link($form_id) ) . '">' . esc_html($form->post_title) . '</a>';
                     } else {
                         echo '<span style="color: #999;">' . esc_html__( 'Form deleted', 'mksddn-forms-handler' ) . '</span>';
                     }
@@ -191,7 +191,7 @@ class AdminColumns {
                         $preview[] = '<strong>' . esc_html($key) . ':</strong> ' . esc_html(substr((string)$value, 0, 50));
                         $count++;
                     }
-                    echo implode('<br>', $preview);
+                    echo wp_kses_post( implode('<br>', $preview) );
                     if (count($form_data) > 3) {
                         echo '<br><small style="color: #666;">+' . (count($form_data) - 3) . ' more fields</small>';
                     }
@@ -210,7 +210,7 @@ class AdminColumns {
                             $statuses[] = '<span style="color: ' . $color . ';">' . ucfirst($method) . ': ' . $status . '</span>';
                         }
                     }
-                    echo implode('<br>', $statuses);
+                    echo wp_kses_post( implode('<br>', $statuses) );
                 } else {
                     echo '<span style="color: #999;">' . esc_html__( 'Unknown', 'mksddn-forms-handler' ) . '</span>';
                 }

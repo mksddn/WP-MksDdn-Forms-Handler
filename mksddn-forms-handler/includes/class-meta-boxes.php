@@ -148,7 +148,8 @@ class MetaBoxes {
 
         echo '<table class="form-table">';
         echo '<tr><th>' . esc_html__( 'Form:', 'mksddn-forms-handler' ) . '</th><td>' . esc_html($form_title ?: __( 'Unknown', 'mksddn-forms-handler' )) . '</td></tr>';
-        echo '<tr><th>' . esc_html__( 'Date:', 'mksddn-forms-handler' ) . '</th><td>' . esc_html($submission_date ? date('d.m.Y H:i:s', strtotime($submission_date)) : __( 'Unknown', 'mksddn-forms-handler' )) . '</td></tr>';
+        $date_display = $submission_date ? wp_date('d.m.Y H:i:s', strtotime($submission_date)) : __( 'Unknown', 'mksddn-forms-handler' );
+        echo '<tr><th>' . esc_html__( 'Date:', 'mksddn-forms-handler' ) . '</th><td>' . esc_html($date_display) . '</td></tr>';
         echo '<tr><th>' . esc_html__( 'IP Address:', 'mksddn-forms-handler' ) . '</th><td>' . esc_html($submission_ip ?: __( 'Unknown', 'mksddn-forms-handler' )) . '</td></tr>';
         echo '<tr><th>' . esc_html__( 'User Agent:', 'mksddn-forms-handler' ) . '</th><td>' . esc_html($user_agent ?: __( 'Unknown', 'mksddn-forms-handler' )) . '</td></tr>';
         echo '</table>';
