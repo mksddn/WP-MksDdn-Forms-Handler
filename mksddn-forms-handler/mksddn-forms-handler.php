@@ -11,8 +11,6 @@
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: mksddn-forms-handler
- * Domain Path: /languages
- * Network: false
  * 
  * @package MksDdnFormsHandler
  * @version 1.0.0
