@@ -429,7 +429,12 @@ class FormsHandler {
                 'total_fields_submitted'  => count($form_data),
                 'authorized_fields_count' => count($filtered_data),
             ];
-            error_log('Form security warning - unauthorized fields attempted: ' . json_encode($log_entry));
+            /**
+             * Fires when unauthorized fields are submitted to a form.
+             *
+             * @param array $log_entry Details about the attempt
+             */
+            do_action('mksddn_forms_handler_log_security', $log_entry);
 
             // Return error if unauthorized fields present
             return new \WP_Error(
@@ -567,7 +572,12 @@ class FormsHandler {
             'ip'        => sanitize_text_field( wp_unslash($_SERVER['REMOTE_ADDR'] ?? 'unknown') ),
         ];
 
-        error_log('Form submission: ' . json_encode($log_entry));
+        /**
+         * Fires when a form submission is processed (for logging purposes).
+         *
+         * @param array $log_entry Submission log entry
+         */
+        do_action('mksddn_forms_handler_log_submission', $log_entry);
     }
     
     /**

@@ -59,15 +59,15 @@ class ExportHandler {
         }
 
         // Check nonce (for POST and GET requests)
-        $nonce = $_POST['export_nonce'] ?? $_GET['export_nonce'] ?? '';
+        $nonce = isset($_POST['export_nonce']) ? wp_unslash($_POST['export_nonce']) : (isset($_GET['export_nonce']) ? wp_unslash($_GET['export_nonce']) : '');
         if (!$nonce || !wp_verify_nonce($nonce, 'export_submissions_csv')) {
             wp_die( esc_html__( 'Security check failed', 'mksddn-forms-handler' ) );
         }
 
         // Get filter parameters (from POST or GET)
-        $form_filter = isset($_POST['form_filter']) ? intval($_POST['form_filter']) : (isset($_GET['form_filter']) ? intval($_GET['form_filter']) : 0);
-        $date_from = isset($_POST['date_from']) ? sanitize_text_field($_POST['date_from']) : (isset($_GET['date_from']) ? sanitize_text_field($_GET['date_from']) : '');
-        $date_to = isset($_POST['date_to']) ? sanitize_text_field($_POST['date_to']) : (isset($_GET['date_to']) ? sanitize_text_field($_GET['date_to']) : '');
+        $form_filter = isset($_POST['form_filter']) ? intval( wp_unslash($_POST['form_filter']) ) : (isset($_GET['form_filter']) ? intval( wp_unslash($_GET['form_filter']) ) : 0);
+        $date_from = isset($_POST['date_from']) ? sanitize_text_field( wp_unslash($_POST['date_from']) ) : (isset($_GET['date_from']) ? sanitize_text_field( wp_unslash($_GET['date_from']) ) : '');
+        $date_to = isset($_POST['date_to']) ? sanitize_text_field( wp_unslash($_POST['date_to']) ) : (isset($_GET['date_to']) ? sanitize_text_field( wp_unslash($_GET['date_to']) ) : '');
 
         // Check if form is selected
         if ($form_filter === 0) {

@@ -39,7 +39,7 @@ class GoogleSheetsAdmin {
      */
     public function handle_oauth_callback(): void {
         if (isset($_GET['page']) && $_GET['page'] === 'google-sheets-settings' && isset($_GET['code'])) {
-            $code = sanitize_text_field($_GET['code']);
+            $code = sanitize_text_field( wp_unslash($_GET['code']) );
             $client_id = get_option('google_sheets_client_id');
             $client_secret = get_option('google_sheets_client_secret');
 
@@ -81,13 +81,13 @@ class GoogleSheetsAdmin {
      * Save settings
      */
     public function save_settings(): void {
-        if (isset($_POST['google_sheets_settings_nonce']) && wp_verify_nonce($_POST['google_sheets_settings_nonce'], 'save_google_sheets_settings')) {
+        if (isset($_POST['google_sheets_settings_nonce']) && wp_verify_nonce( wp_unslash($_POST['google_sheets_settings_nonce']), 'save_google_sheets_settings')) {
             if (isset($_POST['google_sheets_client_id'])) {
-                update_option('google_sheets_client_id', sanitize_text_field($_POST['google_sheets_client_id']));
+                update_option('google_sheets_client_id', sanitize_text_field( wp_unslash($_POST['google_sheets_client_id']) ));
             }
 
             if (isset($_POST['google_sheets_client_secret'])) {
-                update_option('google_sheets_client_secret', sanitize_text_field($_POST['google_sheets_client_secret']));
+                update_option('google_sheets_client_secret', sanitize_text_field( wp_unslash($_POST['google_sheets_client_secret']) ));
             }
 
             wp_redirect( esc_url_raw( admin_url('options-general.php?page=google-sheets-settings&saved=1') ) );
@@ -95,14 +95,14 @@ class GoogleSheetsAdmin {
         }
 
         // Handle authentication revocation
-        if (isset($_POST['revoke_auth_nonce']) && wp_verify_nonce($_POST['revoke_auth_nonce'], 'revoke_google_sheets_auth')) {
+        if (isset($_POST['revoke_auth_nonce']) && wp_verify_nonce( wp_unslash($_POST['revoke_auth_nonce']), 'revoke_google_sheets_auth')) {
             delete_option('google_sheets_refresh_token');
             wp_redirect( esc_url_raw( admin_url('options-general.php?page=google-sheets-settings&revoked=1') ) );
             exit;
         }
 
         // Handle full settings clearing
-        if (isset($_POST['clear_all_nonce']) && wp_verify_nonce($_POST['clear_all_nonce'], 'clear_google_sheets_all')) {
+        if (isset($_POST['clear_all_nonce']) && wp_verify_nonce( wp_unslash($_POST['clear_all_nonce']), 'clear_google_sheets_all')) {
             delete_option('google_sheets_client_id');
             delete_option('google_sheets_client_secret');
             delete_option('google_sheets_refresh_token');
@@ -120,11 +120,11 @@ class GoogleSheetsAdmin {
             wp_die('Access denied');
         }
 
-        if (!isset($_POST['test_connection_nonce']) || !wp_verify_nonce($_POST['test_connection_nonce'], 'test_google_sheets_connection')) {
+        if (!isset($_POST['test_connection_nonce']) || !wp_verify_nonce( wp_unslash($_POST['test_connection_nonce']), 'test_google_sheets_connection')) {
             wp_die('Security check failed');
         }
 
-        $spreadsheet_id = sanitize_text_field($_POST['spreadsheet_id'] ?? '');
+        $spreadsheet_id = isset($_POST['spreadsheet_id']) ? sanitize_text_field( wp_unslash($_POST['spreadsheet_id']) ) : '';
         if (!$spreadsheet_id) {
             wp_redirect( esc_url_raw( admin_url('options-general.php?page=google-sheets-settings&error=no_spreadsheet_id') ) );
             exit;
@@ -148,11 +148,11 @@ class GoogleSheetsAdmin {
             wp_die('Access denied');
         }
 
-        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'test_sheets_nonce')) {
+        if (!isset($_POST['nonce']) || !wp_verify_nonce( wp_unslash($_POST['nonce']), 'test_sheets_nonce')) {
             wp_die('Security check failed');
         }
 
-        $spreadsheet_id = sanitize_text_field($_POST['spreadsheet_id'] ?? '');
+        $spreadsheet_id = isset($_POST['spreadsheet_id']) ? sanitize_text_field( wp_unslash($_POST['spreadsheet_id']) ) : '';
         if (!$spreadsheet_id) {
             wp_send_json_error('Spreadsheet ID is required.');
         }

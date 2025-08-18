@@ -159,7 +159,7 @@ class MetaBoxes {
      * Save form settings
      */
     public function save_form_settings($post_id): void {
-        if (!isset($_POST['form_settings_nonce']) || !wp_verify_nonce($_POST['form_settings_nonce'], 'save_form_settings')) {
+        if (!isset($_POST['form_settings_nonce']) || !wp_verify_nonce( wp_unslash($_POST['form_settings_nonce']), 'save_form_settings')) {
             return;
         }
 
@@ -172,15 +172,15 @@ class MetaBoxes {
         }
 
         if (isset($_POST['recipients'])) {
-            update_post_meta($post_id, '_recipients', sanitize_text_field($_POST['recipients']));
+            update_post_meta($post_id, '_recipients', sanitize_text_field( wp_unslash($_POST['recipients']) ));
         }
 
         if (isset($_POST['bcc_recipient'])) {
-            update_post_meta($post_id, '_bcc_recipient', sanitize_email($_POST['bcc_recipient']));
+            update_post_meta($post_id, '_bcc_recipient', sanitize_email( wp_unslash($_POST['bcc_recipient']) ));
         }
 
         if (isset($_POST['subject'])) {
-            update_post_meta($post_id, '_subject', sanitize_text_field($_POST['subject']));
+            update_post_meta($post_id, '_subject', sanitize_text_field( wp_unslash($_POST['subject']) ));
         }
 
         if (isset($_POST['fields_config'])) {
@@ -202,11 +202,11 @@ class MetaBoxes {
         }
 
         if (isset($_POST['telegram_bot_token'])) {
-            update_post_meta($post_id, '_telegram_bot_token', sanitize_text_field($_POST['telegram_bot_token']));
+            update_post_meta($post_id, '_telegram_bot_token', sanitize_text_field( wp_unslash($_POST['telegram_bot_token']) ));
         }
 
         if (isset($_POST['telegram_chat_ids'])) {
-            update_post_meta($post_id, '_telegram_chat_ids', sanitize_text_field($_POST['telegram_chat_ids']));
+            update_post_meta($post_id, '_telegram_chat_ids', sanitize_text_field( wp_unslash($_POST['telegram_chat_ids']) ));
         }
 
         if (isset($_POST['send_to_sheets'])) {
@@ -216,11 +216,11 @@ class MetaBoxes {
         }
 
         if (isset($_POST['sheets_spreadsheet_id'])) {
-            update_post_meta($post_id, '_sheets_spreadsheet_id', sanitize_text_field($_POST['sheets_spreadsheet_id']));
+            update_post_meta($post_id, '_sheets_spreadsheet_id', sanitize_text_field( wp_unslash($_POST['sheets_spreadsheet_id']) ));
         }
 
         if (isset($_POST['sheets_sheet_name'])) {
-            update_post_meta($post_id, '_sheets_sheet_name', sanitize_text_field($_POST['sheets_sheet_name']));
+            update_post_meta($post_id, '_sheets_sheet_name', sanitize_text_field( wp_unslash($_POST['sheets_sheet_name']) ));
         }
 
         if (isset($_POST['save_to_admin'])) {

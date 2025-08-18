@@ -84,13 +84,13 @@ class Security {
         // Check if we're on submission edit page
         if ($pagenow === 'post.php' && $post_type === 'form_submissions') {
             // Redirect to submissions list when trying to edit
-            wp_redirect(admin_url('edit.php?post_type=form_submissions&message=1'));
+            wp_redirect( esc_url_raw( admin_url('edit.php?post_type=form_submissions&message=1') ) );
             exit;
         }
 
         // Also block new submission creation
         if ($pagenow === 'post-new.php' && $post_type === 'form_submissions') {
-            wp_redirect(admin_url('edit.php?post_type=form_submissions&message=2'));
+            wp_redirect( esc_url_raw( admin_url('edit.php?post_type=form_submissions&message=2') ) );
             exit;
         }
     }
@@ -110,7 +110,8 @@ class Security {
 
         if ($post_type === 'form_submissions' && isset($_GET['message'])) {
             $message = '';
-            switch ($_GET['message']) {
+            $msg_code = sanitize_text_field( wp_unslash($_GET['message']) );
+            switch ($msg_code) {
                 case '1':
                     $message = __( 'Editing submissions is not allowed. Submissions can only be created automatically when forms are submitted.', 'mksddn-forms-handler' );
                     break;
