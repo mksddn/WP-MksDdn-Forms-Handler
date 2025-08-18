@@ -53,6 +53,22 @@ class FormsHandler {
                 ],
             ]
         );
+
+        // Back-compat alias for older integrations expecting wp/v2 namespace
+        register_rest_route(
+            'wp/v2',
+            '/forms/(?P<slug>[a-zA-Z0-9-]+)/submit',
+            [
+                'methods'             => 'POST',
+                'callback'            => [$this, 'handle_rest_form_submission'],
+                'permission_callback' => '__return_true',
+                'args'                => [
+                    'slug' => [
+                        'validate_callback' => fn($param): bool => !empty($param),
+                    ],
+                ],
+            ]
+        );
     }
     
     /**
