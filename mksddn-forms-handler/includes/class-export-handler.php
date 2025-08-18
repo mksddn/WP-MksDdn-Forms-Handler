@@ -162,10 +162,11 @@ class ExportHandler {
 
         // Collect all unique field names from submissions
         foreach ($submissions as $submission) {
-            $form_data = get_post_meta($submission->ID, '_form_data', true);
+            $raw = get_post_meta($submission->ID, '_submission_data', true);
+            $form_data = is_string($raw) ? json_decode($raw, true) : (is_array($raw) ? $raw : []);
             if ($form_data && is_array($form_data)) {
                 foreach ($form_data as $field_name => $value) {
-                    if (!in_array($field_name, $field_names)) {
+                    if (!in_array($field_name, $field_names, true)) {
                         $field_names[] = $field_name;
                     }
                 }
@@ -193,7 +194,8 @@ class ExportHandler {
             ];
 
             // Get form data
-            $form_data = get_post_meta($submission->ID, '_form_data', true);
+            $raw = get_post_meta($submission->ID, '_submission_data', true);
+            $form_data = is_string($raw) ? json_decode($raw, true) : (is_array($raw) ? $raw : []);
             if ($form_data && is_array($form_data)) {
                 // Add field values in the same order as headers
                 for ($i = 3; $i < count($headers); $i++) {
