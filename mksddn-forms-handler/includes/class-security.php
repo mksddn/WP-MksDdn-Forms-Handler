@@ -108,7 +108,9 @@ class Security {
     public function submission_creation_blocked_notice(): void {
         global $pagenow, $post_type;
 
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         if ($post_type === 'form_submissions' && isset($_GET['message'])) {
+            // phpcs:disable WordPress.Security.NonceVerification.Recommended
             $message = '';
             $msg_code = sanitize_text_field( wp_unslash($_GET['message']) );
             switch ($msg_code) {
@@ -123,6 +125,7 @@ class Security {
             if ($message !== '' && $message !== '0') {
                 echo '<div class="notice notice-warning is-dismissible"><p>' . esc_html($message) . '</p></div>';
             }
+            // phpcs:enable WordPress.Security.NonceVerification.Recommended
         }
     }
 } 

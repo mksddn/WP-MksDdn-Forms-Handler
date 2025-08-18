@@ -159,7 +159,8 @@ class MetaBoxes {
      * Save form settings
      */
     public function save_form_settings($post_id): void {
-        if (!isset($_POST['form_settings_nonce']) || !wp_verify_nonce( wp_unslash($_POST['form_settings_nonce']), 'save_form_settings')) {
+        $form_settings_nonce = isset($_POST['form_settings_nonce']) ? sanitize_text_field( wp_unslash($_POST['form_settings_nonce']) ) : '';
+        if (!$form_settings_nonce || !wp_verify_nonce( $form_settings_nonce, 'save_form_settings')) {
             return;
         }
 
@@ -184,7 +185,7 @@ class MetaBoxes {
         }
 
         if (isset($_POST['fields_config'])) {
-            $fields_config = wp_unslash($_POST['fields_config']);
+            $fields_config = wp_unslash($_POST['fields_config']); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
             // Validate JSON to avoid saving invalid data
             if (json_decode($fields_config) !== null) {
                 update_post_meta($post_id, '_fields_config', $fields_config);

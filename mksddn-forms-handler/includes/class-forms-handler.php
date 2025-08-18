@@ -129,7 +129,8 @@ class FormsHandler {
      */
     public function handle_form_submission(): void {
         // Check nonce for security
-        if (!isset($_POST['form_nonce']) || !wp_verify_nonce( wp_unslash($_POST['form_nonce']), 'submit_form_nonce')) {
+        $form_nonce_value = isset($_POST['form_nonce']) ? sanitize_text_field( wp_unslash($_POST['form_nonce']) ) : '';
+        if (!$form_nonce_value || !wp_verify_nonce( $form_nonce_value, 'submit_form_nonce')) {
             wp_die('Security check failed');
         }
 

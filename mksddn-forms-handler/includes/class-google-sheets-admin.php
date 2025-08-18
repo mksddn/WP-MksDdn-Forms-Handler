@@ -38,6 +38,7 @@ class GoogleSheetsAdmin {
      * Handle OAuth callback
      */
     public function handle_oauth_callback(): void {
+        // phpcs:disable WordPress.Security.NonceVerification.Recommended -- OAuth callback relies on GET params from Google
         if (isset($_GET['page']) && $_GET['page'] === 'google-sheets-settings' && isset($_GET['code'])) {
             $code = sanitize_text_field( wp_unslash($_GET['code']) );
             $client_id = get_option('google_sheets_client_id');
@@ -52,6 +53,7 @@ class GoogleSheetsAdmin {
                             'client_secret' => $client_secret,
                             'code'          => $code,
                             'grant_type'    => 'authorization_code',
+                            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- OAuth redirect target
                             'redirect_uri'  => admin_url('options-general.php?page=google-sheets-settings'),
                         ],
                         'timeout' => 30,
@@ -75,13 +77,15 @@ class GoogleSheetsAdmin {
                 exit;
             }
         }
+        // phpcs:enable WordPress.Security.NonceVerification.Recommended
     }
     
     /**
      * Save settings
      */
     public function save_settings(): void {
-        if (isset($_POST['google_sheets_settings_nonce']) && wp_verify_nonce( wp_unslash($_POST['google_sheets_settings_nonce']), 'save_google_sheets_settings')) {
+        $settings_nonce = isset($_POST['google_sheets_settings_nonce']) ? sanitize_text_field( wp_unslash($_POST['google_sheets_settings_nonce']) ) : '';
+        if ($settings_nonce && wp_verify_nonce( $settings_nonce, 'save_google_sheets_settings')) {
             if (isset($_POST['google_sheets_client_id'])) {
                 update_option('google_sheets_client_id', sanitize_text_field( wp_unslash($_POST['google_sheets_client_id']) ));
             }
@@ -95,14 +99,16 @@ class GoogleSheetsAdmin {
         }
 
         // Handle authentication revocation
-        if (isset($_POST['revoke_auth_nonce']) && wp_verify_nonce( wp_unslash($_POST['revoke_auth_nonce']), 'revoke_google_sheets_auth')) {
+        $revoke_nonce = isset($_POST['revoke_auth_nonce']) ? sanitize_text_field( wp_unslash($_POST['revoke_auth_nonce']) ) : '';
+        if ($revoke_nonce && wp_verify_nonce( $revoke_nonce, 'revoke_google_sheets_auth')) {
             delete_option('google_sheets_refresh_token');
             wp_redirect( esc_url_raw( admin_url('options-general.php?page=google-sheets-settings&revoked=1') ) );
             exit;
         }
 
         // Handle full settings clearing
-        if (isset($_POST['clear_all_nonce']) && wp_verify_nonce( wp_unslash($_POST['clear_all_nonce']), 'clear_google_sheets_all')) {
+        $clear_nonce = isset($_POST['clear_all_nonce']) ? sanitize_text_field( wp_unslash($_POST['clear_all_nonce']) ) : '';
+        if ($clear_nonce && wp_verify_nonce( $clear_nonce, 'clear_google_sheets_all')) {
             delete_option('google_sheets_client_id');
             delete_option('google_sheets_client_secret');
             delete_option('google_sheets_refresh_token');
@@ -120,7 +126,8 @@ class GoogleSheetsAdmin {
             wp_die('Access denied');
         }
 
-        if (!isset($_POST['test_connection_nonce']) || !wp_verify_nonce( wp_unslash($_POST['test_connection_nonce']), 'test_google_sheets_connection')) {
+        $test_nonce = isset($_POST['test_connection_nonce']) ? sanitize_text_field( wp_unslash($_POST['test_connection_nonce']) ) : '';
+        if (!$test_nonce || !wp_verify_nonce( $test_nonce, 'test_google_sheets_connection')) {
             wp_die('Security check failed');
         }
 
@@ -148,7 +155,8 @@ class GoogleSheetsAdmin {
             wp_die('Access denied');
         }
 
-        if (!isset($_POST['nonce']) || !wp_verify_nonce( wp_unslash($_POST['nonce']), 'test_sheets_nonce')) {
+        $ajax_nonce = isset($_POST['nonce']) ? sanitize_text_field( wp_unslash($_POST['nonce']) ) : '';
+        if (!$ajax_nonce || !wp_verify_nonce( $ajax_nonce, 'test_sheets_nonce')) {
             wp_die('Security check failed');
         }
 
@@ -170,6 +178,13 @@ class GoogleSheetsAdmin {
      * Render settings page
      */
     public function render_settings_page(): void {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading benign query params for notices only
+        $qs = isset($_GET) ? wp_unslash($_GET) : [];
+        $has_success = isset($qs['success']);
+        $has_error   = isset($qs['error']);
+        $has_saved   = isset($qs['saved']);
+        $has_revoked = isset($qs['revoked']);
+        $has_cleared = isset($qs['cleared']);
         $client_id = get_option('google_sheets_client_id');
         $client_secret = get_option('google_sheets_client_secret');
         $refresh_token = get_option('google_sheets_refresh_token');
@@ -178,31 +193,31 @@ class GoogleSheetsAdmin {
         <div class="wrap">
             <h1>Google Sheets Settings</h1>
             
-            <?php if (isset($_GET['success'])) : ?>
+            <?php if ($has_success) : ?>
                 <div class="notice notice-success">
                     <p>✅ Google Sheets authentication successful! You can now use Google Sheets integration in your forms.</p>
                 </div>
             <?php endif; ?>
             
-            <?php if (isset($_GET['error'])) : ?>
+            <?php if ($has_error) : ?>
                 <div class="notice notice-error">
                     <p>❌ Authentication failed. Please try again.</p>
                 </div>
             <?php endif; ?>
             
-            <?php if (isset($_GET['saved'])) : ?>
+            <?php if ($has_saved) : ?>
                 <div class="notice notice-success">
                     <p>Settings saved successfully!</p>
                 </div>
             <?php endif; ?>
             
-            <?php if (isset($_GET['revoked'])) : ?>
+            <?php if ($has_revoked) : ?>
                 <div class="notice notice-warning">
                     <p>✅ Google Sheets authentication has been revoked. You can now re-authenticate with different credentials.</p>
                 </div>
             <?php endif; ?>
             
-            <?php if (isset($_GET['cleared'])) : ?>
+            <?php if ($has_cleared) : ?>
                 <div class="notice notice-info">
                     <p>🗑️ All Google Sheets settings have been cleared. You can start fresh setup.</p>
                 </div>

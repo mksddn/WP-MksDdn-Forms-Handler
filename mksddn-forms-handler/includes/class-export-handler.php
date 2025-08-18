@@ -59,7 +59,7 @@ class ExportHandler {
         }
 
         // Check nonce (for POST and GET requests)
-        $nonce = isset($_POST['export_nonce']) ? wp_unslash($_POST['export_nonce']) : (isset($_GET['export_nonce']) ? wp_unslash($_GET['export_nonce']) : '');
+        $nonce = isset($_POST['export_nonce']) ? sanitize_text_field( wp_unslash($_POST['export_nonce']) ) : (isset($_GET['export_nonce']) ? sanitize_text_field( wp_unslash($_GET['export_nonce']) ) : '');
         if (!$nonce || !wp_verify_nonce($nonce, 'export_submissions_csv')) {
             wp_die( esc_html__( 'Security check failed', 'mksddn-forms-handler' ) );
         }
