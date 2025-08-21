@@ -4,7 +4,7 @@ Tags: forms, telegram, google-sheets, rest-api, form-handler
 Requires at least: 5.0
 Tested up to: 6.8
 Requires PHP: 8.0
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,10 @@ Yes! The plugin provides REST API endpoints for AJAX form submissions. Check the
 
 == Changelog ==
 
+= 1.0.1 =
+* Added `uninstall.php` to clean plugin options and transients (keeps CPT data)
+* Version metadata adjusted
+
 = 1.0.0 =
 * Initial release
 * Multiple delivery methods (email, Telegram, Google Sheets)
@@ -111,5 +115,5 @@ Yes! The plugin provides REST API endpoints for AJAX form submissions. Check the
 
 == Upgrade Notice ==
 
-= 1.0.0 =
-Initial release of MksDdn Forms Handler. 
+= 1.0.1 =
+Compatibility and housekeeping update: add safe uninstall cleanup. No breaking changes. Data is preserved.
