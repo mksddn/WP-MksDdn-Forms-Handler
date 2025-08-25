@@ -63,8 +63,8 @@ class MetaBoxes {
         wp_nonce_field('save_form_settings', 'form_settings_nonce');
 
         // Check for JSON error temporary data
-        $json_error = get_transient('fields_config_json_error_' . get_current_user_id());
-        $json_error_value = get_transient('fields_config_json_value_' . get_current_user_id());
+        $json_error = get_transient('mksddn_fh_fields_config_json_error_' . get_current_user_id());
+        $json_error_value = get_transient('mksddn_fh_fields_config_json_value_' . get_current_user_id());
 
         $recipients = get_post_meta($post->ID, '_recipients', true);
         $bcc_recipient = get_post_meta($post->ID, '_bcc_recipient', true);
@@ -108,8 +108,8 @@ class MetaBoxes {
         // Show error notification if invalid JSON
         if ($json_error) {
             echo '<div class="notice notice-error"><p>' . esc_html__( 'Error: Invalid JSON in Fields Configuration! Check syntax.', 'mksddn-forms-handler' ) . '</p></div>';
-            delete_transient('fields_config_json_error_' . get_current_user_id());
-            delete_transient('fields_config_json_value_' . get_current_user_id());
+            delete_transient('mksddn_fh_fields_config_json_error_' . get_current_user_id());
+            delete_transient('mksddn_fh_fields_config_json_value_' . get_current_user_id());
         }
 
         include MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/templates/form-settings-meta-box.php';
@@ -185,14 +185,31 @@ class MetaBoxes {
         }
 
         if (isset($_POST['fields_config'])) {
-            $fields_config = wp_unslash($_POST['fields_config']); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-            // Validate JSON to avoid saving invalid data
-            if (json_decode($fields_config) !== null) {
-                update_post_meta($post_id, '_fields_config', $fields_config);
+            // Raw JSON is unslashed first; content is sanitized field-by-field below
+            $raw_json = wp_unslash($_POST['fields_config']); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+            $decoded = json_decode($raw_json, true);
+            if (is_array($decoded)) {
+                // Whitelist and sanitize expected schema
+                $sanitized = [];
+                foreach ($decoded as $item) {
+                    if (!is_array($item)) { continue; }
+                    $name  = isset($item['name']) ? sanitize_key($item['name']) : '';
+                    $label = isset($item['label']) ? sanitize_text_field($item['label']) : '';
+                    $type  = isset($item['type']) ? sanitize_key($item['type']) : 'text';
+                    $required = !empty($item['required']) ? '1' : '0';
+                    if ($name !== '' && $label !== '') {
+                        $sanitized[] = [
+                            'name'     => $name,
+                            'label'    => $label,
+                            'type'     => $type,
+                            'required' => $required,
+                        ];
+                    }
+                }
+                update_post_meta($post_id, '_fields_config', wp_json_encode($sanitized));
             } else {
-                // Save error and entered data to temporary storage
-                set_transient('fields_config_json_error_' . get_current_user_id(), true, 60);
-                set_transient('fields_config_json_value_' . get_current_user_id(), $fields_config, 60);
+                set_transient('mksddn_fh_fields_config_json_error_' . get_current_user_id(), true, 60);
+                set_transient('mksddn_fh_fields_config_json_value_' . get_current_user_id(), $raw_json, 60);
             }
         }
 

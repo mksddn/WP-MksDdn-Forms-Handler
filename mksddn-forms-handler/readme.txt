@@ -4,7 +4,7 @@ Tags: forms, telegram, google-sheets, rest-api, form-handler
 Requires at least: 5.0
 Tested up to: 6.8
 Requires PHP: 8.0
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -46,7 +46,7 @@ MksDdn Forms Handler is a powerful and flexible form processing plugin that allo
 1. Upload the plugin files to the `/wp-content/plugins/mksddn-forms-handler` directory, or install the plugin through the WordPress plugins screen directly.
 2. Activate the plugin through the 'Plugins' screen in WordPress
 3. Use the Forms menu to create and manage your forms
-4. Use the shortcode `[mksddn_form id="form_id"]` to display forms on your pages
+4. Use the shortcode `[mksddn_fh_form id="form_id"]` to display forms on your pages
 
 == Frequently Asked Questions ==
 
@@ -101,6 +101,15 @@ Yes! The plugin provides REST API endpoints for AJAX form submissions. Check the
 
 == Changelog ==
 
+= 1.0.2 =
+* Enqueued scripts/styles properly, removed inline JS/CSS
+* Prefixed options/transients and custom post types
+* REST: custom namespace only; added honeypot and rate limiting
+* Security: strict sanitization/validation for fields config JSON
+* Compliance updates per Plugin Review feedback
+* Prefixes, REST adjustments, enqueue fixes, security hardening
+* Readme External services section added
+
 = 1.0.1 =
 * Added `uninstall.php` to clean plugin options and transients (keeps CPT data)
 * Version metadata adjusted
@@ -115,5 +124,28 @@ Yes! The plugin provides REST API endpoints for AJAX form submissions. Check the
 
 == Upgrade Notice ==
 
-= 1.0.1 =
-Compatibility and housekeeping update: add safe uninstall cleanup. No breaking changes. Data is preserved.
+= 1.0.2 =
+Compliance update: enqueue fixes, security hardening, and REST adjustments. No breaking changes.
+
+== External services ==
+
+This plugin can connect to external services when explicitly enabled in a form's settings:
+
+1) Google OAuth2 and Google Sheets API
+- What: Authenticate and append rows to a spreadsheet
+- When: Only if "Send to Google Sheets" is enabled for a form and valid credentials are provided
+- Data sent: Form fields configured for the form, form title, timestamp
+- Endpoints used: `https://oauth2.googleapis.com/token`, `https://sheets.googleapis.com/v4/spreadsheets/...`
+- Terms: https://policies.google.com/terms
+- Privacy: https://policies.google.com/privacy
+
+2) Telegram Bot API
+- What: Send a message with submission content to specified chat(s)
+- When: Only if "Send to Telegram" is enabled for a form and bot token + chat IDs are configured
+- Data sent: Form fields configured for the form, form title
+- Endpoint used: `https://api.telegram.org/bot<token>/sendMessage`
+- Terms/Privacy: https://telegram.org/privacy
+
+Notes:
+- No IP address or user agent is transmitted to external services; only form field values are sent.
+- External delivery is opt-in per form and disabled by default.

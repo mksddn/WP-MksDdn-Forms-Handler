@@ -54,6 +54,7 @@ class Shortcodes {
                 <?php wp_nonce_field('submit_form_nonce', 'form_nonce'); ?>
                 <input type="hidden" name="action" value="submit_form">
                 <input type="hidden" name="form_id" value="<?php echo esc_attr($form->post_name); ?>">
+                <input type="text" name="mksddn_fh_hp" value="" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true" />
                 
                 <?php foreach ($fields as $field) : ?>
                     <div class="form-field">

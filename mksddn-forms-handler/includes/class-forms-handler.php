@@ -78,6 +78,21 @@ class FormsHandler {
         $slug = $request->get_param('slug');
         $form_data = $request->get_json_params();
 
+        // Honeypot field check (should be empty)
+        $honeypot = $request->get_param('mksddn_fh_hp');
+        if (!empty($honeypot)) {
+            return new \WP_Error('spam_detected', __( 'Spam detected', 'mksddn-forms-handler' ), ['status' => 400]);
+        }
+
+        // Simple rate limiting: 1 request per 10 seconds per IP per form
+        $ip = sanitize_text_field( wp_unslash($_SERVER['REMOTE_ADDR'] ?? 'unknown') );
+        $rl_key = 'mksddn_fh_rate_' . md5($slug . '|' . $ip);
+        $last_ts = get_transient($rl_key);
+        if ($last_ts && (time() - (int)$last_ts) < 10) {
+            return new \WP_Error('rate_limited', __( 'Too many requests. Please wait a few seconds.', 'mksddn-forms-handler' ), ['status' => 429]);
+        }
+        set_transient($rl_key, time(), 15);
+
         if (!$form_data) {
             return new \WP_Error('invalid_data', __( 'Invalid form data', 'mksddn-forms-handler' ), ['status' => 400]);
         }
@@ -136,12 +151,34 @@ class FormsHandler {
 
         $form_id = isset($_POST['form_id']) ? sanitize_text_field( wp_unslash($_POST['form_id']) ) : '';
 
-        // Collect posted fields excluding service fields
-        $raw_post = wp_unslash($_POST);
-        unset($raw_post['action'], $raw_post['form_id'], $raw_post['form_nonce']);
+        // Honeypot check
+        $honeypot = isset($_POST['mksddn_fh_hp']) ? sanitize_text_field( wp_unslash($_POST['mksddn_fh_hp']) ) : '';
+        if (!empty($honeypot)) {
+            wp_die('Spam detected');
+        }
+
+        // Simple rate limiting per IP+form: 1 request per 10 seconds
+        $ip = sanitize_text_field( wp_unslash($_SERVER['REMOTE_ADDR'] ?? 'unknown') );
+        $rl_key = 'mksddn_fh_rate_' . md5($form_id . '|' . $ip);
+        $last_ts = get_transient($rl_key);
+        if ($last_ts && (time() - (int)$last_ts) < 10) {
+            wp_die('Too many requests. Please wait a few seconds.');
+        }
+        set_transient($rl_key, time(), 15);
+
+        // Build form data using whitelist from form configuration
+        $form_config = $this->get_form_config($form_id);
+        if (is_wp_error($form_config)) {
+            wp_die( esc_html( $form_config->get_error_message() ) );
+        }
+        $allowed_fields = $this->get_allowed_fields($form_config['fields_config']);
         $form_data = [];
-        foreach ($raw_post as $key => $value) {
-            $form_data[$key] = is_array($value) ? array_map('sanitize_text_field', $value) : sanitize_text_field((string)$value);
+        foreach ($allowed_fields as $field_name) {
+            if (isset($_POST[$field_name])) {
+                // Raw input is unslashed first, then sanitized below
+                $value = wp_unslash($_POST[$field_name]); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+                $form_data[$field_name] = is_array($value) ? array_map('sanitize_text_field', $value) : sanitize_text_field((string)$value);
+            }
         }
 
         if (!$form_id || !$form_data) {
