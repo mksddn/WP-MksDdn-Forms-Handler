@@ -17,8 +17,8 @@ class GoogleSheetsAdmin {
         add_action('admin_menu', [$this, 'add_settings_page']);
         add_action('admin_init', [$this, 'handle_oauth_callback']);
         add_action('admin_init', [$this, 'save_settings']);
-        add_action('admin_post_test_google_sheets_connection', [$this, 'handle_test_connection']);
-        add_action('wp_ajax_test_google_sheets_connection', [$this, 'handle_ajax_test_connection']);
+        add_action('admin_post_mksddn_fh_test_google_sheets_connection', [$this, 'handle_test_connection']);
+        add_action('wp_ajax_mksddn_fh_test_google_sheets_connection', [$this, 'handle_ajax_test_connection']);
     }
     
     /**
@@ -29,7 +29,7 @@ class GoogleSheetsAdmin {
             'Google Sheets Settings',
             'Google Sheets',
             'manage_options',
-            'google-sheets-settings',
+            'mksddn-fh-google-sheets-settings',
             [$this, 'render_settings_page']
         );
     }
@@ -39,10 +39,10 @@ class GoogleSheetsAdmin {
      */
     public function handle_oauth_callback(): void {
         // phpcs:disable WordPress.Security.NonceVerification.Recommended -- OAuth callback relies on GET params from Google
-        if (isset($_GET['page']) && $_GET['page'] === 'google-sheets-settings' && isset($_GET['code'])) {
+        if (isset($_GET['page']) && $_GET['page'] === 'mksddn-fh-google-sheets-settings' && isset($_GET['code'])) {
             $code = sanitize_text_field( wp_unslash($_GET['code']) );
-            $client_id = get_option('google_sheets_client_id');
-            $client_secret = get_option('google_sheets_client_secret');
+            $client_id = get_option('mksddn_fh_google_sheets_client_id');
+            $client_secret = get_option('mksddn_fh_google_sheets_client_secret');
 
             if ($client_id && $client_secret) {
                 $response = wp_remote_post(
@@ -54,7 +54,7 @@ class GoogleSheetsAdmin {
                             'code'          => $code,
                             'grant_type'    => 'authorization_code',
                             // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- OAuth redirect target
-                            'redirect_uri'  => admin_url('options-general.php?page=google-sheets-settings'),
+                            'redirect_uri'  => admin_url('options-general.php?page=mksddn-fh-google-sheets-settings'),
                         ],
                         'timeout' => 30,
                     ]
@@ -64,16 +64,16 @@ class GoogleSheetsAdmin {
                     $result = json_decode(wp_remote_retrieve_body($response), true);
 
                     if (isset($result['refresh_token'])) {
-                        update_option('google_sheets_refresh_token', $result['refresh_token']);
-                        wp_redirect( esc_url_raw( admin_url('options-general.php?page=google-sheets-settings&success=1') ) );
+                        update_option('mksddn_fh_google_sheets_refresh_token', $result['refresh_token']);
+                        wp_redirect( esc_url_raw( admin_url('options-general.php?page=mksddn-fh-google-sheets-settings&success=1') ) );
                         exit;
                     }
 
-                    wp_redirect( esc_url_raw( admin_url('options-general.php?page=google-sheets-settings&error=1') ) );
+                    wp_redirect( esc_url_raw( admin_url('options-general.php?page=mksddn-fh-google-sheets-settings&error=1') ) );
                     exit;
                 }
 
-                wp_redirect( esc_url_raw( admin_url('options-general.php?page=google-sheets-settings&error=1') ) );
+                wp_redirect( esc_url_raw( admin_url('options-general.php?page=mksddn-fh-google-sheets-settings&error=1') ) );
                 exit;
             }
         }
@@ -87,33 +87,33 @@ class GoogleSheetsAdmin {
         $settings_nonce = isset($_POST['google_sheets_settings_nonce']) ? sanitize_text_field( wp_unslash($_POST['google_sheets_settings_nonce']) ) : '';
         if ($settings_nonce && wp_verify_nonce( $settings_nonce, 'save_google_sheets_settings')) {
             if (isset($_POST['google_sheets_client_id'])) {
-                update_option('google_sheets_client_id', sanitize_text_field( wp_unslash($_POST['google_sheets_client_id']) ));
+                update_option('mksddn_fh_google_sheets_client_id', sanitize_text_field( wp_unslash($_POST['google_sheets_client_id']) ));
             }
 
             if (isset($_POST['google_sheets_client_secret'])) {
-                update_option('google_sheets_client_secret', sanitize_text_field( wp_unslash($_POST['google_sheets_client_secret']) ));
+                update_option('mksddn_fh_google_sheets_client_secret', sanitize_text_field( wp_unslash($_POST['google_sheets_client_secret']) ));
             }
 
-            wp_redirect( esc_url_raw( admin_url('options-general.php?page=google-sheets-settings&saved=1') ) );
+            wp_redirect( esc_url_raw( admin_url('options-general.php?page=mksddn-fh-google-sheets-settings&saved=1') ) );
             exit;
         }
 
         // Handle authentication revocation
         $revoke_nonce = isset($_POST['revoke_auth_nonce']) ? sanitize_text_field( wp_unslash($_POST['revoke_auth_nonce']) ) : '';
         if ($revoke_nonce && wp_verify_nonce( $revoke_nonce, 'revoke_google_sheets_auth')) {
-            delete_option('google_sheets_refresh_token');
-            wp_redirect( esc_url_raw( admin_url('options-general.php?page=google-sheets-settings&revoked=1') ) );
+            delete_option('mksddn_fh_google_sheets_refresh_token');
+            wp_redirect( esc_url_raw( admin_url('options-general.php?page=mksddn-fh-google-sheets-settings&revoked=1') ) );
             exit;
         }
 
         // Handle full settings clearing
         $clear_nonce = isset($_POST['clear_all_nonce']) ? sanitize_text_field( wp_unslash($_POST['clear_all_nonce']) ) : '';
         if ($clear_nonce && wp_verify_nonce( $clear_nonce, 'clear_google_sheets_all')) {
-            delete_option('google_sheets_client_id');
-            delete_option('google_sheets_client_secret');
-            delete_option('google_sheets_refresh_token');
+            delete_option('mksddn_fh_google_sheets_client_id');
+            delete_option('mksddn_fh_google_sheets_client_secret');
+            delete_option('mksddn_fh_google_sheets_refresh_token');
 
-            wp_redirect( esc_url_raw( admin_url('options-general.php?page=google-sheets-settings&cleared=1') ) );
+            wp_redirect( esc_url_raw( admin_url('options-general.php?page=mksddn-fh-google-sheets-settings&cleared=1') ) );
             exit;
         }
     }
@@ -133,16 +133,16 @@ class GoogleSheetsAdmin {
 
         $spreadsheet_id = isset($_POST['spreadsheet_id']) ? sanitize_text_field( wp_unslash($_POST['spreadsheet_id']) ) : '';
         if (!$spreadsheet_id) {
-            wp_redirect( esc_url_raw( admin_url('options-general.php?page=google-sheets-settings&error=no_spreadsheet_id') ) );
+            wp_redirect( esc_url_raw( admin_url('options-general.php?page=mksddn-fh-google-sheets-settings&error=no_spreadsheet_id') ) );
             exit;
         }
 
         $result = GoogleSheetsHandler::test_connection($spreadsheet_id);
 
         if ($result['success']) {
-            wp_redirect( esc_url_raw( admin_url('options-general.php?page=google-sheets-settings&test_success=1&details=' . urlencode(json_encode($result['details']))) ) );
+            wp_redirect( esc_url_raw( admin_url('options-general.php?page=mksddn-fh-google-sheets-settings&test_success=1&details=' . urlencode(json_encode($result['details']))) ) );
         } else {
-            wp_redirect( esc_url_raw( admin_url('options-general.php?page=google-sheets-settings&test_error=' . urlencode($result['message'])) ) );
+            wp_redirect( esc_url_raw( admin_url('options-general.php?page=mksddn-fh-google-sheets-settings&test_error=' . urlencode($result['message'])) ) );
         }
         exit;
     }
@@ -185,9 +185,9 @@ class GoogleSheetsAdmin {
         $has_saved   = isset($qs['saved']);
         $has_revoked = isset($qs['revoked']);
         $has_cleared = isset($qs['cleared']);
-        $client_id = get_option('google_sheets_client_id');
-        $client_secret = get_option('google_sheets_client_secret');
-        $refresh_token = get_option('google_sheets_refresh_token');
+        $client_id = get_option('mksddn_fh_google_sheets_client_id');
+        $client_secret = get_option('mksddn_fh_google_sheets_client_secret');
+        $refresh_token = get_option('mksddn_fh_google_sheets_refresh_token');
 
         ?>
         <div class="wrap">
@@ -240,7 +240,7 @@ class GoogleSheetsAdmin {
                             <li>Go to "APIs &amp; Services" → "Credentials"</li>
                             <li>Click "Create Credentials" → "OAuth 2.0 Client IDs"</li>
                             <li>Choose "Web application"</li>
-                            <li>Add authorized redirect URI: <code><?php echo esc_html( admin_url('options-general.php?page=google-sheets-settings') ); ?></code></li>
+                            <li>Add authorized redirect URI: <code><?php echo esc_html( admin_url('options-general.php?page=mksddn-fh-google-sheets-settings') ); ?></code></li>
                             <li><strong>Important:</strong> Make sure this exact URL is added to your Google Cloud Console OAuth credentials</li>
                             <li>Save Client ID and Client Secret</li>
                         </ul>
@@ -331,46 +331,6 @@ class GoogleSheetsAdmin {
                     <div id="test-result" style="margin-top: 10px;"></div>
                 </div>
                 
-                <script>
-                jQuery(document).ready(function($) {
-                    $('#test-sheets-btn').on('click', function() {
-                        var $btn = $(this);
-                        var $result = $('#test-result');
-                        var spreadsheetId = $('#test_spreadsheet_id').val(); // Get spreadsheet ID from input
-                        
-                        if (!spreadsheetId) {
-                            $result.html('<div class="notice notice-error"><p>Spreadsheet ID is required.</p></div>');
-                            return;
-                        }
-
-                        $btn.prop('disabled', true).text('Testing...');
-                        $result.html('');
-                        
-                        $.ajax({
-                            url: ajaxurl,
-                            method: 'POST',
-                            data: {
-                                action: 'test_google_sheets_connection',
-                                nonce: '<?php echo esc_js( wp_create_nonce('test_sheets_nonce') ); ?>',
-                                spreadsheet_id: spreadsheetId // Pass spreadsheet_id to AJAX
-                            },
-                            success: function(response) {
-                                if (response.success) {
-                                    $result.html('<div class="notice notice-success"><p>✅ ' + response.data.message + '</p></div>');
-                                } else {
-                                    $result.html('<div class="notice notice-error"><p>❌ ' + response.data.message + '</p></div>');
-                                }
-                            },
-                            error: function() {
-                                $result.html('<div class="notice notice-error"><p>❌ Test failed</p></div>');
-                            },
-                            complete: function() {
-                                $btn.prop('disabled', false).text('Test Google Sheets Connection');
-                            }
-                        });
-                    });
-                });
-                </script>
             <?php endif; ?>
             
             <div class="card">

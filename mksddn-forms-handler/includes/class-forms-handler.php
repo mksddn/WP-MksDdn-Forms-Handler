@@ -31,7 +31,7 @@ class FormsHandler {
         add_action('admin_post_nopriv_submit_form', [$this, 'handle_form_submission']);
         
         // Clear cache when form is updated
-        add_action('save_post_forms', [$this, 'clear_form_cache'], 10, 2);
+        add_action('save_post_mksddn_fh_forms', [$this, 'clear_form_cache'], 10, 2);
         add_action('deleted_post', [$this, 'clear_form_cache'], 10, 2);
     }
     
@@ -306,12 +306,12 @@ class FormsHandler {
         }
         
         // Get form by slug or ID
-        $form = get_page_by_path($form_id, OBJECT, 'forms');
+        $form = get_page_by_path($form_id, OBJECT, 'mksddn_fh_forms');
         if (!$form) {
             $form = get_post($form_id);
         }
 
-        if (!$form || $form->post_type !== 'forms') {
+        if (!$form || $form->post_type !== 'mksddn_fh_forms') {
             return new \WP_Error('form_not_found', 'Form not found', ['status' => 404]);
         }
 
@@ -346,7 +346,7 @@ class FormsHandler {
      * Clear form cache when form is updated
      */
     public function clear_form_cache($post_id, $post): void {
-        if ($post->post_type === 'forms') {
+        if ($post->post_type === 'mksddn_fh_forms') {
             $cache_key = 'form_config_' . md5($post_id);
             wp_cache_delete($cache_key, 'mksddn_forms_handler');
             
@@ -614,7 +614,7 @@ class FormsHandler {
             'post_title'   => $submission_title,
             'post_content' => '',
             'post_status'  => 'publish',
-            'post_type'    => 'form_submissions',
+            'post_type'    => 'mksddn_fh_submits',
             'post_author'  => 1,
         ];
 

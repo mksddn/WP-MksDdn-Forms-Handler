@@ -20,10 +20,10 @@ class AdminColumns {
     private $submissions_cache = [];
     
     public function __construct() {
-        add_filter('manage_forms_posts_columns', [$this, 'add_forms_admin_columns']);
-        add_action('manage_forms_posts_custom_column', [$this, 'fill_forms_admin_columns'], 10, 2);
-        add_filter('manage_form_submissions_posts_columns', [$this, 'add_submissions_admin_columns']);
-        add_action('manage_form_submissions_posts_custom_column', [$this, 'fill_submissions_admin_columns'], 10, 2);
+        add_filter('manage_mksddn_fh_forms_posts_columns', [$this, 'add_forms_admin_columns']);
+        add_action('manage_mksddn_fh_forms_posts_custom_column', [$this, 'fill_forms_admin_columns'], 10, 2);
+        add_filter('manage_mksddn_fh_submits_posts_columns', [$this, 'add_submissions_admin_columns']);
+        add_action('manage_mksddn_fh_submits_posts_custom_column', [$this, 'fill_submissions_admin_columns'], 10, 2);
         
         // Clear cache when submissions are added/updated
         add_action('save_post_form_submissions', [$this, 'clear_submissions_cache'], 10, 2);
@@ -104,7 +104,7 @@ class AdminColumns {
         
         // Count submissions with optimized query
         $submissions = get_posts([
-            'post_type'      => 'form_submissions',
+            'post_type'      => 'mksddn_fh_submits',
             'post_status'    => 'publish',
             'posts_per_page' => -1,
             'fields'         => 'ids', // Only get IDs for better performance
@@ -129,7 +129,7 @@ class AdminColumns {
      * Clear submissions cache when submissions are updated
      */
     public function clear_submissions_cache($post_id, $post): void {
-        if ($post->post_type === 'form_submissions') {
+        if ($post->post_type === 'mksddn_fh_submits') {
             $form_id = get_post_meta($post_id, '_form_id', true);
             if ($form_id) {
                 $cache_key = 'submissions_count_' . $form_id;

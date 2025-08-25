@@ -27,7 +27,7 @@ class MetaBoxes {
             'form_settings',
             __( 'Form Settings', 'mksddn-forms-handler' ),
             [$this, 'render_form_settings_meta_box'],
-            'forms',
+            'mksddn_fh_forms',
             'normal',
             'high'
         );
@@ -41,7 +41,7 @@ class MetaBoxes {
             'submission_data',
             __( 'Submission Data', 'mksddn-forms-handler' ),
             [$this, 'render_submission_data_meta_box'],
-            'form_submissions',
+            'mksddn_fh_submits',
             'normal',
             'high'
         );
@@ -50,7 +50,7 @@ class MetaBoxes {
             'submission_info',
             __( 'Submission Info', 'mksddn-forms-handler' ),
             [$this, 'render_submission_info_meta_box'],
-            'form_submissions',
+            'mksddn_fh_submits',
             'side',
             'high'
         );

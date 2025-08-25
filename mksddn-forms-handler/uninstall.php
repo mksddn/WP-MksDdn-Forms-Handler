@@ -12,9 +12,9 @@ if (!defined('WP_UNINSTALL_PLUGIN')) {
 }
 
 // Remove plugin options (Google Sheets integration credentials)
-delete_option('google_sheets_client_id');
-delete_option('google_sheets_client_secret');
-delete_option('google_sheets_refresh_token');
+delete_option('mksddn_fh_google_sheets_client_id');
+delete_option('mksddn_fh_google_sheets_client_secret');
+delete_option('mksddn_fh_google_sheets_refresh_token');
 
 // Cleanup of transients created by this plugin (best-effort via API)
 $user_id = get_current_user_id();
@@ -23,7 +23,7 @@ if ($user_id) {
     delete_transient('fields_config_json_value_' . $user_id);
 }
 
-// Intentionally keep CPT data (forms, form_submissions) to avoid data loss
+// Intentionally keep CPT data (mksddn_fh_forms, mksddn_fh_form_submissions) to avoid data loss
 // If in the future a data deletion option is introduced, handle it here conditionally.
 
 

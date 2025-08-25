@@ -30,7 +30,7 @@ class PostTypes {
      */
     private function register_forms_post_type(): void {
         register_post_type(
-            'forms',
+            'mksddn_fh_forms',
             [
                 'labels'              => [
                     'name'               => __( 'Forms', 'mksddn-forms-handler' ),
@@ -49,10 +49,10 @@ class PostTypes {
                 'show_ui'             => true,
                 'show_in_menu'        => true,
                 'show_in_rest'        => true,
-                'rest_base'           => 'forms',
+                'rest_base'           => 'mksddn_fh_forms',
                 'capability_type'     => 'post',
                 'hierarchical'        => false,
-                'rewrite'             => ['slug' => 'forms'],
+                'rewrite'             => ['slug' => 'mksddn_fh_forms'],
                 'supports'            => ['title', 'custom-fields'],
                 'menu_icon'           => 'dashicons-feedback',
                 'show_in_admin_bar'   => true,
@@ -80,7 +80,7 @@ class PostTypes {
      */
     private function register_submissions_post_type(): void {
         register_post_type(
-            'form_submissions',
+            'mksddn_fh_submits',
             [
                 'labels'              => [
                     'name'               => __( 'Form Submissions', 'mksddn-forms-handler' ),

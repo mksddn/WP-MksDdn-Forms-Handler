@@ -143,3 +143,12 @@
         padding: 8px;
     }
 } 
+
+/* Hide Add New controls on submissions screens (moved from inline CSS) */
+body.post-type-mksddn_fh_submits .page-title-action,
+body.post-type-mksddn_fh_submits .wp-heading-inline + .page-title-action,
+body.post-type-mksddn_fh_submits a.page-title-action,
+body.post-type-mksddn_fh_submits .wrap .page-title-action,
+body.post-type-mksddn_fh_submits .subsubsub .add-new-h2 {
+    display: none !important;
+}

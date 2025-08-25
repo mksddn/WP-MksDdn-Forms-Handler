@@ -40,7 +40,7 @@ class ExportHandler {
      */
     public function add_submissions_export_menu(): void {
         add_submenu_page(
-            'edit.php?post_type=form_submissions',
+            'edit.php?post_type=mksddn_fh_submits',
             'Export Submissions',
             'Export Submissions',
             'manage_options',
@@ -124,7 +124,7 @@ class ExportHandler {
      */
     private function get_submissions_for_export($form_filter, $date_from, $date_to): array {
         $args = [
-            'post_type'      => 'form_submissions',
+            'post_type'      => 'mksddn_fh_submits',
             'post_status'    => 'publish',
             'posts_per_page' => -1,
             'orderby'        => 'date',
@@ -263,7 +263,7 @@ class ExportHandler {
         $form_stats = [];
         foreach ($forms as $form) {
             $submissions_count = get_posts([
-                'post_type'      => 'form_submissions',
+                'post_type'      => 'mksddn_fh_submits',
                 'post_status'    => 'publish',
                 'posts_per_page' => -1,
                 'meta_query'     => [
@@ -346,36 +346,7 @@ class ExportHandler {
                 </div>
             </div>
             
-            <script>
-            function openExportModal(formId, formName) {
-                document.getElementById('modal-title').textContent = 'Export ' + formName + ' by Date';
-                document.getElementById('modal-form-filter').value = formId;
-                document.getElementById('export-modal').style.display = 'block';
-            }
-            
-            function closeExportModal() {
-                document.getElementById('export-modal').style.display = 'none';
-                document.getElementById('export-filters-form').reset();
-            }
-            
-            // Close modal when clicking outside
-            document.getElementById('export-modal').addEventListener('click', function(e) {
-                if (e.target === this) {
-                    closeExportModal();
-                }
-            });
-            
-            // Handle "Export by Date" buttons
-            document.addEventListener('DOMContentLoaded', function() {
-                document.querySelectorAll('.export-with-filters').forEach(function(button) {
-                    button.addEventListener('click', function() {
-                        var formId = this.getAttribute('data-form-id');
-                        var formName = this.getAttribute('data-form-name');
-                        openExportModal(formId, formName);
-                    });
-                });
-            });
-            </script>
+            <!-- Scripts moved to assets/js/admin.js and enqueued via admin hooks -->
         </div>
         <?php
     }

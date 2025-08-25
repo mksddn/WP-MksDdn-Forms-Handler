@@ -14,7 +14,7 @@ namespace MksDdn\FormsHandler;
 class Shortcodes {
     
     public function __construct() {
-        add_shortcode('form', [$this, 'render_form_shortcode']);
+        add_shortcode('mksddn_fh_form', [$this, 'render_form_shortcode']);
     }
     
     /**
@@ -35,12 +35,12 @@ class Shortcodes {
         }
 
         // Get form
-        $form = get_page_by_path($form_id, OBJECT, 'forms');
+        $form = get_page_by_path($form_id, OBJECT, 'mksddn_fh_forms');
         if (!$form) {
             $form = get_post($form_id);
         }
 
-        if (!$form || $form->post_type !== 'forms') {
+        if (!$form || $form->post_type !== 'mksddn_fh_forms') {
             return '<p>' . esc_html__( 'Form not found', 'mksddn-forms-handler' ) . '</p>';
         }
 
@@ -98,120 +98,17 @@ class Shortcodes {
             <div class="form-message" style="display: none;"></div>
         </div>
         
-        <script>
-        jQuery(document).ready(function($) {
-            $('.wp-form').on('submit', function(e) {
-                e.preventDefault();
-                
-                var $form = $(this);
-                var $message = $form.siblings('.form-message');
-                var $submitButton = $form.find('.submit-button');
-                
-                $submitButton.prop('disabled', true).text('<?php echo esc_js( __( 'Sending...', 'mksddn-forms-handler' ) ); ?>');
-                $message.hide();
-                
-                $.ajax({
-                    url: $form.attr('action'),
-                    method: 'POST',
-                    data: $form.serialize(),
-                    success: function(response) {
-                        if (response.success) {
-                            var message = response.data.message;
-                            
-                            // Add delivery information
-                            if (response.data.delivery_results) {
-                                var delivery = response.data.delivery_results;
-                                message += '<br><br><strong>Delivery Status:</strong><br>';
-                                
-                                // Email
-                                if (delivery.email.success) {
-                                    message += '✅ Email: Sent successfully<br>';
-                                } else {
-                                    message += '❌ Email: ' + (delivery.email.error || 'Failed') + '<br>';
-                                }
-                                
-                                // Telegram
-                                if (delivery.telegram.enabled) {
-                                    if (delivery.telegram.success) {
-                                        message += '✅ Telegram: Sent successfully<br>';
-                                    } else {
-                                        message += '❌ Telegram: ' + (delivery.telegram.error || 'Failed') + '<br>';
-                                    }
-                                }
-                                
-                                // Google Sheets
-                                if (delivery.google_sheets.enabled) {
-                                    if (delivery.google_sheets.success) {
-                                        message += '✅ Google Sheets: Data saved<br>';
-                                    } else {
-                                        message += '❌ Google Sheets: ' + (delivery.google_sheets.error || 'Failed') + '<br>';
-                                    }
-                                }
-                                
-                                // Admin Storage
-                                if (delivery.admin_storage.enabled) {
-                                    if (delivery.admin_storage.success) {
-                                        message += '✅ Admin Panel: Submission saved<br>';
-                                    } else {
-                                        message += '❌ Admin Panel: ' + (delivery.admin_storage.error || 'Failed') + '<br>';
-                                    }
-                                }
-                            }
-                            
-                            $message.removeClass('error').addClass('success').html(message).show();
-                            $form[0].reset();
-                        } else {
-                            var errorMessage = response.data.message;
-                            
-                            // Add unauthorized fields information
-                            if (response.data.unauthorized_fields && response.data.unauthorized_fields.length > 0) {
-                                errorMessage += '<br><br><strong>Unauthorized fields:</strong> ' + response.data.unauthorized_fields.join(', ');
-                                if (response.data.allowed_fields && response.data.allowed_fields.length > 0) {
-                                    errorMessage += '<br><strong>Allowed fields:</strong> ' + response.data.allowed_fields.join(', ');
-                                }
-                            }
-                            
-                            // Add delivery results for send errors
-                            if (response.data.delivery_results) {
-                                errorMessage += '<br><br><strong>Delivery Status:</strong><br>';
-                                var delivery = response.data.delivery_results;
-                                
-                                if (delivery.email.success) {
-                                    errorMessage += '✅ Email: Sent successfully<br>';
-                                } else {
-                                    errorMessage += '❌ Email: ' + (delivery.email.error || 'Failed') + '<br>';
-                                }
-                                
-                                if (delivery.telegram.enabled) {
-                                    if (delivery.telegram.success) {
-                                        errorMessage += '✅ Telegram: Sent successfully<br>';
-                                    } else {
-                                        errorMessage += '❌ Telegram: ' + (delivery.telegram.error || 'Failed') + '<br>';
-                                    }
-                                }
-                                
-                                if (delivery.google_sheets.enabled) {
-                                    if (delivery.google_sheets.success) {
-                                        errorMessage += '✅ Google Sheets: Data saved<br>';
-                                    } else {
-                                        errorMessage += '❌ Google Sheets: ' + (delivery.google_sheets.error || 'Failed') + '<br>';
-                                    }
-                                }
-                            }
-                            
-                            $message.removeClass('success').addClass('error').html(errorMessage).show();
-                        }
-                    },
-                    error: function() {
-                        $message.removeClass('success').addClass('error').html('<?php echo esc_js( __( 'An error occurred while sending the form', 'mksddn-forms-handler' ) ); ?>').show();
-                    },
-                    complete: function() {
-                        $submitButton.prop('disabled', false).text('<?php echo esc_js( __( 'Send', 'mksddn-forms-handler' ) ); ?>');
-                    }
-                });
-            });
-        });
-        </script>
+        <?php
+        wp_enqueue_script('mksddn-fh-form');
+        wp_localize_script(
+            'mksddn-fh-form',
+            'mksddn_fh_form',
+            [
+                'sending_text' => __( 'Sending...', 'mksddn-forms-handler' ),
+                'send_text'    => __( 'Send', 'mksddn-forms-handler' ),
+            ]
+        );
+        ?>
         <?php
         return ob_get_clean();
     }

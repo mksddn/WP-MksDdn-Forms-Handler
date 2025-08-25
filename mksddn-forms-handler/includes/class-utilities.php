@@ -18,14 +18,14 @@ class Utilities {
      */
     public static function create_default_contact_form(): void {
         // Check if form with this slug already exists
-        $existing_form = get_page_by_path('contact-form', OBJECT, 'forms');
+        $existing_form = get_page_by_path('contact-form', OBJECT, 'mksddn_fh_forms');
 
         if (!$existing_form) {
             $form_data = [
                 'post_title'   => 'Contact Form',
                 'post_name'    => 'contact-form',
                 'post_status'  => 'publish',
-                'post_type'    => 'forms',
+                'post_type'    => 'mksddn_fh_forms',
                 'post_content' => 'Default contact form',
             ];
 
@@ -73,7 +73,7 @@ class Utilities {
      */
     public static function get_all_forms() {
         return get_posts([
-            'post_type'      => 'forms',
+            'post_type'      => 'mksddn_fh_forms',
             'post_status'    => 'publish',
             'posts_per_page' => -1,
             'orderby'        => 'title',
@@ -85,7 +85,7 @@ class Utilities {
      * Get form by slug
      */
     public static function get_form_by_slug($slug) {
-        return get_page_by_path($slug, OBJECT, 'forms');
+        return get_page_by_path($slug, OBJECT, 'mksddn_fh_forms');
     }
     
     /**

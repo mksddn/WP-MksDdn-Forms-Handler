@@ -41,6 +41,7 @@ require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/includes/class-export-handler.p
 require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/includes/class-security.php';
 require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/includes/class-utilities.php';
 require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/includes/class-google-sheets-admin.php';
+require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/includes/class-assets.php';
 
 // Load handlers
 require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/handlers/class-telegram-handler.php';
@@ -56,6 +57,7 @@ add_action('plugins_loaded', function() {
     new MksDdn\FormsHandler\ExportHandler();
     new MksDdn\FormsHandler\Security();
     new MksDdn\FormsHandler\GoogleSheetsAdmin();
+    new MksDdn\FormsHandler\Assets();
     
     // Nothing else here
 });

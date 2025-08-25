@@ -79,9 +79,9 @@ class GoogleSheetsHandler {
      * Get access token using refresh token
      */
     private static function get_access_token() {
-        $refresh_token = get_option('google_sheets_refresh_token');
-        $client_id = get_option('google_sheets_client_id');
-        $client_secret = get_option('google_sheets_client_secret');
+        $refresh_token = get_option('mksddn_fh_google_sheets_refresh_token');
+        $client_id = get_option('mksddn_fh_google_sheets_client_id');
+        $client_secret = get_option('mksddn_fh_google_sheets_client_secret');
 
         if (!$refresh_token || !$client_id || !$client_secret) {
             return new \WP_Error('sheets_auth_error', __( 'Google Sheets authentication not configured', 'mksddn-forms-handler' ));
@@ -123,9 +123,9 @@ class GoogleSheetsHandler {
             return new \WP_Error('sheets_config_error', __( 'Spreadsheet ID is required', 'mksddn-forms-handler' ));
         }
 
-        $refresh_token = get_option('google_sheets_refresh_token');
-        $client_id = get_option('google_sheets_client_id');
-        $client_secret = get_option('google_sheets_client_secret');
+        $refresh_token = get_option('mksddn_fh_google_sheets_refresh_token');
+        $client_id = get_option('mksddn_fh_google_sheets_client_id');
+        $client_secret = get_option('mksddn_fh_google_sheets_client_secret');
 
         if (!$refresh_token || !$client_id || !$client_secret) {
             return new \WP_Error('sheets_auth_error', __( 'Google Sheets authentication not configured', 'mksddn-forms-handler' ));
@@ -200,7 +200,7 @@ class GoogleSheetsHandler {
      * Get OAuth authorization URL
      */
     public static function get_auth_url(): string {
-        $client_id = get_option('google_sheets_client_id');
+        $client_id = get_option('mksddn_fh_google_sheets_client_id');
         if (!$client_id) {
             return '';
         }
