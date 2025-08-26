@@ -237,7 +237,7 @@ add_action('mksddn_sheets_sent', function($spreadsheet_id, $sheet_name, $data, $
 #### Отправка формы
 
 ```
-POST /wp-json/wp/v2/forms/{slug}/submit
+POST /wp-json/mksddn-forms-handler/v1/forms/{slug}/submit
 ```
 
 **Параметры:**
@@ -247,7 +247,7 @@ POST /wp-json/wp/v2/forms/{slug}/submit
 **Пример запроса:**
 
 ```javascript
-fetch('/wp-json/wp/v2/forms/contact-form/submit', {
+fetch('/wp-json/mksddn-forms-handler/v1/forms/contact-form/submit', {
     method: 'POST',
     headers: {
         'Content-Type': 'application/json',
@@ -290,6 +290,47 @@ fetch('/wp-json/wp/v2/forms/contact-form/submit', {
             "enabled": true
         }
     }
+}
+```
+
+#### Получение списка форм
+
+```
+GET /wp-json/mksddn-forms-handler/v1/forms
+```
+
+Параметры:
+- `per_page` (1..100)
+- `page` (>=1)
+- `search` (строка, опционально)
+
+Пример ответа:
+
+```json
+[
+  {
+    "id": 12,
+    "slug": "contact-form",
+    "title": "Contact Form",
+    "submit_url": "/wp-json/mksddn-forms-handler/v1/forms/contact-form/submit"
+  }
+]
+```
+
+#### Получение одной формы по слагу
+
+```
+GET /wp-json/mksddn-forms-handler/v1/forms/{slug}
+```
+
+Пример ответа:
+
+```json
+{
+  "id": 12,
+  "slug": "contact-form",
+  "title": "Contact Form",
+  "submit_url": "/wp-json/mksddn-forms-handler/v1/forms/contact-form/submit"
 }
 ```
 

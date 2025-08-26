@@ -655,3 +655,48 @@
 
 1. Завершить условную локализацию (REST endpoints, nonce) для формы.
 2. Продолжить с публичным REST (honeypot + rate limiting) и префиксами.
+
+## Запись от 2025-08-26 (REST namespace унификация)
+
+### Наблюдения
+
+- В коде оставался back-compat маршрут `/wp/v2/forms/{slug}/submit`.
+- По требованиям проекта нужно оставить только `mksddn-forms-handler/v1`.
+
+### Изменения
+
+1. Удалена регистрация маршрута `wp/v2` в `includes/class-forms-handler.php`.
+2. Добавлены новые эндпойнты в нашем namespace:
+   - `GET /wp-json/mksddn-forms-handler/v1/forms`
+   - `GET /wp-json/mksddn-forms-handler/v1/forms/{slug}`
+3. Обновлена документация: `docs/user-guide/faq.md`, `docs/user-guide/integrations.md`, `mksddn-forms-handler/README.md`.
+
+### Проверки
+
+- Поиском подтверждено отсутствие упоминаний `/wp-json/wp/v2/forms` в коде и документации.
+- Основной endpoint: `/wp-json/mksddn-forms-handler/v1/forms/{slug}/submit`.
+
+### Следующие шаги
+
+1. Сообщить пользователям об изменении в changelog (указано в readme.txt 1.0.2).
+2. Продолжить локализацию фронтенд-скриптов значениями endpoint и nonce.
+
+## Запись от 2025-08-26 (Версия 1.0.3)
+
+### Наблюдения
+
+- Внесены изменения в REST API: единый namespace и новые GET эндпойнты для списка и одной формы.
+
+### Изменения
+
+1. Повышена версия плагина до 1.0.3 в заголовке и константе.
+2. Обновлён `readme.txt`: Stable tag 1.0.3, Changelog/Upgrade Notice.
+
+### Проверки
+
+- Синтаксическая проверка PHP — ок.
+- Линтеры для документации — ок.
+
+### Замечания
+
+- Совместимость не нарушена; старый `/wp/v2` роут удалён.

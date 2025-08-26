@@ -238,5 +238,24 @@
 - **Шаги выполнения**:
   - [x] Регистрация `mksddn-fh-form`
   - [x] Enqueue внутри `render_form_shortcode`
-  - [ ] Расширенная локализация (REST endpoints, nonce)
+  - [x] Расширенная локализация (REST endpoints, nonce)
+
+### Задача: Единый REST namespace и удаление устаревшего роутинга
+- **Статус**: Завершена ✅
+- **Описание**: Удалён маршрут `/wp/v2/forms/{slug}/submit`, оставлен только `mksddn-forms-handler/v1/forms/{slug}/submit`. Обновлена документация (README, FAQ, Integrations).
+- **Шаги выполнения**:
+  - [x] Удалена регистрация `wp/v2` в `includes/class-forms-handler.php`
+  - [x] Обновлены ссылки в `docs/user-guide/faq.md`
+  - [x] Обновлены ссылки и примеры в `docs/user-guide/integrations.md`
+  - [x] Обновлены ссылки в `mksddn-forms-handler/README.md`
+- **Зависимости**: Нет
+
+### Задача: Список форм в нашем REST namespace
+- **Статус**: Завершена ✅
+- **Описание**: Добавлены GET эндпойнты `mksddn-forms-handler/v1/forms` и `mksddn-forms-handler/v1/forms/{slug}` для получения списка и данных одной формы.
+- **Шаги выполнения**:
+  - [x] Регистрация маршрутов в `includes/class-forms-handler.php`
+  - [x] Реализация обработчиков `handle_rest_get_forms` и `handle_rest_get_form`
+  - [x] Обновление документации: README, FAQ, Integrations
+- **Зависимости**: Единый REST namespace
 - **Зависимости**: Шорткод

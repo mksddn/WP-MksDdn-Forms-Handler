@@ -54,13 +54,35 @@ class FormsHandler {
             ]
         );
 
-        // Back-compat alias for older integrations expecting wp/v2 namespace
+        // Public list of forms in the same namespace
         register_rest_route(
-            'wp/v2',
-            '/forms/(?P<slug>[a-zA-Z0-9-]+)/submit',
+            'mksddn-forms-handler/v1',
+            '/forms',
             [
-                'methods'             => 'POST',
-                'callback'            => [$this, 'handle_rest_form_submission'],
+                'methods'             => 'GET',
+                'callback'            => [$this, 'handle_rest_get_forms'],
+                'permission_callback' => '__return_true',
+                'args'                => [
+                    'per_page' => [
+                        'validate_callback' => fn($param): bool => is_numeric($param) && (int)$param >= 1 && (int)$param <= 100,
+                    ],
+                    'page' => [
+                        'validate_callback' => fn($param): bool => is_numeric($param) && (int)$param >= 1,
+                    ],
+                    'search' => [
+                        'validate_callback' => fn($param): bool => is_string($param),
+                    ],
+                ],
+            ]
+        );
+
+        // Public single form meta in the same namespace
+        register_rest_route(
+            'mksddn-forms-handler/v1',
+            '/forms/(?P<slug>[a-zA-Z0-9-]+)',
+            [
+                'methods'             => 'GET',
+                'callback'            => [$this, 'handle_rest_get_form'],
                 'permission_callback' => '__return_true',
                 'args'                => [
                     'slug' => [
@@ -137,6 +159,89 @@ class FormsHandler {
         }
 
         return new \WP_REST_Response($result, 200);
+    }
+
+    /**
+     * Get public list of forms
+     *
+     * @param \WP_REST_Request $request Request instance
+     * @return \WP_REST_Response
+     */
+    public function handle_rest_get_forms($request): \WP_REST_Response {
+        $per_page = (int) ($request->get_param('per_page') ?? 10);
+        if ($per_page < 1) {
+            $per_page = 10;
+        }
+        if ($per_page > 100) {
+            $per_page = 100;
+        }
+        $page = (int) ($request->get_param('page') ?? 1);
+        if ($page < 1) {
+            $page = 1;
+        }
+        $search = $request->get_param('search');
+        $search = is_string($search) ? sanitize_text_field( wp_unslash($search) ) : '';
+
+        $args = [
+            'post_type'      => 'mksddn_fh_forms',
+            'posts_per_page' => $per_page,
+            'paged'          => $page,
+            's'              => $search,
+            'post_status'    => 'publish',
+            'fields'         => 'ids',
+        ];
+
+        $query = new \WP_Query($args);
+        $form_ids = $query->posts;
+
+        $items = [];
+        foreach ($form_ids as $form_id) {
+            $post = get_post($form_id);
+            if (!$post) {
+                continue;
+            }
+            $items[] = [
+                'id'         => $post->ID,
+                'slug'       => $post->post_name,
+                'title'      => $post->post_title,
+                'submit_url' => rest_url('mksddn-forms-handler/v1/forms/' . $post->post_name . '/submit'),
+            ];
+        }
+
+        $response = new \WP_REST_Response($items, 200);
+        $response->header('X-WP-Total', (string) $query->found_posts);
+        $total_pages = $per_page > 0 ? (int) ceil($query->found_posts / $per_page) : 1;
+        $response->header('X-WP-TotalPages', (string) $total_pages);
+
+        return $response;
+    }
+
+    /**
+     * Get single form public meta by slug
+     *
+     * @param \WP_REST_Request $request Request instance
+     * @return \WP_REST_Response
+     */
+    public function handle_rest_get_form($request): \WP_REST_Response {
+        $slug = $request->get_param('slug');
+        $slug = is_string($slug) ? sanitize_title($slug) : '';
+        if ($slug === '') {
+            return new \WP_REST_Response(['message' => 'Invalid slug'], 400);
+        }
+
+        $post = get_page_by_path($slug, OBJECT, 'mksddn_fh_forms');
+        if (!$post) {
+            return new \WP_REST_Response(['message' => 'Form not found'], 404);
+        }
+
+        $data = [
+            'id'         => $post->ID,
+            'slug'       => $post->post_name,
+            'title'      => $post->post_title,
+            'submit_url' => rest_url('mksddn-forms-handler/v1/forms/' . $post->post_name . '/submit'),
+        ];
+
+        return new \WP_REST_Response($data, 200);
     }
     
     /**

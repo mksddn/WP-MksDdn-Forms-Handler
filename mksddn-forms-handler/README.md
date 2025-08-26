@@ -68,7 +68,17 @@ forms-handler/
 
 Submit forms via POST to:
 ```
-/wp-json/wp/v2/forms/{slug}/submit
+/wp-json/mksddn-forms-handler/v1/forms/{slug}/submit
+```
+
+List forms via GET:
+```
+/wp-json/mksddn-forms-handler/v1/forms
+```
+
+Get single form meta via GET:
+```
+/wp-json/mksddn-forms-handler/v1/forms/{slug}
 ```
 
 ### Google Sheets Setup

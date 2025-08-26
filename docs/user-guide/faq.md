@@ -147,7 +147,10 @@
 
 ### Q: Как использовать REST API?
 
-**A:** Отправляйте POST запросы на `/wp-json/wp/v2/forms/{slug}/submit` с JSON данными формы.
+**A:**
+- Отправка формы: `/wp-json/mksddn-forms-handler/v1/forms/{slug}/submit` (POST)
+- Список форм: `/wp-json/mksddn-forms-handler/v1/forms` (GET)
+- Информация о форме: `/wp-json/mksddn-forms-handler/v1/forms/{slug}` (GET)
 
 ### Q: Какие ошибки может вернуть API?
 

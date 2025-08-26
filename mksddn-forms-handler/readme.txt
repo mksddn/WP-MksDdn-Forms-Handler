@@ -4,7 +4,7 @@ Tags: forms, telegram, google-sheets, rest-api, form-handler
 Requires at least: 5.0
 Tested up to: 6.8
 Requires PHP: 8.0
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,14 @@ Yes! The plugin provides REST API endpoints for AJAX form submissions. Check the
 
 == Changelog ==
 
+= 1.0.3 =
+* REST: Removed legacy `/wp/v2/forms` route; unified custom namespace
+* REST: Added GET endpoints in custom namespace:
+  - `GET /wp-json/mksddn-forms-handler/v1/forms`
+  - `GET /wp-json/mksddn-forms-handler/v1/forms/{slug}`
+* Docs: Updated README and user guides (FAQ, Integrations)
+* Meta: Bumped plugin version to 1.0.3
+
 = 1.0.2 =
 * Enqueued scripts/styles properly, removed inline JS/CSS
 * Prefixed options/transients and custom post types
@@ -123,6 +131,9 @@ Yes! The plugin provides REST API endpoints for AJAX form submissions. Check the
 * Clean, maintainable code structure
 
 == Upgrade Notice ==
+
+= 1.0.3 =
+Unified REST namespace and added GET endpoints. Update recommended.
 
 = 1.0.2 =
 Compliance update: enqueue fixes, security hardening, and REST adjustments. No breaking changes.
