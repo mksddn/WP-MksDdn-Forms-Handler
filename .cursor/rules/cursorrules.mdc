@@ -289,3 +289,8 @@ error_log('Forms Handler: Form submission failed - ' . $error_message);
 При любых изменениях в проекте сначала актуализируй документацию, а затем приступай к следующему шагу разработки. Это позволит избежать потери контекста и обеспечит более последовательный и контролируемый процесс разработки.
 
 Документация по созданию вордпресс плагинов: https://make.wordpress.org/plugins/
+
+Популярные комментарии:
+- Use wp_enqueue commands
+- Data Must be Sanitized, Escaped, and Validated
+- Generic function/class/define/namespace/option names
