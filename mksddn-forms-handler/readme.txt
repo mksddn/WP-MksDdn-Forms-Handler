@@ -4,7 +4,7 @@ Tags: forms, telegram, google-sheets, rest-api, form-handler
 Requires at least: 5.0
 Tested up to: 6.8
 Requires PHP: 8.0
-Stable tag: 1.0.3
+Stable tag: 1.0.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -91,6 +91,61 @@ Yes, the plugin includes comprehensive security measures:
 
 Yes! The plugin provides REST API endpoints for AJAX form submissions. Check the documentation for API details.
 
+== Supported Field Types ==
+
+Fields are configured as JSON in the form settings. Supported types:
+
+* text, email, tel, url, number, date
+* textarea
+* checkbox (if required, must be checked)
+* select (supports multiple)
+* radio
+
+Notes:
+
+* `options` can be an array of strings or objects `{ "value": "...", "label": "..." }`.
+* For `select` with multiple choice, set `multiple: true` (shortcode renders `name[]`).
+* For REST submissions, send arrays for multiple selects.
+
+Example JSON config:
+
+```
+[
+  {"name":"name","label":"Name","type":"text","required":true},
+  {"name":"email","label":"Email","type":"email","required":true},
+  {"name":"message","label":"Message","type":"textarea","required":true},
+  {"name":"agree","label":"I agree to Terms","type":"checkbox","required":true},
+  {
+    "name":"services",
+    "label":"Choose a service (or multiple)",
+    "type":"select",
+    "required":false,
+    "multiple":true,
+    "options":["seo","smm","ads"]
+  },
+  {
+    "name":"contact_method",
+    "label":"Preferred contact",
+    "type":"radio",
+    "required":true,
+    "options":[
+      {"value":"email","label":"Email"},
+      {"value":"phone","label":"Phone"}
+    ]
+  },
+  {
+    "name":"attachments",
+    "label":"Attach files",
+    "type":"file",
+    "required":false,
+    "multiple":true,
+    "allowed_extensions":["pdf","png","jpg","jpeg"],
+    "max_size_mb":10,
+    "max_files":3
+  }
+]
+```
+
 == Screenshots ==
 
 1. Form creation interface
@@ -100,6 +155,13 @@ Yes! The plugin provides REST API endpoints for AJAX form submissions. Check the
 5. Google Sheets integration
 
 == Changelog ==
+
+= 1.0.4 =
+* Fields: Added select (with multiple) and radio support in shortcode
+* Config: `options` and `multiple` support in fields JSON
+* Validation: Ensured submitted values match configured options
+* Emails/Admin: Proper rendering of array values (comma-separated)
+* Docs: README and readme.txt updated with field types and examples
 
 = 1.0.3 =
 * REST: Removed legacy `/wp/v2/forms` route; unified custom namespace

@@ -80,6 +80,49 @@ class Shortcodes {
                                 value="1"
                                 <?php echo (isset($field['required']) && $field['required']) ? 'required' : ''; ?>
                             >
+                        <?php elseif ($field['type'] === 'select') : ?>
+                            <?php 
+                            $options = isset($field['options']) && is_array($field['options']) ? $field['options'] : [];
+                            $is_multiple = isset($field['multiple']) && ($field['multiple'] === '1' || $field['multiple'] === true);
+                            $name_attr = $is_multiple ? $field['name'] . '[]' : $field['name'];
+                            ?>
+                            <select 
+                                name="<?php echo esc_attr($name_attr); ?>" 
+                                id="<?php echo esc_attr($field['name']); ?>"
+                                <?php echo $is_multiple ? 'multiple' : ''; ?>
+                                <?php echo (isset($field['required']) && $field['required']) ? 'required' : ''; ?>
+                            >
+                                <?php foreach ($options as $opt) : 
+                                    $opt_value = is_array($opt) ? ($opt['value'] ?? '') : (string) $opt;
+                                    $opt_label = is_array($opt) ? ($opt['label'] ?? $opt_value) : (string) $opt;
+                                    if ($opt_value === '') { continue; }
+                                ?>
+                                    <option value="<?php echo esc_attr($opt_value); ?>"><?php echo esc_html($opt_label); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        <?php elseif ($field['type'] === 'radio') : ?>
+                            <?php 
+                            $options = isset($field['options']) && is_array($field['options']) ? $field['options'] : [];
+                            ?>
+                            <div class="radio-group" role="radiogroup" aria-labelledby="<?php echo esc_attr($field['name']); ?>-label">
+                                <?php foreach ($options as $idx => $opt) : 
+                                    $opt_value = is_array($opt) ? ($opt['value'] ?? '') : (string) $opt;
+                                    $opt_label = is_array($opt) ? ($opt['label'] ?? $opt_value) : (string) $opt;
+                                    if ($opt_value === '') { continue; }
+                                    $input_id = $field['name'] . '_' . sanitize_title($opt_value);
+                                ?>
+                                    <label for="<?php echo esc_attr($input_id); ?>" class="radio-option">
+                                        <input 
+                                            type="radio" 
+                                            name="<?php echo esc_attr($field['name']); ?>" 
+                                            id="<?php echo esc_attr($input_id); ?>" 
+                                            value="<?php echo esc_attr($opt_value); ?>"
+                                            <?php echo (isset($field['required']) && $field['required']) ? 'required' : ''; ?>
+                                        >
+                                        <?php echo esc_html($opt_label); ?>
+                                    </label>
+                                <?php endforeach; ?>
+                            </div>
                         <?php else : ?>
                             <input 
                                 type="<?php echo esc_attr($field['type']); ?>" 

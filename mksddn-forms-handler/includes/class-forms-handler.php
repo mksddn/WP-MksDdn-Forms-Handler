@@ -634,6 +634,17 @@ class FormsHandler {
             $field_label = $field['label'] ?? $field_name;
             $is_required = $field['required'] ?? false;
             $field_type = $field['type'] ?? 'text';
+            $options = [];
+            if (($field_type === 'select' || $field_type === 'radio') && isset($field['options']) && is_array($field['options'])) {
+                foreach ($field['options'] as $opt) {
+                    if (is_array($opt)) {
+                        if (isset($opt['value'])) { $options[] = (string)$opt['value']; }
+                    } else {
+                        $options[] = (string)$opt;
+                    }
+                }
+                $options = array_values(array_unique(array_filter($options, fn($v) => $v !== '')));
+            }
 
             // Check required fields
             if ($is_required) {
@@ -651,11 +662,37 @@ class FormsHandler {
                 return new \WP_Error('validation_error', sprintf( /* translators: %s: field label */ __( "Field '%s' must contain a valid email address", 'mksddn-forms-handler' ), $field_label), ['status' => 400]);
             }
 
-            // Check field length
+            // Validate select/radio against allowed options
+            if (($field_type === 'select' || $field_type === 'radio') && isset($form_data[$field_name]) && $options !== []) {
+                $value = $form_data[$field_name];
+                if (is_array($value)) {
+                    // Multiple select
+                    foreach ($value as $v) {
+                        if (!in_array((string)$v, $options, true)) {
+                            return new \WP_Error('validation_error', sprintf( /* translators: %s: field label */ __( "Field '%s' contains an invalid value", 'mksddn-forms-handler' ), $field_label), ['status' => 400]);
+                        }
+                    }
+                } else {
+                    if (!in_array((string)$value, $options, true)) {
+                        return new \WP_Error('validation_error', sprintf( /* translators: %s: field label */ __( "Field '%s' contains an invalid value", 'mksddn-forms-handler' ), $field_label), ['status' => 400]);
+                    }
+                }
+            }
+
+            // Check field length (strings only)
             if (isset($form_data[$field_name]) && !empty($form_data[$field_name]) && $field_type !== 'checkbox') {
-                $value_length = strlen((string)$form_data[$field_name]);
-                if ($value_length > 10000) {
-                    return new \WP_Error('validation_error', sprintf( /* translators: %s: field label */ __( "Field '%s' is too long (maximum 10,000 characters)", 'mksddn-forms-handler' ), $field_label), ['status' => 400]);
+                if (is_array($form_data[$field_name])) {
+                    // Sum of lengths of array values
+                    $total = 0;
+                    foreach ($form_data[$field_name] as $v) { $total += strlen((string)$v); }
+                    if ($total > 10000) {
+                        return new \WP_Error('validation_error', sprintf( /* translators: %s: field label */ __( "Field '%s' is too long (maximum 10,000 characters)", 'mksddn-forms-handler' ), $field_label), ['status' => 400]);
+                    }
+                } else {
+                    $value_length = strlen((string)$form_data[$field_name]);
+                    if ($value_length > 10000) {
+                        return new \WP_Error('validation_error', sprintf( /* translators: %s: field label */ __( "Field '%s' is too long (maximum 10,000 characters)", 'mksddn-forms-handler' ), $field_label), ['status' => 400]);
+                    }
                 }
             }
         }
@@ -709,9 +746,16 @@ class FormsHandler {
         $body .= "<tr style='background-color: #f8f8f8;'><th style='padding: 10px; border: 1px solid #e9e9e9; text-align: left;'>Field</th><th style='padding: 10px; border: 1px solid #e9e9e9; text-align: left;'>Value</th></tr>";
 
         foreach ($form_data as $key => $value) {
+            $display_value = '';
+            if (is_array($value)) {
+                $display_value = implode(', ', array_map('sanitize_text_field', array_map('strval', $value)));
+            } else {
+                $display_value = (string) $value;
+            }
+
             $body .= '<tr>';
             $body .= "<td style='padding: 10px; border: 1px solid #e9e9e9;'><strong>" . esc_html($key) . '</strong></td>';
-            $body .= "<td style='padding: 10px; border: 1px solid #e9e9e9;'>" . esc_html($value) . '</td>';
+            $body .= "<td style='padding: 10px; border: 1px solid #e9e9e9;'>" . esc_html($display_value) . '</td>';
             $body .= '</tr>';
         }
 
