@@ -71,6 +71,7 @@ class Shortcodes {
                                 id="<?php echo esc_attr($field['name']); ?>"
                                 <?php echo (isset($field['required']) && $field['required']) ? 'required' : ''; ?>
                                 rows="4"
+                                <?php if (!empty($field['placeholder'])) : ?>placeholder="<?php echo esc_attr($field['placeholder']); ?>"<?php endif; ?>
                             ></textarea>
                         <?php elseif ($field['type'] === 'checkbox') : ?>
                             <input 
@@ -124,11 +125,30 @@ class Shortcodes {
                                 <?php endforeach; ?>
                             </div>
                         <?php else : ?>
+                            <?php 
+                            $type = isset($field['type']) ? (string) $field['type'] : 'text';
+                            $has_min = isset($field['min']) && $field['min'] !== '';
+                            $has_max = isset($field['max']) && $field['max'] !== '';
+                            $has_step = isset($field['step']) && $field['step'] !== '';
+                            $pattern = '';
+                            if (!empty($field['pattern'])) {
+                                $pattern = (string) $field['pattern'];
+                            } elseif ($type === 'tel') {
+                                // Reasonable default pattern for phone numbers (E.164-like)
+                                $pattern = '^\\+?\\d{7,15}$';
+                            }
+                            ?>
                             <input 
-                                type="<?php echo esc_attr($field['type']); ?>" 
+                                type="<?php echo esc_attr($type); ?>" 
                                 name="<?php echo esc_attr($field['name']); ?>" 
                                 id="<?php echo esc_attr($field['name']); ?>"
                                 <?php echo (isset($field['required']) && $field['required']) ? 'required' : ''; ?>
+                                <?php if (!empty($field['placeholder'])) : ?>placeholder="<?php echo esc_attr($field['placeholder']); ?>"<?php endif; ?>
+                                <?php if ($has_min) : ?>min="<?php echo esc_attr($field['min']); ?>"<?php endif; ?>
+                                <?php if ($has_max) : ?>max="<?php echo esc_attr($field['max']); ?>"<?php endif; ?>
+                                <?php if ($has_step) : ?>step="<?php echo esc_attr($field['step']); ?>"<?php endif; ?>
+                                <?php if ($pattern !== '') : ?>pattern="<?php echo esc_attr($pattern); ?>"<?php endif; ?>
+                                <?php if ($type === 'tel') : ?>inputmode="tel"<?php endif; ?>
                             >
                         <?php endif; ?>
                     </div>

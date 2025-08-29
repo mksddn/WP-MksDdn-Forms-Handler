@@ -774,6 +774,78 @@ class FormsHandler {
                 return new \WP_Error('validation_error', sprintf( /* translators: %s: field label */ __( "Field '%s' must contain a valid email address", 'mksddn-forms-handler' ), $field_label), ['status' => 400]);
             }
 
+            // Check URL
+            if ($field_type === 'url' && isset($form_data[$field_name]) && $form_data[$field_name] !== '') {
+                $sanitized_url = esc_url_raw((string)$form_data[$field_name]);
+                if ($sanitized_url === '') {
+                    return new \WP_Error('validation_error', sprintf( __( "Field '%s' must contain a valid URL", 'mksddn-forms-handler' ), $field_label), ['status' => 400]);
+                }
+            }
+
+            // Check number with optional min/max/step
+            if ($field_type === 'number' && isset($form_data[$field_name]) && $form_data[$field_name] !== '') {
+                $value = $form_data[$field_name];
+                if (!is_numeric($value)) {
+                    return new \WP_Error('validation_error', sprintf( __( "Field '%s' must be a number", 'mksddn-forms-handler' ), $field_label), ['status' => 400]);
+                }
+                $num = $value + 0; // cast numeric
+                if (isset($field['min']) && $field['min'] !== '' && $num < ($field['min'] + 0)) {
+                    return new \WP_Error('validation_error', sprintf( __( "Field '%s' must be greater than or equal to %s", 'mksddn-forms-handler' ), $field_label, $field['min']), ['status' => 400]);
+                }
+                if (isset($field['max']) && $field['max'] !== '' && $num > ($field['max'] + 0)) {
+                    return new \WP_Error('validation_error', sprintf( __( "Field '%s' must be less than or equal to %s", 'mksddn-forms-handler' ), $field_label, $field['max']), ['status' => 400]);
+                }
+                if (isset($field['step']) && $field['step'] !== '' && is_numeric($field['step']) && (float)$field['step'] > 0) {
+                    $step = (float)$field['step'];
+                    $remainder = fmod((float)$num, $step);
+                    if ($remainder !== 0.0 && $step !== 1.0) {
+                        return new \WP_Error('validation_error', sprintf( __( "Field '%s' must follow step %s", 'mksddn-forms-handler' ), $field_label, $field['step']), ['status' => 400]);
+                    }
+                }
+            }
+
+            // Check telephone pattern (server-side, optional)
+            if ($field_type === 'tel' && isset($form_data[$field_name]) && $form_data[$field_name] !== '') {
+                $pattern = '';
+                if (!empty($field['pattern']) && is_string($field['pattern'])) {
+                    $pattern = (string)$field['pattern'];
+                } else {
+                    $pattern = '^\+?\d{7,15}$';
+                }
+                $delimited = '/'.$pattern.'/';
+                if (@preg_match($delimited, '') === false) {
+                    // Fallback to default if provided pattern is invalid
+                    $delimited = '/^\+?\d{7,15}$/';
+                }
+                if (!preg_match($delimited, (string)$form_data[$field_name])) {
+                    return new \WP_Error('validation_error', sprintf( __( "Field '%s' must be a valid phone number", 'mksddn-forms-handler' ), $field_label), ['status' => 400]);
+                }
+            }
+
+            // Check date/time/datetime-local formats (if present)
+            if (isset($form_data[$field_name]) && $form_data[$field_name] !== '') {
+                $val = (string)$form_data[$field_name];
+                if ($field_type === 'date') {
+                    $dt = \DateTime::createFromFormat('Y-m-d', $val);
+                    if (!$dt || $dt->format('Y-m-d') !== $val) {
+                        return new \WP_Error('validation_error', sprintf( __( "Field '%s' must be a valid date (YYYY-MM-DD)", 'mksddn-forms-handler' ), $field_label), ['status' => 400]);
+                    }
+                }
+                if ($field_type === 'time') {
+                    $dt = \DateTime::createFromFormat('H:i', $val);
+                    if (!$dt || $dt->format('H:i') !== $val) {
+                        return new \WP_Error('validation_error', sprintf( __( "Field '%s' must be a valid time (HH:MM)", 'mksddn-forms-handler' ), $field_label), ['status' => 400]);
+                    }
+                }
+                if ($field_type === 'datetime-local') {
+                    // HTML datetime-local typically 'YYYY-MM-DDTHH:MM'
+                    $dt = \DateTime::createFromFormat('Y-m-d\TH:i', $val);
+                    if (!$dt || $dt->format('Y-m-d\TH:i') !== $val) {
+                        return new \WP_Error('validation_error', sprintf( __( "Field '%s' must be a valid datetime (YYYY-MM-DDTHH:MM)", 'mksddn-forms-handler' ), $field_label), ['status' => 400]);
+                    }
+                }
+            }
+
             // Validate select/radio against allowed options
             if (($field_type === 'select' || $field_type === 'radio') && isset($form_data[$field_name]) && $options !== []) {
                 $value = $form_data[$field_name];

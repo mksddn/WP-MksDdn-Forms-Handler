@@ -48,6 +48,54 @@ MksDdn Forms Handler is a powerful and flexible form processing plugin that allo
 3. Use the Forms menu to create and manage your forms
 4. Use the shortcode `[mksddn_fh_form id="form_id"]` to display forms on your pages
 
+== REST API ==
+
+Namespace: `mksddn-forms-handler/v1`
+
+1) List forms
+- Method: GET
+- Path: `/wp-json/mksddn-forms-handler/v1/forms`
+- Query params:
+  - `per_page` (1–100, default: 10)
+  - `page` (>=1, default: 1)
+  - `search` (string, optional)
+- Response headers: `X-WP-Total`, `X-WP-TotalPages`
+
+2) Get single form
+- Method: GET
+- Path: `/wp-json/mksddn-forms-handler/v1/forms/{slug}`
+- Response body includes: `id`, `slug`, `title`, `submit_url`, `fields` (sanitized config)
+
+3) Submit form
+- Method: POST
+- Path: `/wp-json/mksddn-forms-handler/v1/forms/{slug}/submit`
+- Body (application/json): key/value пары согласно конфигу полей. Поле `mksddn_fh_hp` (honeypot) может присутствовать и должно быть пустым.
+- Validation & limits:
+  - Only configured fields are accepted; others return `unauthorized_fields` error
+  - Required fields, `email`, `url`, `number(min/max/step)`, `tel(pattern)`, `date`, `time`, `datetime-local` are validated
+  - Max 50 fields; total payload size ≤ 100 KB
+  - Rate limiting: 1 request per 10s per IP per form
+
+Examples:
+
+List forms:
+```
+curl -s 'https://example.com/wp-json/mksddn-forms-handler/v1/forms'
+```
+
+Get single form:
+```
+curl -s 'https://example.com/wp-json/mksddn-forms-handler/v1/forms/contact'
+```
+
+Submit form:
+```
+curl -s -X POST \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"John","email":"john@example.com","message":"Hi","mksddn_fh_hp":""}' \
+  'https://example.com/wp-json/mksddn-forms-handler/v1/forms/contact/submit'
+```
+
 == Frequently Asked Questions ==
 
 = How do I create my first form? =
@@ -95,7 +143,8 @@ Yes! The plugin provides REST API endpoints for AJAX form submissions. Check the
 
 Fields are configured as JSON in the form settings. Supported types:
 
-* text, email, tel, url, number, date
+* text, email, password
+* tel, url, number, date, time, datetime-local
 * textarea
 * checkbox (if required, must be checked)
 * select (supports multiple)
@@ -105,6 +154,9 @@ Notes:
 
 * `options` can be an array of strings or objects `{ "value": "...", "label": "..." }`.
 * For `select` with multiple choice, set `multiple: true` (shortcode renders `name[]`).
+* For `number`, optional attributes: `min`, `max`, `step`.
+* For `tel`, optional `pattern` (default server validation uses `^\+?\d{7,15}$`).
+* For `date/time/datetime-local`, server validates formats: `YYYY-MM-DD`, `HH:MM`, `YYYY-MM-DDTHH:MM`.
 * For REST submissions, send arrays for multiple selects.
 
 Example JSON config:
