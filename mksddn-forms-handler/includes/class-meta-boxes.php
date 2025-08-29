@@ -131,7 +131,27 @@ class MetaBoxes {
         foreach ($data_array as $key => $value) {
             echo '<tr>';
             echo '<th scope="row"><label>' . esc_html($key) . '</label></th>';
-            echo '<td>' . esc_html($value) . '</td>';
+            echo '<td>';
+            if (is_array($value)) {
+                $parts = [];
+                foreach ($value as $v) {
+                    $v_str = (string) $v;
+                    if (preg_match('#^https?://#i', $v_str)) {
+                        $parts[] = '<a href="' . esc_url($v_str) . '" target="_blank" rel="noopener noreferrer">' . esc_html($v_str) . '</a>';
+                    } else {
+                        $parts[] = esc_html($v_str);
+                    }
+                }
+                echo implode(', ', $parts);
+            } else {
+                $v_str = (string) $value;
+                if (preg_match('#^https?://#i', $v_str)) {
+                    echo '<a href="' . esc_url($v_str) . '" target="_blank" rel="noopener noreferrer">' . esc_html($v_str) . '</a>';
+                } else {
+                    echo esc_html($v_str);
+                }
+            }
+            echo '</td>';
             echo '</tr>';
         }
         echo '</table>';
