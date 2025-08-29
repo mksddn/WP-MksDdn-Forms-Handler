@@ -330,7 +330,13 @@ GET /wp-json/mksddn-forms-handler/v1/forms/{slug}
   "id": 12,
   "slug": "contact-form",
   "title": "Contact Form",
-  "submit_url": "/wp-json/mksddn-forms-handler/v1/forms/contact-form/submit"
+  "submit_url": "/wp-json/mksddn-forms-handler/v1/forms/contact-form/submit",
+  "fields": [
+    {"name":"name","label":"Name","type":"text","required":true},
+    {"name":"email","label":"Email","type":"email","required":true},
+    {"name":"phone","label":"Phone","type":"tel","required":false},
+    {"name":"message","label":"Message","type":"textarea","required":true}
+  ]
 }
 ```
 

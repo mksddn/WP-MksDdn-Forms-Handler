@@ -234,14 +234,126 @@ class FormsHandler {
             return new \WP_REST_Response(['message' => 'Form not found'], 404);
         }
 
+        // Read and sanitize fields configuration preserving arbitrary attributes
+        $raw_fields_config = get_post_meta($post->ID, '_fields_config', true);
+        $decoded_fields = json_decode((string) $raw_fields_config, true);
+        $sanitized_fields = [];
+
+        if (is_array($decoded_fields)) {
+            foreach ($decoded_fields as $item) {
+                if (!is_array($item)) { continue; }
+                $sanitized_item = $this->sanitize_field_item_public($item);
+                if (!empty($sanitized_item) && !empty($sanitized_item['name'])) {
+                    $sanitized_fields[] = $sanitized_item;
+                }
+            }
+        }
+
         $data = [
             'id'         => $post->ID,
             'slug'       => $post->post_name,
             'title'      => $post->post_title,
             'submit_url' => rest_url('mksddn-forms-handler/v1/forms/' . $post->post_name . '/submit'),
+            'fields'     => $sanitized_fields,
         ];
 
         return new \WP_REST_Response($data, 200);
+    }
+
+    /**
+     * Sanitize a single field item for public output while preserving arbitrary attributes.
+     *
+     * - Ensures `name` and `type` are safe slugs
+     * - Recursively sanitizes strings inside arrays/objects
+     * - Keeps booleans and numbers as-is
+     *
+     * @param array $item Raw field item from meta
+     * @return array Sanitized field item suitable for REST output
+     */
+    private function sanitize_field_item_public(array $item): array {
+        $result = [];
+
+        foreach ($item as $key => $value) {
+            // Keep original keys to allow custom attributes (e.g., file rules)
+            if ($key === 'name') {
+                $result['name'] = sanitize_key((string) $value);
+                continue;
+            }
+            if ($key === 'type') {
+                $result['type'] = sanitize_key((string) $value);
+                continue;
+            }
+            if ($key === 'label' || $key === 'description' || $key === 'placeholder' || $key === 'help') {
+                $result[$key] = is_string($value) ? sanitize_text_field($value) : $this->sanitize_any_public($value);
+                continue;
+            }
+            if ($key === 'options' && is_array($value)) {
+                $result['options'] = $this->sanitize_options_public($value);
+                continue;
+            }
+            // For any other key, sanitize value recursively
+            $result[$key] = $this->sanitize_any_public($value);
+        }
+
+        // Ensure name exists and is not empty; otherwise drop the field
+        if (!isset($result['name']) || $result['name'] === '') {
+            return [];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Recursively sanitize arbitrary values for public output.
+     * Strings: sanitize_text_field
+     * Numbers/booleans: keep type
+     * Arrays: sanitize each item recursively
+     *
+     * @param mixed $value Raw value
+     * @return mixed Sanitized value
+     */
+    private function sanitize_any_public($value) {
+        if (is_string($value)) {
+            return sanitize_text_field($value);
+        }
+        if (is_bool($value) || is_int($value) || is_float($value) || $value === null) {
+            return $value;
+        }
+        if (is_array($value)) {
+            $sanitized = [];
+            foreach ($value as $k => $v) {
+                $sanitized[$k] = $this->sanitize_any_public($v);
+            }
+            return $sanitized;
+        }
+        // Fallback: cast to string and sanitize
+        return sanitize_text_field((string) $value);
+    }
+
+    /**
+     * Sanitize options: accepts ["a","b"] or [{"value":"a","label":"A"}]
+     * Returns array of strings or array of objects with {value,label}
+     *
+     * @param array $options Raw options
+     * @return array Sanitized options
+     */
+    private function sanitize_options_public(array $options): array {
+        $result = [];
+        foreach ($options as $opt) {
+            if (is_array($opt)) {
+                $val = isset($opt['value']) ? sanitize_text_field((string) $opt['value']) : '';
+                $lab = isset($opt['label']) ? sanitize_text_field((string) $opt['label']) : $val;
+                if ($val !== '') {
+                    $result[] = ['value' => $val, 'label' => $lab];
+                }
+            } else {
+                $val = sanitize_text_field((string) $opt);
+                if ($val !== '') {
+                    $result[] = $val; // Keep as simple string for lightweight configs
+                }
+            }
+        }
+        return $result;
     }
     
     /**
