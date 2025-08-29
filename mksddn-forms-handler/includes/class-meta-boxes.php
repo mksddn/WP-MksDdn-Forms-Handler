@@ -205,67 +205,11 @@ class MetaBoxes {
         }
 
         if (isset($_POST['fields_config'])) {
-            // Raw JSON is unslashed first; content is sanitized field-by-field below
+            // Raw JSON is unslashed first; content is sanitized below
             $raw_json = wp_unslash($_POST['fields_config']); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
             $decoded = json_decode($raw_json, true);
             if (is_array($decoded)) {
-                // Whitelist and sanitize expected schema
-                $sanitized = [];
-                foreach ($decoded as $item) {
-                    if (!is_array($item)) { continue; }
-                    $name  = isset($item['name']) ? sanitize_key($item['name']) : '';
-                    $label = isset($item['label']) ? sanitize_text_field($item['label']) : '';
-                    $type  = isset($item['type']) ? sanitize_key($item['type']) : 'text';
-                    $required = !empty($item['required']) ? '1' : '0';
-
-                    // Optional: multiple flag for selects
-                    $multiple = !empty($item['multiple']) ? '1' : '0';
-
-                    // Optional: options for select/radio; supports ["a","b"] or [{"value":"a","label":"A"}]
-                    $options = [];
-                    if (isset($item['options']) && is_array($item['options'])) {
-                        foreach ($item['options'] as $opt) {
-                            if (is_array($opt)) {
-                                $opt_value = isset($opt['value']) ? sanitize_text_field($opt['value']) : '';
-                                $opt_label = isset($opt['label']) ? sanitize_text_field($opt['label']) : $opt_value;
-                                if ($opt_value !== '') {
-                                    $options[] = [
-                                        'value' => $opt_value,
-                                        'label' => $opt_label,
-                                    ];
-                                }
-                            } else {
-                                $opt_value = sanitize_text_field((string)$opt);
-                                if ($opt_value !== '') {
-                                    $options[] = [
-                                        'value' => $opt_value,
-                                        'label' => $opt_value,
-                                    ];
-                                }
-                            }
-                        }
-                    }
-
-                    if ($name !== '' && $label !== '') {
-                        $entry = [
-                            'name'     => $name,
-                            'label'    => $label,
-                            'type'     => $type,
-                            'required' => $required,
-                        ];
-
-                        if ($type === 'select' || $type === 'radio') {
-                            if ($options !== []) {
-                                $entry['options'] = $options;
-                            }
-                            if ($type === 'select' && $multiple === '1') {
-                                $entry['multiple'] = '1';
-                            }
-                        }
-
-                        $sanitized[] = $entry;
-                    }
-                }
+                $sanitized = Utilities::sanitize_fields_config_for_storage($decoded);
                 update_post_meta($post_id, '_fields_config', wp_json_encode($sanitized, JSON_PRETTY_PRINT));
             } else {
                 set_transient('mksddn_fh_fields_config_json_error_' . get_current_user_id(), true, 60);

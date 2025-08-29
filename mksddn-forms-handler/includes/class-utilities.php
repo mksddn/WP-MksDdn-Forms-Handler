@@ -120,4 +120,127 @@ class Utilities {
 
         return true;
     }
+
+    /**
+     * Sanitize fields configuration for storage preserving arbitrary attributes.
+     *
+     * - Ensures each field has a non-empty sanitized `name`
+     * - `type`/`name` are sanitized via sanitize_key
+     * - String attributes are sanitized via sanitize_text_field
+     * - Booleans and numbers are preserved
+     * - `required`/`multiple` normalized to '1'/'0' strings
+     * - `options` arrays are sanitized recursively (strings or {value,label} objects)
+     *
+     * @param array $decoded Raw decoded JSON array
+     * @return array Sanitized array for storage
+     */
+    public static function sanitize_fields_config_for_storage(array $decoded): array {
+        $result = [];
+        foreach ($decoded as $item) {
+            if (!is_array($item)) { continue; }
+            $sanitized = self::sanitize_field_item_for_storage($item);
+            if (!empty($sanitized) && !empty($sanitized['name'])) {
+                $result[] = $sanitized;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Sanitize single field item for storage.
+     *
+     * @param array $item Raw field item
+     * @return array Sanitized field item
+     */
+    public static function sanitize_field_item_for_storage(array $item): array {
+        $result = [];
+
+        foreach ($item as $key => $value) {
+            if ($key === 'name') {
+                $result['name'] = sanitize_key((string) $value);
+                continue;
+            }
+            if ($key === 'type') {
+                $result['type'] = sanitize_key((string) $value) ?: 'text';
+                continue;
+            }
+            if ($key === 'required' || $key === 'multiple') {
+                // Normalize to '1'/'0' for consistency with current storage
+                $truthy = ($value === true || $value === '1' || $value === 1 || $value === 'true');
+                $result[$key] = $truthy ? '1' : '0';
+                continue;
+            }
+            if ($key === 'label' || $key === 'description' || $key === 'placeholder' || $key === 'help') {
+                $result[$key] = is_string($value) ? sanitize_text_field($value) : self::sanitize_any_for_storage($value);
+                continue;
+            }
+            if ($key === 'options' && is_array($value)) {
+                $result['options'] = self::sanitize_options_for_storage($value);
+                continue;
+            }
+            // Preserve arbitrary keys with recursive sanitization
+            $result[$key] = self::sanitize_any_for_storage($value);
+        }
+
+        // Ensure name exists
+        if (!isset($result['name']) || $result['name'] === '') {
+            return [];
+        }
+
+        // Default type
+        if (!isset($result['type']) || $result['type'] === '') {
+            $result['type'] = 'text';
+        }
+
+        return $result;
+    }
+
+    /**
+     * Recursively sanitize arbitrary value for storage.
+     * Strings: sanitize_text_field, numbers/bools preserved, arrays sanitized recursively.
+     *
+     * @param mixed $value Raw value
+     * @return mixed Sanitized value
+     */
+    public static function sanitize_any_for_storage($value) {
+        if (is_string($value)) {
+            return sanitize_text_field($value);
+        }
+        if (is_bool($value) || is_int($value) || is_float($value) || $value === null) {
+            return $value;
+        }
+        if (is_array($value)) {
+            $sanitized = [];
+            foreach ($value as $k => $v) {
+                $sanitized[$k] = self::sanitize_any_for_storage($v);
+            }
+            return $sanitized;
+        }
+        return sanitize_text_field((string) $value);
+    }
+
+    /**
+     * Sanitize options for storage: accepts string values or objects with value/label.
+     *
+     * @param array $options Raw options array
+     * @return array Sanitized options array
+     */
+    public static function sanitize_options_for_storage(array $options): array {
+        $result = [];
+        foreach ($options as $opt) {
+            if (is_array($opt)) {
+                $val = isset($opt['value']) ? sanitize_text_field((string) $opt['value']) : '';
+                $lab = isset($opt['label']) ? sanitize_text_field((string) $opt['label']) : $val;
+                if ($val !== '') {
+                    $result[] = ['value' => $val, 'label' => $lab];
+                }
+            } else {
+                $val = sanitize_text_field((string) $opt);
+                if ($val !== '') {
+                    $result[] = $val;
+                }
+            }
+        }
+        return $result;
+    }
 } 
