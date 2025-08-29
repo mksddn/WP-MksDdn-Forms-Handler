@@ -31,7 +31,7 @@ class ExportHandler {
         add_action('admin_post_nopriv_export_submissions_csv', [$this, 'handle_export_submissions_csv']);
         
         // Clear cache when forms are updated
-        add_action('save_post_forms', [$this, 'clear_forms_cache'], 10, 2);
+        add_action('save_post_mksddn_fh_forms', [$this, 'clear_forms_cache'], 10, 2);
         add_action('deleted_post', [$this, 'clear_forms_cache'], 10, 2);
     }
     
@@ -200,7 +200,17 @@ class ExportHandler {
                 // Add field values in the same order as headers
                 for ($i = 3; $i < count($headers); $i++) {
                     $field_name = $headers[$i];
-                    $row[] = isset($form_data[$field_name]) ? $form_data[$field_name] : '';
+                    if (isset($form_data[$field_name])) {
+                        $value = $form_data[$field_name];
+                        if (is_array($value)) {
+                            // Join arrays (e.g., multi-select, files)
+                            $row[] = implode(', ', array_map('strval', $value));
+                        } else {
+                            $row[] = (string) $value;
+                        }
+                    } else {
+                        $row[] = '';
+                    }
                 }
             } else {
                 // Fill empty values for missing data
@@ -223,7 +233,7 @@ class ExportHandler {
      * Clear forms cache when forms are updated
      */
     public function clear_forms_cache($post_id, $post): void {
-        if ($post->post_type === 'forms') {
+        if ($post->post_type === 'mksddn_fh_forms') {
             wp_cache_delete('forms_list', 'mksddn_forms_handler');
         }
     }
@@ -240,7 +250,7 @@ class ExportHandler {
 
         // Get all forms
         $forms = get_posts([
-            'post_type'      => 'forms',
+            'post_type'      => 'mksddn_fh_forms',
             'post_status'    => 'publish',
             'posts_per_page' => -1,
             'orderby'        => 'title',
