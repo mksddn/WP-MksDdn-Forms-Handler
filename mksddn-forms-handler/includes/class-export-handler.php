@@ -93,24 +93,19 @@ class ExportHandler {
         // Add BOM for UTF-8
         fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
 
-        // Get submissions with optimized query
+        // Get submissions (may be empty for selected dates)
         $submissions = $this->get_submissions_for_export($form_filter, $date_from, $date_to);
 
-        if (empty($submissions)) {
-            // Close output stream before exiting
-            if (is_resource($output)) {
-                // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
-                fclose($output);
-            }
-            wp_die( esc_html__( 'No submissions found for the selected form and criteria.', 'mksddn-forms-handler' ) );
+        // Write CSV headers (stable across filters)
+        $headers = $this->get_csv_headers($submissions, (int) $form_filter);
+        if (!empty($headers)) {
+            fputcsv($output, $headers);
         }
 
-        // Write CSV headers
-        $headers = $this->get_csv_headers($submissions);
-        fputcsv($output, $headers);
-
         // Write data in batches for better performance
-        $this->write_csv_data($output, $submissions, $headers);
+        if (!empty($submissions)) {
+            $this->write_csv_data($output, $submissions, $headers);
+        }
 
         if (is_resource($output)) {
             // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
@@ -138,16 +133,17 @@ class ExportHandler {
             ],
         ];
 
-        // Add date filter if specified
+        // Add date filter if specified (inclusive range)
         if ($date_from || $date_to) {
-            $date_query = [];
+            $range = [];
             if ($date_from) {
-                $date_query['after'] = $date_from;
+                $range['after'] = $date_from;
             }
             if ($date_to) {
-                $date_query['before'] = $date_to . ' 23:59:59';
+                $range['before'] = $date_to . ' 23:59:59';
             }
-            $args['date_query'] = $date_query;
+            $range['inclusive'] = true;
+            $args['date_query'] = [ $range ];
         }
 
         return get_posts($args);
@@ -156,13 +152,37 @@ class ExportHandler {
     /**
      * Get CSV headers from submissions data
      */
-    private function get_csv_headers($submissions): array {
+    private function get_csv_headers($submissions, int $form_id): array {
         $headers = ['ID', 'Date', 'Form Title'];
-        $field_names = [];
 
-        // Collect all unique field names from submissions
-        foreach ($submissions as $submission) {
-            $raw = get_post_meta($submission->ID, '_submission_data', true);
+        // 1) Base on configured fields (stable order)
+        $field_names = [];
+        $configured_fields = Utilities::get_form_fields_config($form_id);
+        if (is_array($configured_fields) && $configured_fields !== []) {
+            foreach ($configured_fields as $field) {
+                if (isset($field['name']) && is_string($field['name']) && $field['name'] !== '') {
+                    $field_names[] = $field['name'];
+                }
+            }
+        }
+
+        // 2) Append any extra keys that appeared in submissions historically (all submissions of the form)
+        $all_submission_ids = get_posts([
+            'post_type'      => 'mksddn_fh_submits',
+            'post_status'    => 'publish',
+            'posts_per_page' => -1,
+            'fields'         => 'ids',
+            'meta_query'     => [
+                [
+                    'key'     => '_form_id',
+                    'value'   => $form_id,
+                    'compare' => '=',
+                ],
+            ],
+        ]);
+
+        foreach ($all_submission_ids as $submission_id) {
+            $raw = get_post_meta($submission_id, '_submission_data', true);
             $form_data = is_string($raw) ? json_decode($raw, true) : (is_array($raw) ? $raw : []);
             if ($form_data && is_array($form_data)) {
                 foreach ($form_data as $field_name => $value) {
@@ -173,10 +193,8 @@ class ExportHandler {
             }
         }
 
-        // Add field names to headers
-        $headers = array_merge($headers, $field_names);
-        
-        return $headers;
+        // Build final headers
+        return array_merge($headers, $field_names);
     }
     
     /**

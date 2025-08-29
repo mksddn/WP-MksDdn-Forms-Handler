@@ -33,6 +33,9 @@
             
             // Export functionality
             $(document).on('click', '.mksddn-export-csv', this.exportCSV);
+			// Export by Date modal
+			$(document).on('click', '.export-with-filters', this.openExportModal);
+			$(document).on('click', '#export-modal', this.overlayCloseExportModal);
             
             // Settings tabs
             $(document).on('click', '.mksddn-tab-nav a', this.switchTab);
@@ -167,6 +170,39 @@
             window.location.href = url;
         },
 
+		/**
+		 * Open Export by Date modal and populate form id/name
+		 */
+		openExportModal: function(e) {
+			e.preventDefault();
+			var $btn = $(this);
+			var formId = $btn.data('form-id');
+			var formName = $btn.data('form-name') || '';
+			$('#modal-form-filter').val(formId);
+			if (formName) {
+				$('#modal-title').text('Export by Date — ' + formName);
+			}
+			$('#modal_date_from').val('');
+			$('#modal_date_to').val('');
+			$('#export-modal').show();
+		},
+
+		/**
+		 * Close Export by Date modal
+		 */
+		hideExportModal: function() {
+			$('#export-modal').hide();
+		},
+
+		/**
+		 * Close modal when clicking on overlay background
+		 */
+		overlayCloseExportModal: function(e) {
+			if (e.target && e.target.id === 'export-modal') {
+				$('#export-modal').hide();
+			}
+		},
+
         /**
          * Switch tabs
          */
@@ -289,5 +325,10 @@
     $(document).ready(function() {
         MksDdnFormsHandler.init();
     });
+
+    // Provide global close function used in PHP markup (onclick)
+    window.closeExportModal = function() {
+        MksDdnFormsHandler.hideExportModal();
+    };
 
 })(jQuery); 
