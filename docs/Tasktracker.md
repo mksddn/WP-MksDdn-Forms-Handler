@@ -190,6 +190,26 @@
   - [x] Указаны лимиты, honeypot, rate limiting
 - **Зависимости**: FormsHandler (REST)
 
+### Задача: Полный Example JSON с поддерживаемыми типами
+- **Статус**: Завершена ✅
+- **Описание**: Обновлён пример конфигурации полей в `readme.txt`, теперь включает все поддерживаемые типы (`text,email,password,tel,url,number,date,time,datetime-local,textarea,checkbox,select,radio`) и демонстрацию атрибутов (`placeholder,min,max,step,pattern,multiple`).
+- **Шаги выполнения**:
+  - [x] Расширен блок Example JSON config в `readme.txt`
+  - [x] Проверка формата и экранирования
+- **Зависимости**: Supported Field Types
+
+### Задача: Поддержка загрузки файлов (form + REST)
+- **Статус**: Завершена ✅
+- **Описание**: Реализована поддержка поля `file` в шорткоде (multiple, accept), загрузка и валидация файлов на сервере, добавление в медиа-библиотеку, вложения к email, ссылки в Telegram. REST: поддержка `multipart/form-data` через `get_file_params`.
+- **Шаги выполнения**:
+  - [x] Рендер: `enctype="multipart/form-data"`, `<input type="file">` c `multiple`/`accept`
+  - [x] Сервер: `process_uploaded_files()` с проверками `allowed_extensions`, `max_size_mb`, `max_files`
+  - [x] REST: чтение файлов из `get_file_params`, объединение с данными
+  - [x] Email: вложения файлов
+  - [x] Telegram: человекочитаемые значения (CSV) для массивов
+  - [x] Документация: readme/user-guide обновлены
+- **Зависимости**: Шорткод, FormsHandler, Handlers
+
 ### Задача: Поддержка select/radio полей
 - **Статус**: Завершена ✅
 - **Описание**: Добавлена поддержка рендера `select` (включая `multiple`) и `radio` в шорткоде, расширен конфиг полей `options`/`multiple`, реализована валидация значений по списку опций, улучшено форматирование массивов в письмах/админке.

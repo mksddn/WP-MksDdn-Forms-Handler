@@ -66,10 +66,11 @@ Namespace: `mksddn-forms-handler/v1`
 - Path: `/wp-json/mksddn-forms-handler/v1/forms/{slug}`
 - Response body includes: `id`, `slug`, `title`, `submit_url`, `fields` (sanitized config)
 
-3) Submit form
+3) Submit form (JSON or multipart)
 - Method: POST
 - Path: `/wp-json/mksddn-forms-handler/v1/forms/{slug}/submit`
 - Body (application/json): key/value пары согласно конфигу полей. Поле `mksddn_fh_hp` (honeypot) может присутствовать и должно быть пустым.
+- Body (multipart/form-data): поддерживаются поля и файлы (`type":"file"`). Для множественных файлов используйте `name[]`.
 - Validation & limits:
   - Only configured fields are accepted; others return `unauthorized_fields` error
   - Required fields, `email`, `url`, `number(min/max/step)`, `tel(pattern)`, `date`, `time`, `datetime-local` are validated
@@ -93,6 +94,16 @@ Submit form:
 curl -s -X POST \
   -H 'Content-Type: application/json' \
   -d '{"name":"John","email":"john@example.com","message":"Hi","mksddn_fh_hp":""}' \
+  'https://example.com/wp-json/mksddn-forms-handler/v1/forms/contact/submit'
+```
+
+Submit form with files (multipart):
+```
+curl -s -X POST \
+  -F 'name=John' \
+  -F 'email=john@example.com' \
+  -F 'attachments[]=@/path/to/file1.pdf' \
+  -F 'attachments[]=@/path/to/file2.png' \
   'https://example.com/wp-json/mksddn-forms-handler/v1/forms/contact/submit'
 ```
 
@@ -149,6 +160,7 @@ Fields are configured as JSON in the form settings. Supported types:
 * checkbox (if required, must be checked)
 * select (supports multiple)
 * radio
+* file (uploads via form and REST multipart)
 
 Notes:
 
@@ -158,13 +170,25 @@ Notes:
 * For `tel`, optional `pattern` (default server validation uses `^\+?\d{7,15}$`).
 * For `date/time/datetime-local`, server validates formats: `YYYY-MM-DD`, `HH:MM`, `YYYY-MM-DDTHH:MM`.
 * For REST submissions, send arrays for multiple selects.
+* File fields:
+  - `allowed_extensions`: array of extensions, e.g. `["pdf","png","jpg"]`
+  - `max_size_mb`: max size per file (default 10)
+  - `max_files`: max files per field (default 5)
+  - `multiple`: allow multiple files
 
 Example JSON config:
 
 ```
 [
-  {"name":"name","label":"Name","type":"text","required":true},
+  {"name":"name","label":"Name","type":"text","required":true,"placeholder":"Your name"},
   {"name":"email","label":"Email","type":"email","required":true},
+  {"name":"password","label":"Password","type":"password","required":true},
+  {"name":"phone","label":"Phone","type":"tel","pattern":"^\\+?\\d{7,15}$"},
+  {"name":"website","label":"Website","type":"url"},
+  {"name":"age","label":"Age","type":"number","min":1,"max":120,"step":1},
+  {"name":"birth","label":"Birth date","type":"date"},
+  {"name":"meet_time","label":"Meeting time","type":"time"},
+  {"name":"meet_at","label":"Meeting at","type":"datetime-local"},
   {"name":"message","label":"Message","type":"textarea","required":true},
   {"name":"agree","label":"I agree to Terms","type":"checkbox","required":true},
   {

@@ -34,6 +34,128 @@ class FormsHandler {
         add_action('save_post_mksddn_fh_forms', [$this, 'clear_form_cache'], 10, 2);
         add_action('deleted_post', [$this, 'clear_form_cache'], 10, 2);
     }
+
+    /**
+     * Process uploaded files according to fields config
+     * Returns ['data_updates'=> [field=>urls...], 'attachments'=> [filepaths]]
+     */
+    private function process_uploaded_files(array $file_params, $fields_config) {
+        $fields = json_decode((string)$fields_config, true);
+        if (!$fields || !is_array($fields)) {
+            return new \WP_Error('validation_error', __( 'Invalid form fields configuration', 'mksddn-forms-handler' ), ['status' => 400]);
+        }
+
+        // Build rules
+        $file_fields = [];
+        foreach ($fields as $f) {
+            if (($f['type'] ?? '') === 'file' && !empty($f['name'])) {
+                $name = (string)$f['name'];
+                $file_fields[$name] = [
+                    'multiple'           => !empty($f['multiple']) && ($f['multiple'] === '1' || $f['multiple'] === true),
+                    'allowed_extensions' => isset($f['allowed_extensions']) && is_array($f['allowed_extensions']) ? array_map('strtolower', array_map('strval', $f['allowed_extensions'])) : [],
+                    'max_size_mb'        => isset($f['max_size_mb']) && is_numeric($f['max_size_mb']) ? (float)$f['max_size_mb'] : 10.0,
+                    'max_files'          => isset($f['max_files']) && is_numeric($f['max_files']) ? (int)$f['max_files'] : 5,
+                    'required'           => !empty($f['required']),
+                ];
+            }
+        }
+
+        if ($file_fields === []) {
+            return ['data_updates' => [], 'attachments' => []];
+        }
+
+        require_once ABSPATH . 'wp-admin/includes/file.php';
+        $overrides = ['test_form' => false];
+        $data_updates = [];
+        $attachments = [];
+
+        foreach ($file_fields as $field_name => $rules) {
+            if (!isset($file_params[$field_name])) {
+                if ($rules['required']) {
+                    return new \WP_Error('validation_error', sprintf( __( "Field '%s' is required", 'mksddn-forms-handler' ), $field_name), ['status' => 400]);
+                }
+                continue;
+            }
+
+            $f = $file_params[$field_name];
+            // Normalize to array of files
+            $files = [];
+            if (is_array($f['name'])) {
+                $count = count($f['name']);
+                for ($i = 0; $i < $count; $i++) {
+                    if ((int)$f['error'][$i] === UPLOAD_ERR_NO_FILE) { continue; }
+                    $files[] = [
+                        'name'     => $f['name'][$i],
+                        'type'     => $f['type'][$i] ?? '',
+                        'tmp_name' => $f['tmp_name'][$i],
+                        'error'    => (int)$f['error'][$i],
+                        'size'     => (int)$f['size'][$i],
+                    ];
+                }
+            } else {
+                if ((int)$f['error'] !== UPLOAD_ERR_NO_FILE) {
+                    $files[] = $f;
+                }
+            }
+
+            if ($files === []) {
+                if ($rules['required']) {
+                    return new \WP_Error('validation_error', sprintf( __( "Field '%s' is required", 'mksddn-forms-handler' ), $field_name), ['status' => 400]);
+                }
+                continue;
+            }
+
+            if (count($files) > $rules['max_files']) {
+                return new \WP_Error('validation_error', sprintf( __( "Field '%s' exceeds max files (%d)", 'mksddn-forms-handler' ), $field_name, $rules['max_files']), ['status' => 400]);
+            }
+
+            $urls = [];
+            foreach ($files as $one) {
+                if ($one['error'] !== UPLOAD_ERR_OK) {
+                    return new \WP_Error('validation_error', sprintf( __( "File upload error for field '%s'", 'mksddn-forms-handler' ), $field_name), ['status' => 400]);
+                }
+                $size_mb = $one['size'] / (1024 * 1024);
+                if ($size_mb > $rules['max_size_mb']) {
+                    return new \WP_Error('validation_error', sprintf( __( "File too large for field '%s' (max %s MB)", 'mksddn-forms-handler' ), $field_name, $rules['max_size_mb']), ['status' => 400]);
+                }
+                // Extension check
+                $ext = strtolower(pathinfo($one['name'], PATHINFO_EXTENSION));
+                if ($rules['allowed_extensions'] !== [] && !in_array($ext, $rules['allowed_extensions'], true)) {
+                    return new \WP_Error('validation_error', sprintf( __( "File type not allowed for field '%s'", 'mksddn-forms-handler' ), $field_name), ['status' => 400]);
+                }
+
+                $moved = wp_handle_upload($one, $overrides);
+                if (isset($moved['error'])) {
+                    return new \WP_Error('upload_error', $moved['error'], ['status' => 500]);
+                }
+
+                $file_url = $moved['url'];
+                $file_path = $moved['file'];
+
+                // Add to media library
+                $attachment_id = wp_insert_attachment([
+                    'post_mime_type' => $moved['type'] ?? '',
+                    'post_title'     => sanitize_file_name(basename($file_path)),
+                    'post_content'   => '',
+                    'post_status'    => 'inherit',
+                ], $file_path);
+                if (!is_wp_error($attachment_id)) {
+                    require_once ABSPATH . 'wp-admin/includes/image.php';
+                    wp_update_attachment_metadata($attachment_id, wp_generate_attachment_metadata($attachment_id, $file_path));
+                }
+
+                $urls[] = $file_url;
+                $attachments[] = $file_path; // for email attachments
+            }
+
+            $data_updates[$field_name] = $rules['multiple'] ? $urls : ($urls[0] ?? '');
+        }
+
+        return [
+            'data_updates' => $data_updates,
+            'attachments'  => $attachments,
+        ];
+    }
     
     /**
      * Register REST routes
@@ -98,7 +220,16 @@ class FormsHandler {
      */
     public function handle_rest_form_submission($request): \WP_Error|\WP_REST_Response {
         $slug = $request->get_param('slug');
-        $form_data = $request->get_json_params();
+        // Support both JSON and multipart/form-data
+        $content_type = isset($_SERVER['CONTENT_TYPE']) ? strtolower((string) $_SERVER['CONTENT_TYPE']) : '';
+        $form_data = false;
+        $file_params = [];
+        if (strpos($content_type, 'application/json') !== false) {
+            $form_data = $request->get_json_params();
+        } else {
+            $form_data = $request->get_body_params();
+            $file_params = $request->get_file_params();
+        }
 
         // Honeypot field check (should be empty)
         $honeypot = $request->get_param('mksddn_fh_hp');
@@ -115,7 +246,7 @@ class FormsHandler {
         }
         set_transient($rl_key, time(), 15);
 
-        if (!$form_data) {
+        if (!$form_data && empty($file_params)) {
             return new \WP_Error('invalid_data', __( 'Invalid form data', 'mksddn-forms-handler' ), ['status' => 400]);
         }
 
@@ -134,7 +265,24 @@ class FormsHandler {
             return new \WP_Error('data_too_large', __( 'Form data is too large', 'mksddn-forms-handler' ), ['status' => 400]);
         }
 
-        $result = $this->process_form_submission($slug, $form_data);
+        // Build files if present
+        $email_attachments = [];
+        if (!empty($file_params)) {
+            $fields_config = $this->get_form_config($slug);
+            if (is_wp_error($fields_config)) {
+                return $fields_config;
+            }
+            $files_result = $this->process_uploaded_files($file_params, $fields_config['fields_config']);
+            if (is_wp_error($files_result)) {
+                return $files_result;
+            }
+            if (!empty($files_result['data_updates'])) {
+                foreach ($files_result['data_updates'] as $k => $v) { $form_data[$k] = $v; }
+            }
+            if (!empty($files_result['attachments'])) { $email_attachments = $files_result['attachments']; }
+        }
+
+        $result = $this->process_form_submission($slug, $form_data, $email_attachments);
 
         if (is_wp_error($result)) {
             $response_data = [
@@ -398,11 +546,28 @@ class FormsHandler {
             }
         }
 
-        if (!$form_id || !$form_data) {
+        // Process uploaded files (if any)
+        $email_attachments = [];
+        if (!empty($_FILES)) {
+            $files_result = $this->process_uploaded_files($_FILES, $form_config['fields_config']);
+            if (is_wp_error($files_result)) {
+                wp_die( esc_html( $files_result->get_error_message() ) );
+            }
+            if (!empty($files_result['data_updates'])) {
+                foreach ($files_result['data_updates'] as $k => $v) {
+                    $form_data[$k] = $v;
+                }
+            }
+            if (!empty($files_result['attachments'])) {
+                $email_attachments = $files_result['attachments'];
+            }
+        }
+
+        if (!$form_id || (!$form_data && empty($email_attachments))) {
             wp_die('Invalid form data');
         }
 
-        $result = $this->process_form_submission($form_id, $form_data);
+        $result = $this->process_form_submission($form_id, $form_data, $email_attachments);
 
         if (is_wp_error($result)) {
             wp_send_json_error($result->get_error_message());
@@ -414,7 +579,7 @@ class FormsHandler {
     /**
      * Process form submission with optimized performance
      */
-    private function process_form_submission($form_id, $form_data): \WP_Error|true|array {
+    private function process_form_submission($form_id, $form_data, array $email_attachments = []): \WP_Error|true|array {
         // Get cached form configuration
         $form_config = $this->get_form_config($form_id);
         
@@ -474,7 +639,8 @@ class FormsHandler {
             $form_config['bcc_recipient'], 
             $form_config['subject'], 
             $filtered_form_data, 
-            $form_config['form_title']
+            $form_config['form_title'],
+            $email_attachments
         );
         $delivery_results['email']['success'] = !is_wp_error($email_result);
         if (is_wp_error($email_result)) {
@@ -773,6 +939,21 @@ class FormsHandler {
             if ($field_type === 'email' && isset($form_data[$field_name]) && !empty($form_data[$field_name]) && !is_email($form_data[$field_name])) {
                 return new \WP_Error('validation_error', sprintf( /* translators: %s: field label */ __( "Field '%s' must contain a valid email address", 'mksddn-forms-handler' ), $field_label), ['status' => 400]);
             }
+            // Validate file fields (store URLs in form data)
+            if ($field_type === 'file') {
+                // Accept strings (single URL) or arrays of URLs
+                if (isset($form_data[$field_name]) && $form_data[$field_name] !== '') {
+                    $val = $form_data[$field_name];
+                    $urls = is_array($val) ? $val : [$val];
+                    foreach ($urls as $u) {
+                        if (esc_url_raw((string)$u) === '') {
+                            return new \WP_Error('validation_error', sprintf( __( "Field '%s' contains invalid file URL", 'mksddn-forms-handler' ), $field_label), ['status' => 400]);
+                        }
+                    }
+                } elseif ($is_required) {
+                    return new \WP_Error('validation_error', sprintf( __( "Field '%s' is required", 'mksddn-forms-handler' ), $field_label), ['status' => 400]);
+                }
+            }
 
             // Check URL
             if ($field_type === 'url' && isset($form_data[$field_name]) && $form_data[$field_name] !== '') {
@@ -887,7 +1068,7 @@ class FormsHandler {
     /**
      * Prepare and send email
      */
-    private function prepare_and_send_email($recipients, ?string $bcc_recipient, $subject, \WP_Error|array $form_data, $form_title): \WP_Error|true {
+    private function prepare_and_send_email($recipients, ?string $bcc_recipient, $subject, \WP_Error|array $form_data, $form_title, array $attachments = []): \WP_Error|true {
         $recipients_array = array_map('trim', explode(',', (string)$recipients));
 
         // Validate email addresses
@@ -914,7 +1095,7 @@ class FormsHandler {
         }
 
         // Send email
-        if (wp_mail($valid_emails, $subject, $body, $headers)) {
+        if (wp_mail($valid_emails, $subject, $body, $headers, $attachments)) {
             return true;
         }
 
@@ -939,13 +1120,31 @@ class FormsHandler {
 
             $body .= '<tr>';
             $body .= "<td style='padding: 10px; border: 1px solid #e9e9e9;'><strong>" . esc_html($key) . '</strong></td>';
-            $body .= "<td style='padding: 10px; border: 1px solid #e9e9e9;'>" . esc_html($display_value) . '</td>';
+            if ($this->looks_like_urls($value)) {
+                $urls = is_array($value) ? $value : [$value];
+                $links = array_map(function($u) { $su = esc_url($u); return $su ? '<a href="' . $su . '">' . esc_html($su) . '</a>' : esc_html((string)$u); }, $urls);
+                $body .= "<td style='padding: 10px; border: 1px solid #e9e9e9;'>" . implode('<br>', $links) . '</td>';
+            } else {
+                $body .= "<td style='padding: 10px; border: 1px solid #e9e9e9;'>" . esc_html($display_value) . '</td>';
+            }
             $body .= '</tr>';
         }
 
         $body .= '</table>';
 
         return $body . ('<p><small>Sent: ' . current_time('d.m.Y H:i:s') . '</small></p>');
+    }
+
+    /**
+     * Heuristic: check if value is URL(s)
+     */
+    private function looks_like_urls($value): bool {
+        if (is_array($value)) {
+            if ($value === []) { return false; }
+            foreach ($value as $v) { if (esc_url_raw((string)$v) === '') { return false; } }
+            return true;
+        }
+        return esc_url_raw((string)$value) !== '';
     }
     
     /**

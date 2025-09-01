@@ -61,6 +61,9 @@ class TelegramHandler {
         $message .= "*Form Data:*\n";
 
         foreach ($form_data as $key => $value) {
+            if (is_array($value)) {
+                $value = implode(', ', array_map('strval', $value));
+            }
             $message .= "• *" . ucfirst($key) . ":* " . $value . "\n";
         }
 

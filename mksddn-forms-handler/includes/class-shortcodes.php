@@ -48,9 +48,15 @@ class Shortcodes {
         $fields = json_decode($fields_config, true) ?: [];
 
         ob_start();
+        $has_file = false;
+        if (is_array($fields)) {
+            foreach ($fields as $f) {
+                if (isset($f['type']) && $f['type'] === 'file') { $has_file = true; break; }
+            }
+        }
         ?>
         <div class="form-container" data-form-id="<?php echo esc_attr($form->post_name); ?>">
-            <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" class="wp-form">
+            <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" class="wp-form" <?php echo $has_file ? 'enctype="multipart/form-data"' : ''; ?>>
                 <?php wp_nonce_field('submit_form_nonce', 'form_nonce'); ?>
                 <input type="hidden" name="action" value="submit_form">
                 <input type="hidden" name="form_id" value="<?php echo esc_attr($form->post_name); ?>">
@@ -124,6 +130,24 @@ class Shortcodes {
                                     </label>
                                 <?php endforeach; ?>
                             </div>
+                        <?php elseif ($field['type'] === 'file') : ?>
+                            <?php 
+                            $is_multiple = isset($field['multiple']) && ($field['multiple'] === '1' || $field['multiple'] === true);
+                            $name_attr = $is_multiple ? $field['name'] . '[]' : $field['name'];
+                            $accept = '';
+                            if (!empty($field['allowed_extensions']) && is_array($field['allowed_extensions'])) {
+                                $exts = array_filter(array_map('sanitize_text_field', $field['allowed_extensions']));
+                                if ($exts !== []) { $accept = implode(',', array_map(fn($e) => '.' . ltrim($e, '.'), $exts)); }
+                            }
+                            ?>
+                            <input 
+                                type="file" 
+                                name="<?php echo esc_attr($name_attr); ?>" 
+                                id="<?php echo esc_attr($field['name']); ?>"
+                                <?php echo $is_multiple ? 'multiple' : ''; ?>
+                                <?php echo (isset($field['required']) && $field['required']) ? 'required' : ''; ?>
+                                <?php echo $accept ? 'accept="' . esc_attr($accept) . '"' : ''; ?>
+                            >
                         <?php else : ?>
                             <?php 
                             $type = isset($field['type']) ? (string) $field['type'] : 'text';

@@ -60,6 +60,50 @@
 
 - Формат readme соответствует стандарту WordPress.org, раздел добавлен до FAQ.
 
+## Запись от 2025-08-29 (Полный Example JSON в readme)
+
+### Наблюдения
+
+- Пример JSON-конфига не включал все поддерживаемые типы полей и атрибуты.
+
+### Изменения
+
+1. Расширен блок "Example JSON config" в `readme.txt`:
+   - Добавлены: `password`, `tel` (с `pattern`), `url`, `number` (`min/max/step`), `date`, `time`, `datetime-local`.
+   - Сохранены: `text`, `email`, `textarea`, `checkbox`, `select(multiple)`, `radio`.
+2. Пример выровнен под текущую серверную валидацию и рендер.
+
+### Проверки
+
+- Экранирование обратных слешей в `pattern` для корректного отображения в readme.
+
+## Запись от 2025-08-29 (Поддержка загрузки файлов)
+
+### Наблюдения
+
+- Требуется поддержка `file` полей как на фронтенде, так и в REST.
+
+### Изменения
+
+1. Рендер (`class-shortcodes.php`):
+   - Авто-установка `enctype="multipart/form-data"` при наличии поля `file`.
+   - `<input type="file">` с `multiple` и `accept` (по `allowed_extensions`).
+2. Сервер (`class-forms-handler.php`):
+   - `process_uploaded_files()`: валидация (`allowed_extensions`, `max_size_mb`, `max_files`), загрузка `wp_handle_upload`, добавление в медиа, возврат URL и путей для вложений.
+   - admin-post: объединение данных и файлов, вложения в письма.
+   - REST: поддержка `multipart/form-data` (`get_body_params` + `get_file_params`).
+   - Email: передача массива вложений в `wp_mail` и кликабельные ссылки в теле письма.
+   - Телеграм: массивы значений выводятся человекочитаемо (CSV).
+3. Документация:
+   - `readme.txt`: REST multipart, примеры curl, поле `file` в Supported Field Types и Example JSON.
+   - `docs/user-guide/forms-creation.md`: добавлен раздел про `File` и JSON-пример.
+
+### Проверки
+
+- PHPCS/WPCS — без ошибок.
+- Формы без `file` не затронуты (нет `enctype`).
+- REST JSON работает как прежде; multipart — корректно обрабатывается.
+
 
 
 ## Запись от 2025-08-21 (Релиз 1.0.1)

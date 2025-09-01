@@ -60,6 +60,10 @@
 - Поля даты/времени
 - Серверная проверка формата: `YYYY-MM-DD`, `HH:MM`, `YYYY-MM-DDTHH:MM`
 
+**File (Файлы)**
+- Загрузка одного или нескольких файлов
+- Атрибуты: `allowed_extensions` (массив), `max_size_mb`, `max_files`, `multiple`
+
 #### Настройки полей
 
 Для каждого поля доступны настройки:
@@ -158,6 +162,23 @@
   {"name":"birth","label":"Дата рождения","type":"date"},
   {"name":"meet_time","label":"Время встречи","type":"time"},
   {"name":"meet_at","label":"Дата и время","type":"datetime-local"}
+]
+```
+
+### Пример поля файла
+
+```json
+[
+  {
+    "name":"attachments",
+    "label":"Прикрепить файлы",
+    "type":"file",
+    "required":false,
+    "multiple":true,
+    "allowed_extensions":["pdf","png","jpg","jpeg"],
+    "max_size_mb":10,
+    "max_files":3
+  }
 ]
 ```
 
