@@ -72,6 +72,7 @@ class FormsHandler {
         foreach ($file_fields as $field_name => $rules) {
             if (!isset($file_params[$field_name])) {
                 if ($rules['required']) {
+                    /* translators: %s: field name */
                     return new \WP_Error('validation_error', sprintf( __( "Field '%s' is required", 'mksddn-forms-handler' ), $field_name), ['status' => 400]);
                 }
                 continue;
@@ -100,27 +101,32 @@ class FormsHandler {
 
             if ($files === []) {
                 if ($rules['required']) {
+                    /* translators: %s: field name */
                     return new \WP_Error('validation_error', sprintf( __( "Field '%s' is required", 'mksddn-forms-handler' ), $field_name), ['status' => 400]);
                 }
                 continue;
             }
 
             if (count($files) > $rules['max_files']) {
-                return new \WP_Error('validation_error', sprintf( __( "Field '%s' exceeds max files (%d)", 'mksddn-forms-handler' ), $field_name, $rules['max_files']), ['status' => 400]);
+                /* translators: 1: field name, 2: max files count */
+                return new \WP_Error('validation_error', sprintf( __( "Field '%1\$s' exceeds max files (%2\$d)", 'mksddn-forms-handler' ), $field_name, $rules['max_files']), ['status' => 400]);
             }
 
             $urls = [];
             foreach ($files as $one) {
                 if ($one['error'] !== UPLOAD_ERR_OK) {
+                    /* translators: %s: field name */
                     return new \WP_Error('validation_error', sprintf( __( "File upload error for field '%s'", 'mksddn-forms-handler' ), $field_name), ['status' => 400]);
                 }
                 $size_mb = $one['size'] / (1024 * 1024);
                 if ($size_mb > $rules['max_size_mb']) {
-                    return new \WP_Error('validation_error', sprintf( __( "File too large for field '%s' (max %s MB)", 'mksddn-forms-handler' ), $field_name, $rules['max_size_mb']), ['status' => 400]);
+                    /* translators: 1: field name, 2: max size in MB */
+                    return new \WP_Error('validation_error', sprintf( __( "File too large for field '%1\$s' (max %2\$s MB)", 'mksddn-forms-handler' ), $field_name, $rules['max_size_mb']), ['status' => 400]);
                 }
                 // Extension check
                 $ext = strtolower(pathinfo($one['name'], PATHINFO_EXTENSION));
                 if ($rules['allowed_extensions'] !== [] && !in_array($ext, $rules['allowed_extensions'], true)) {
+                    /* translators: %s: field name */
                     return new \WP_Error('validation_error', sprintf( __( "File type not allowed for field '%s'", 'mksddn-forms-handler' ), $field_name), ['status' => 400]);
                 }
 
@@ -221,7 +227,7 @@ class FormsHandler {
     public function handle_rest_form_submission($request): \WP_Error|\WP_REST_Response {
         $slug = $request->get_param('slug');
         // Support both JSON and multipart/form-data
-        $content_type = isset($_SERVER['CONTENT_TYPE']) ? strtolower((string) $_SERVER['CONTENT_TYPE']) : '';
+        $content_type = isset($_SERVER['CONTENT_TYPE']) ? strtolower( sanitize_text_field( wp_unslash( (string) $_SERVER['CONTENT_TYPE'] ) ) ) : '';
         $form_data = false;
         $file_params = [];
         if (strpos($content_type, 'application/json') !== false) {
@@ -258,7 +264,14 @@ class FormsHandler {
         // Check total data size
         $total_size = 0;
         foreach ($form_data as $key => $value) {
-            $total_size += strlen((string)$key) + strlen((string)$value);
+            $size_key = strlen((string) $key);
+            $size_val = 0;
+            if (is_array($value)) {
+                foreach ($value as $v) { $size_val += strlen((string) $v); }
+            } else {
+                $size_val = strlen((string) $value);
+            }
+            $total_size += $size_key + $size_val;
         }
 
         if ($total_size > 100000) { // Maximum 100KB total data
@@ -936,8 +949,15 @@ class FormsHandler {
             }
 
             // Check email
-            if ($field_type === 'email' && isset($form_data[$field_name]) && !empty($form_data[$field_name]) && !is_email($form_data[$field_name])) {
-                return new \WP_Error('validation_error', sprintf( /* translators: %s: field label */ __( "Field '%s' must contain a valid email address", 'mksddn-forms-handler' ), $field_label), ['status' => 400]);
+            if ($field_type === 'email' && isset($form_data[$field_name]) && $form_data[$field_name] !== '') {
+                if (is_array($form_data[$field_name])) {
+                    /* translators: %s: field label */
+                    return new \WP_Error('validation_error', sprintf( __( "Field '%s' must be a single email address", 'mksddn-forms-handler' ), $field_label), ['status' => 400]);
+                }
+                if (!is_email($form_data[$field_name])) {
+                    /* translators: %s: field label */
+                    return new \WP_Error('validation_error', sprintf( __( "Field '%s' must contain a valid email address", 'mksddn-forms-handler' ), $field_label), ['status' => 400]);
+                }
             }
             // Validate file fields (store URLs in form data)
             if ($field_type === 'file') {
@@ -947,18 +967,25 @@ class FormsHandler {
                     $urls = is_array($val) ? $val : [$val];
                     foreach ($urls as $u) {
                         if (esc_url_raw((string)$u) === '') {
+                            /* translators: %s: field label */
                             return new \WP_Error('validation_error', sprintf( __( "Field '%s' contains invalid file URL", 'mksddn-forms-handler' ), $field_label), ['status' => 400]);
                         }
                     }
                 } elseif ($is_required) {
+                    /* translators: %s: field label */
                     return new \WP_Error('validation_error', sprintf( __( "Field '%s' is required", 'mksddn-forms-handler' ), $field_label), ['status' => 400]);
                 }
             }
 
             // Check URL
             if ($field_type === 'url' && isset($form_data[$field_name]) && $form_data[$field_name] !== '') {
-                $sanitized_url = esc_url_raw((string)$form_data[$field_name]);
+                if (is_array($form_data[$field_name])) {
+                    /* translators: %s: field label */
+                    return new \WP_Error('validation_error', sprintf( __( "Field '%s' must be a single URL", 'mksddn-forms-handler' ), $field_label), ['status' => 400]);
+                }
+                $sanitized_url = esc_url_raw((string) $form_data[$field_name]);
                 if ($sanitized_url === '') {
+                    /* translators: %s: field label */
                     return new \WP_Error('validation_error', sprintf( __( "Field '%s' must contain a valid URL", 'mksddn-forms-handler' ), $field_label), ['status' => 400]);
                 }
             }
@@ -966,23 +993,31 @@ class FormsHandler {
             // Check number with optional min/max/step
             if ($field_type === 'number' && isset($form_data[$field_name]) && $form_data[$field_name] !== '') {
                 $value = $form_data[$field_name];
+                if (is_array($value)) {
+                    /* translators: %s: field label */
+                    return new \WP_Error('validation_error', sprintf( __( "Field '%s' must be a single number", 'mksddn-forms-handler' ), $field_label), ['status' => 400]);
+                }
                 if (!is_numeric($value)) {
+                    /* translators: %s: field label */
                     return new \WP_Error('validation_error', sprintf( __( "Field '%s' must be a number", 'mksddn-forms-handler' ), $field_label), ['status' => 400]);
                 }
                 $num = $value + 0; // cast numeric
                 if (isset($field['min']) && $field['min'] !== '' && $num < ($field['min'] + 0)) {
-                    return new \WP_Error('validation_error', sprintf( __( "Field '%s' must be greater than or equal to %s", 'mksddn-forms-handler' ), $field_label, $field['min']), ['status' => 400]);
+                    /* translators: 1: field label, 2: min value */
+                    return new \WP_Error('validation_error', sprintf( __( "Field '%1\$s' must be greater than or equal to %2\$s", 'mksddn-forms-handler' ), $field_label, $field['min']), ['status' => 400]);
                 }
                 if (isset($field['max']) && $field['max'] !== '' && $num > ($field['max'] + 0)) {
-                    return new \WP_Error('validation_error', sprintf( __( "Field '%s' must be less than or equal to %s", 'mksddn-forms-handler' ), $field_label, $field['max']), ['status' => 400]);
+                    /* translators: 1: field label, 2: max value */
+                    return new \WP_Error('validation_error', sprintf( __( "Field '%1\$s' must be less than or equal to %2\$s", 'mksddn-forms-handler' ), $field_label, $field['max']), ['status' => 400]);
                 }
                 if (isset($field['step']) && $field['step'] !== '' && is_numeric($field['step']) && (float)$field['step'] > 0) {
-                    $step = (float)$field['step'];
-                    $remainder = fmod((float)$num, $step);
-                    if ($remainder !== 0.0 && $step !== 1.0) {
-                        return new \WP_Error('validation_error', sprintf( __( "Field '%s' must follow step %s", 'mksddn-forms-handler' ), $field_label, $field['step']), ['status' => 400]);
-                    }
-                }
+					$step = (float)$field['step'];
+					$remainder = fmod((float)$num, $step);
+					if ($remainder !== 0.0 && $step !== 1.0) {
+						/* translators: 1: field label, 2: step value */
+						return new \WP_Error('validation_error', sprintf( __( "Field '%1\$s' must follow step %2\$s", 'mksddn-forms-handler' ), $field_label, $field['step']), ['status' => 400]);
+					}
+				}
             }
 
             // Check telephone pattern (server-side, optional)
@@ -998,30 +1033,53 @@ class FormsHandler {
                     // Fallback to default if provided pattern is invalid
                     $delimited = '/^\+?\d{7,15}$/';
                 }
+                if (is_array($form_data[$field_name])) {
+                    /* translators: %s: field label */
+                    return new \WP_Error('validation_error', sprintf( __( "Field '%s' must be a single phone number", 'mksddn-forms-handler' ), $field_label), ['status' => 400]);
+                }
                 if (!preg_match($delimited, (string)$form_data[$field_name])) {
+                    /* translators: %s: field label */
                     return new \WP_Error('validation_error', sprintf( __( "Field '%s' must be a valid phone number", 'mksddn-forms-handler' ), $field_label), ['status' => 400]);
                 }
             }
 
             // Check date/time/datetime-local formats (if present)
             if (isset($form_data[$field_name]) && $form_data[$field_name] !== '') {
-                $val = (string)$form_data[$field_name];
+                $raw_value = $form_data[$field_name];
                 if ($field_type === 'date') {
+                    if (is_array($raw_value)) {
+                        /* translators: %s: field label */
+                        return new \WP_Error('validation_error', sprintf( __( "Field '%s' must be a single date value", 'mksddn-forms-handler' ), $field_label), ['status' => 400]);
+                    }
+                    $val = (string) $raw_value;
                     $dt = \DateTime::createFromFormat('Y-m-d', $val);
                     if (!$dt || $dt->format('Y-m-d') !== $val) {
+                        /* translators: %s: field label */
                         return new \WP_Error('validation_error', sprintf( __( "Field '%s' must be a valid date (YYYY-MM-DD)", 'mksddn-forms-handler' ), $field_label), ['status' => 400]);
                     }
                 }
                 if ($field_type === 'time') {
+                    if (is_array($raw_value)) {
+                        /* translators: %s: field label */
+                        return new \WP_Error('validation_error', sprintf( __( "Field '%s' must be a single time value", 'mksddn-forms-handler' ), $field_label), ['status' => 400]);
+                    }
+                    $val = (string) $raw_value;
                     $dt = \DateTime::createFromFormat('H:i', $val);
                     if (!$dt || $dt->format('H:i') !== $val) {
+                        /* translators: %s: field label */
                         return new \WP_Error('validation_error', sprintf( __( "Field '%s' must be a valid time (HH:MM)", 'mksddn-forms-handler' ), $field_label), ['status' => 400]);
                     }
                 }
                 if ($field_type === 'datetime-local') {
+                    if (is_array($raw_value)) {
+                        /* translators: %s: field label */
+                        return new \WP_Error('validation_error', sprintf( __( "Field '%s' must be a single datetime value", 'mksddn-forms-handler' ), $field_label), ['status' => 400]);
+                    }
                     // HTML datetime-local typically 'YYYY-MM-DDTHH:MM'
-                    $dt = \DateTime::createFromFormat('Y-m-d\TH:i', $val);
-                    if (!$dt || $dt->format('Y-m-d\TH:i') !== $val) {
+                    $val = (string) $raw_value;
+                    $dt = \DateTime::createFromFormat('Y-m-d\\TH:i', $val);
+                    if (!$dt || $dt->format('Y-m-d\\TH:i') !== $val) {
+                        /* translators: %s: field label */
                         return new \WP_Error('validation_error', sprintf( __( "Field '%s' must be a valid datetime (YYYY-MM-DDTHH:MM)", 'mksddn-forms-handler' ), $field_label), ['status' => 400]);
                     }
                 }

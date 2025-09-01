@@ -4,7 +4,7 @@ Tags: forms, telegram, google-sheets, rest-api, form-handler
 Requires at least: 5.0
 Tested up to: 6.8
 Requires PHP: 8.0
-Stable tag: 1.0.4
+Stable tag: 1.0.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -232,6 +232,11 @@ Example JSON config:
 
 == Changelog ==
 
+= 1.0.5 =
+* REST: Fixed warnings caused by implicit array-to-string conversions (multipart submissions)
+* Validation: Hardened guards for email/url/tel/number; refined date/time/datetime-local handling
+* REST: Correct total payload size calculation for array values
+
 = 1.0.4 =
 * Fields: Added select (with multiple) and radio support in shortcode
 * Config: `options` and `multiple` support in fields JSON
@@ -269,6 +274,9 @@ Example JSON config:
 * Clean, maintainable code structure
 
 == Upgrade Notice ==
+
+= 1.0.5 =
+Bugfix release: resolves REST warnings for multipart submissions and strengthens validation. Recommended update.
 
 = 1.0.3 =
 Unified REST namespace and added GET endpoints. Update recommended.

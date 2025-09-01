@@ -142,7 +142,8 @@ class MetaBoxes {
                         $parts[] = esc_html($v_str);
                     }
                 }
-                echo implode(', ', $parts);
+                // Each item in $parts is properly escaped; join with a safe separator
+                echo wp_kses_post(implode(', ', $parts));
             } else {
                 $v_str = (string) $value;
                 if (preg_match('#^https?://#i', $v_str)) {
