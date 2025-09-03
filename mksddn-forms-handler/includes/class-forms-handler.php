@@ -1199,10 +1199,14 @@ class FormsHandler {
     private function looks_like_urls($value): bool {
         if (is_array($value)) {
             if ($value === []) { return false; }
-            foreach ($value as $v) { if (esc_url_raw((string)$v) === '') { return false; } }
+            foreach ($value as $v) {
+                if (!is_string($v) || !wp_http_validate_url($v)) {
+                    return false;
+                }
+            }
             return true;
         }
-        return esc_url_raw((string)$value) !== '';
+        return is_string($value) && (bool) wp_http_validate_url($value);
     }
     
     /**
