@@ -1,6 +1,6 @@
 === MksDdn Forms Handler ===
 Contributors: mksddn
-Tags: forms, telegram, google-sheets, rest-api, form-handler, ajax, validation
+Tags: forms, telegram, google-sheets, rest-api, form-handler
 Requires at least: 5.0
 Tested up to: 6.8
 Requires PHP: 8.0
