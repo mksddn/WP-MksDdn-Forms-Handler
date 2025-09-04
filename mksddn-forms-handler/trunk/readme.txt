@@ -30,12 +30,11 @@ MksDdn Forms Handler is a powerful and flexible form processing plugin that allo
 * Lead generation forms with instant notifications
 * Data collection forms with Google Sheets backup
 * Custom forms with REST API integration
-* Multi-step forms with conditional logic
 
 = Technical Features =
 
 * WordPress 5.0+ compatible
-* PHP 7.4+ required
+* PHP 8.0+ required
 * GPL v2+ licensed
 * Clean, maintainable code
 * Proper error handling
@@ -69,8 +68,8 @@ Namespace: `mksddn-forms-handler/v1`
 3) Submit form (JSON or multipart)
 - Method: POST
 - Path: `/wp-json/mksddn-forms-handler/v1/forms/{slug}/submit`
-- Body (application/json): key/value пары согласно конфигу полей. Поле `mksddn_fh_hp` (honeypot) может присутствовать и должно быть пустым.
-- Body (multipart/form-data): поддерживаются поля и файлы (`type":"file"`). Для множественных файлов используйте `name[]`.
+- Body (application/json): key/value pairs according to the fields configuration. The `mksddn_fh_hp` honeypot field may be present and must be empty.
+- Body (multipart/form-data): fields and file uploads are supported (`type: "file"`). For multiple files, use `name[]`.
 - Validation & limits:
   - Only configured fields are accepted; others return `unauthorized_fields` error
   - Required fields, `email`, `url`, `number(min/max/step)`, `tel(pattern)`, `date`, `time`, `datetime-local` are validated
