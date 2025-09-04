@@ -1,6 +1,6 @@
 === MksDdn Forms Handler ===
 Contributors: mksddn
-Tags: forms, telegram, google-sheets, rest-api, form-handler
+Tags: forms, telegram, google-sheets, rest-api, form-handler, ajax, validation
 Requires at least: 5.0
 Tested up to: 6.8
 Requires PHP: 8.0
@@ -51,53 +51,55 @@ MksDdn Forms Handler is a powerful and flexible form processing plugin that allo
 
 Namespace: `mksddn-forms-handler/v1`
 
-1) List forms
-- Method: GET
-- Path: `/wp-json/mksddn-forms-handler/v1/forms`
-- Query params:
+### List Forms
+- **Method**: GET
+- **Path**: `/wp-json/mksddn-forms-handler/v1/forms`
+- **Query Parameters**:
   - `per_page` (1–100, default: 10)
   - `page` (>=1, default: 1)
   - `search` (string, optional)
-- Response headers: `X-WP-Total`, `X-WP-TotalPages`
+- **Response Headers**: `X-WP-Total`, `X-WP-TotalPages`
 
-2) Get single form
-- Method: GET
-- Path: `/wp-json/mksddn-forms-handler/v1/forms/{slug}`
-- Response body includes: `id`, `slug`, `title`, `submit_url`, `fields` (sanitized config)
+### Get Single Form
+- **Method**: GET
+- **Path**: `/wp-json/mksddn-forms-handler/v1/forms/{slug}`
+- **Response**: Includes `id`, `slug`, `title`, `submit_url`, `fields` (sanitized config)
 
-3) Submit form (JSON or multipart)
-- Method: POST
-- Path: `/wp-json/mksddn-forms-handler/v1/forms/{slug}/submit`
-- Body (application/json): key/value pairs according to the fields configuration. The `mksddn_fh_hp` honeypot field may be present and must be empty.
-- Body (multipart/form-data): fields and file uploads are supported (`type: "file"`). For multiple files, use `name[]`.
-- Validation & limits:
-  - Only configured fields are accepted; others return `unauthorized_fields` error
-  - Required fields, `email`, `url`, `number(min/max/step)`, `tel(pattern)`, `date`, `time`, `datetime-local` are validated
-  - Max 50 fields; total payload size ≤ 100 KB
-  - Rate limiting: 1 request per 10s per IP per form
+### Submit Form
+- **Method**: POST
+- **Path**: `/wp-json/mksddn-forms-handler/v1/forms/{slug}/submit`
+- **Content Types**: JSON or multipart/form-data
+- **Body (JSON)**: Key/value pairs according to field configuration. The `mksddn_fh_hp` honeypot field may be present and must be empty.
+- **Body (Multipart)**: Fields and file uploads supported. For multiple files, use `name[]`.
 
-Examples:
+#### Validation & Limits
+- Only configured fields accepted; unauthorized fields return `unauthorized_fields` error
+- Required fields, email, URL, number (min/max/step), tel (pattern), date, time, datetime-local are validated
+- Maximum 50 fields; total payload size ≤ 100 KB
+- Rate limiting: 1 request per 10 seconds per IP per form
 
-List forms:
-```
+#### Examples
+
+**List forms:**
+```bash
 curl -s 'https://example.com/wp-json/mksddn-forms-handler/v1/forms'
 ```
 
-Get single form:
-```
+**Get single form:**
+```bash
 curl -s 'https://example.com/wp-json/mksddn-forms-handler/v1/forms/contact'
 ```
 
-Submit form:
-```
+**Submit form (JSON):**
+```bash
 curl -s -X POST \
   -H 'Content-Type: application/json' \
   -d '{"name":"John","email":"john@example.com","message":"Hi","mksddn_fh_hp":""}' \
   'https://example.com/wp-json/mksddn-forms-handler/v1/forms/contact/submit'
 ```
 
-Submit form with files (multipart):
-```
+**Submit form with files (multipart):**
+```bash
 curl -s -X POST \
   -F 'name=John' \
   -F 'email=john@example.com' \
@@ -147,74 +149,59 @@ Yes, the plugin includes comprehensive security measures:
 
 = Can I submit forms via AJAX? =
 
-Yes! The plugin provides REST API endpoints for AJAX form submissions. Check the documentation for API details.
+Yes! The plugin provides REST API endpoints for AJAX form submissions. Check the REST API section for details.
 
 == Supported Field Types ==
 
 Fields are configured as JSON in the form settings. Supported types:
 
-* text, email, password
-* tel, url, number, date, time, datetime-local
-* textarea
-* checkbox (if required, must be checked)
-* select (supports multiple)
-* radio
-* file (uploads via form and REST multipart)
+* **Basic**: text, email, password
+* **Input**: tel, url, number, date, time, datetime-local
+* **Text**: textarea
+* **Choice**: checkbox, select (supports multiple), radio
+* **File**: file uploads (form and REST multipart)
 
-Notes:
+### Field Configuration Notes
 
-* `options` can be an array of strings or objects `{ "value": "...", "label": "..." }`.
-* For `select` with multiple choice, set `multiple: true` (shortcode renders `name[]`).
-* For `number`, optional attributes: `min`, `max`, `step`.
-* For `tel`, optional `pattern` (default server validation uses `^\+?\d{7,15}$`).
-* For `date/time/datetime-local`, server validates formats: `YYYY-MM-DD`, `HH:MM`, `YYYY-MM-DDTHH:MM`.
-* For REST submissions, send arrays for multiple selects.
-* File fields:
-  - `allowed_extensions`: array of extensions, e.g. `["pdf","png","jpg"]`
-  - `max_size_mb`: max size per file (default 10)
-  - `max_files`: max files per field (default 5)
-  - `multiple`: allow multiple files
+* `options` can be an array of strings or objects `{ "value": "...", "label": "..." }`
+* For `select` with multiple choice, set `multiple: true` (shortcode renders `name[]`)
+* For `number`, optional attributes: `min`, `max`, `step`
+* For `tel`, optional `pattern` (default server validation uses `^\+?\d{7,15}$`)
+* For `date/time/datetime-local`, server validates formats: `YYYY-MM-DD`, `HH:MM`, `YYYY-MM-DDTHH:MM`
+* For REST submissions, send arrays for multiple selects
 
-Example JSON config:
+### File Field Options
 
-```
+* `allowed_extensions`: Array of extensions, e.g. `["pdf","png","jpg"]`
+* `max_size_mb`: Maximum size per file (default: 10)
+* `max_files`: Maximum files per field (default: 5)
+* `multiple`: Allow multiple files
+
+### Example JSON Configuration
+
+```json
 [
   {"name":"name","label":"Name","type":"text","required":true,"placeholder":"Your name"},
   {"name":"email","label":"Email","type":"email","required":true},
-  {"name":"password","label":"Password","type":"password","required":true},
   {"name":"phone","label":"Phone","type":"tel","pattern":"^\\+?\\d{7,15}$"},
   {"name":"website","label":"Website","type":"url"},
   {"name":"age","label":"Age","type":"number","min":1,"max":120,"step":1},
   {"name":"birth","label":"Birth date","type":"date"},
-  {"name":"meet_time","label":"Meeting time","type":"time"},
-  {"name":"meet_at","label":"Meeting at","type":"datetime-local"},
   {"name":"message","label":"Message","type":"textarea","required":true},
   {"name":"agree","label":"I agree to Terms","type":"checkbox","required":true},
   {
     "name":"services",
-    "label":"Choose a service (or multiple)",
+    "label":"Choose services",
     "type":"select",
-    "required":false,
     "multiple":true,
     "options":["seo","smm","ads"]
-  },
-  {
-    "name":"contact_method",
-    "label":"Preferred contact",
-    "type":"radio",
-    "required":true,
-    "options":[
-      {"value":"email","label":"Email"},
-      {"value":"phone","label":"Phone"}
-    ]
   },
   {
     "name":"attachments",
     "label":"Attach files",
     "type":"file",
-    "required":false,
     "multiple":true,
-    "allowed_extensions":["pdf","png","jpg","jpeg"],
+    "allowed_extensions":["pdf","png","jpg"],
     "max_size_mb":10,
     "max_files":3
   }
@@ -272,36 +259,25 @@ Example JSON config:
 * Security measures and validation
 * Clean, maintainable code structure
 
-== Upgrade Notice ==
-
-= 1.0.5 =
-Bugfix release: resolves REST warnings for multipart submissions and strengthens validation. Recommended update.
-
-= 1.0.3 =
-Unified REST namespace and added GET endpoints. Update recommended.
-
-= 1.0.2 =
-Compliance update: enqueue fixes, security hardening, and REST adjustments. No breaking changes.
-
-== External services ==
+== External Services ==
 
 This plugin can connect to external services when explicitly enabled in a form's settings:
 
-1) Google OAuth2 and Google Sheets API
-- What: Authenticate and append rows to a spreadsheet
-- When: Only if "Send to Google Sheets" is enabled for a form and valid credentials are provided
-- Data sent: Form fields configured for the form, form title, timestamp
-- Endpoints used: `https://oauth2.googleapis.com/token`, `https://sheets.googleapis.com/v4/spreadsheets/...`
-- Terms: https://policies.google.com/terms
-- Privacy: https://policies.google.com/privacy
+### Google OAuth2 and Google Sheets API
+- **Purpose**: Authenticate and append rows to a spreadsheet
+- **When**: Only if "Send to Google Sheets" is enabled for a form and valid credentials are provided
+- **Data sent**: Form fields configured for the form, form title, timestamp
+- **Endpoints used**: `https://oauth2.googleapis.com/token`, `https://sheets.googleapis.com/v4/spreadsheets/...`
+- **Terms**: https://policies.google.com/terms
+- **Privacy**: https://policies.google.com/privacy
 
-2) Telegram Bot API
-- What: Send a message with submission content to specified chat(s)
-- When: Only if "Send to Telegram" is enabled for a form and bot token + chat IDs are configured
-- Data sent: Form fields configured for the form, form title
-- Endpoint used: `https://api.telegram.org/bot<token>/sendMessage`
-- Terms/Privacy: https://telegram.org/privacy
+### Telegram Bot API
+- **Purpose**: Send a message with submission content to specified chat(s)
+- **When**: Only if "Send to Telegram" is enabled for a form and bot token + chat IDs are configured
+- **Data sent**: Form fields configured for the form, form title
+- **Endpoint used**: `https://api.telegram.org/bot<token>/sendMessage`
+- **Terms/Privacy**: https://telegram.org/privacy
 
-Notes:
-- No IP address or user agent is transmitted to external services; only form field values are sent.
-- External delivery is opt-in per form and disabled by default.
+### Privacy Notes
+- No IP address or user agent is transmitted to external services; only form field values are sent
+- External delivery is opt-in per form and disabled by default
