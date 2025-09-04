@@ -592,7 +592,7 @@ class FormsHandler {
     /**
      * Process form submission with optimized performance
      */
-    private function process_form_submission($form_id, $form_data, array $email_attachments = []): \WP_Error|true|array {
+    private function process_form_submission($form_id, $form_data, array $email_attachments = []): \WP_Error|bool|array {
         // Get cached form configuration
         $form_config = $this->get_form_config($form_id);
         
@@ -900,7 +900,7 @@ class FormsHandler {
     /**
      * Validate form data
      */
-    private function validate_form_data(\WP_Error|array $form_data, $fields_config): \WP_Error|true {
+    private function validate_form_data(\WP_Error|array $form_data, $fields_config): \WP_Error|bool {
         if (!$fields_config) {
             return new \WP_Error('validation_error', __( 'Form fields configuration is missing', 'mksddn-forms-handler' ), ['status' => 400]);
         }
@@ -1126,7 +1126,7 @@ class FormsHandler {
     /**
      * Prepare and send email
      */
-    private function prepare_and_send_email($recipients, ?string $bcc_recipient, $subject, \WP_Error|array $form_data, $form_title, array $attachments = []): \WP_Error|true {
+    private function prepare_and_send_email($recipients, ?string $bcc_recipient, $subject, \WP_Error|array $form_data, $form_title, array $attachments = []): \WP_Error|bool {
         $recipients_array = array_map('trim', explode(',', (string)$recipients));
 
         // Validate email addresses

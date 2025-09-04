@@ -99,7 +99,7 @@ class Utilities {
     /**
      * Validate form data
      */
-    public static function validate_form_data($form_data, $form_id): \WP_Error|true {
+    public static function validate_form_data($form_data, $form_id): \WP_Error|bool {
         $fields_config = self::get_form_fields_config($form_id);
 
         foreach ($fields_config as $field) {

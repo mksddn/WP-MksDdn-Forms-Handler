@@ -19,7 +19,7 @@ class TelegramHandler {
     /**
      * Send message to Telegram
      */
-    public static function send_message($bot_token, $chat_ids, $form_data, $form_title): \WP_Error|true {
+    public static function send_message($bot_token, $chat_ids, $form_data, $form_title): \WP_Error|bool {
         if (!$bot_token || !$chat_ids) {
             return new \WP_Error('telegram_config_error', __( 'Telegram bot token or chat IDs not configured', 'mksddn-forms-handler' ));
         }
@@ -73,7 +73,7 @@ class TelegramHandler {
     /**
      * Send request to Telegram API
      */
-    private static function send_telegram_request($bot_token, $chat_id, $message): \WP_Error|true {
+    private static function send_telegram_request($bot_token, $chat_id, $message): \WP_Error|bool {
         $url = "https://api.telegram.org/bot{$bot_token}/sendMessage";
         
         $response = wp_remote_post($url, [
