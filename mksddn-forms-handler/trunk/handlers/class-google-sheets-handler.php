@@ -118,7 +118,7 @@ class GoogleSheetsHandler {
     /**
      * Validate Google Sheets configuration
      */
-    public static function validate_config(?string $spreadsheet_id, $sheet_name = ''): \WP_Error|true {
+    public static function validate_config(?string $spreadsheet_id, $sheet_name = ''): \WP_Error|bool {
         if (!$spreadsheet_id) {
             return new \WP_Error('sheets_config_error', __( 'Spreadsheet ID is required', 'mksddn-forms-handler' ));
         }
