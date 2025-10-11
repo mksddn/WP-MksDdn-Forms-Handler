@@ -409,3 +409,15 @@
   - [x] Добавлены комментарии переводчикам для строк с плейсхолдерами
   - [x] Проверен линтер — ошибок нет
 - **Зависимости**: PCP, I18n
+
+## Задача: Поддержка готовых форм из PHP шаблонов
+- **Статус**: Завершена ✅
+- **Описание**: Добавлен функционал для интеграции готовых форм, сверстанных в PHP шаблонах тем. Созданы вспомогательные функции для упрощения использования.
+- **Шаги выполнения**:
+  - [x] Добавлены методы в `class-utilities.php`: `get_form_action()`, `render_form_fields()`, `get_form_config()`, `get_rest_endpoint()`, `form_has_file_fields()`
+  - [x] Создан файл `includes/template-functions.php` с глобальными функциями: `mksddn_fh_get_form_action()`, `mksddn_fh_form_fields()`, `mksddn_fh_get_form_config()`, `mksddn_fh_get_rest_endpoint()`, `mksddn_fh_form_has_files()`, `mksddn_fh_enqueue_form_script()`
+  - [x] Подключен `template-functions.php` в главном файле плагина
+  - [x] Созданы примеры использования в `templates/custom-form-examples.php` (5 примеров: базовая форма, форма с файлами, динамический рендеринг, AJAX, AJAX с файлами)
+  - [x] Обновлена документация в `Project.md` и `Tasktracker.md`
+- **Зависимости**: FormsHandler, Utilities, Shortcodes
+- **Приоритет**: Средний

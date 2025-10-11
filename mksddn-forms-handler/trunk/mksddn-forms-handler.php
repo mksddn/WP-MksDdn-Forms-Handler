@@ -47,6 +47,9 @@ require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/includes/class-assets.php';
 require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/handlers/class-telegram-handler.php';
 require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/handlers/class-google-sheets-handler.php';
 
+// Load template functions for custom form integration
+require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/includes/template-functions.php';
+
 // Initialize plugin
 add_action('plugins_loaded', function() {
     new MksDdn\FormsHandler\PostTypes();

@@ -56,11 +56,57 @@ mksddn-forms-handler/
 - **Security** - реализация ограничений безопасности для отправлений
 - **Utilities** - вспомогательные функции и утилиты создания форм
 - **GoogleSheetsAdmin** - страница настроек Google Sheets и обработка OAuth
+- **Template Functions** - глобальные функции для интеграции готовых форм в PHP шаблонах
 
 #### 2. Обработчики (handlers/)
 
 - **TelegramHandler** - отправка отправлений форм в Telegram
 - **GoogleSheetsHandler** - интеграция с Google Sheets API
+
+### Способы использования форм
+
+Плагин поддерживает несколько способов интеграции форм:
+
+#### 1. Шорткод (стандартный способ)
+```php
+[mksddn_fh_form slug="contact-form"]
+```
+Плагин автоматически генерирует HTML форму на основе конфигурации.
+
+#### 2. Готовые формы в PHP шаблонах (новое)
+Интеграция готовых форм, сверстанных в PHP шаблонах тем:
+
+**Базовый пример:**
+```php
+<form method="post" action="<?php echo mksddn_fh_get_form_action(); ?>">
+    <?php mksddn_fh_form_fields('contact-form'); ?>
+    <!-- Ваши кастомные поля -->
+    <input type="text" name="name" required>
+    <input type="email" name="email" required>
+    <button type="submit">Send</button>
+</form>
+```
+
+**Доступные функции:**
+- `mksddn_fh_get_form_action()` - получить URL для action
+- `mksddn_fh_form_fields($slug)` - вывести скрытые поля (nonce, form_id, honeypot)
+- `mksddn_fh_get_form_config($slug)` - получить конфигурацию формы
+- `mksddn_fh_get_rest_endpoint($slug)` - получить REST API endpoint для AJAX
+- `mksddn_fh_form_has_files($slug)` - проверить наличие файловых полей
+- `mksddn_fh_enqueue_form_script()` - подключить скрипт для AJAX отправки
+
+**Примеры использования:**
+См. файл `/templates/custom-form-examples.php` для детальных примеров.
+
+#### 3. REST API (AJAX)
+Отправка форм через REST API без перезагрузки страницы:
+```javascript
+fetch('<?php echo mksddn_fh_get_rest_endpoint("contact-form"); ?>', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(formData)
+});
+```
 
 ### Технологический стек
 

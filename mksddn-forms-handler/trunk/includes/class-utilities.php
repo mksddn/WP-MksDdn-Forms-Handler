@@ -243,4 +243,98 @@ class Utilities {
         }
         return $result;
     }
+
+    /**
+     * Get form action URL for template integration
+     *
+     * @return string Form action URL
+     */
+    public static function get_form_action(): string {
+        return esc_url(admin_url('admin-post.php'));
+    }
+
+    /**
+     * Render hidden form fields for template integration
+     *
+     * @param string $form_slug Form slug or ID
+     * @return void
+     */
+    public static function render_form_fields(string $form_slug): void {
+        // Validate form exists
+        $form = self::get_form_by_slug($form_slug);
+        if (!$form) {
+            $form = get_post($form_slug);
+        }
+
+        if (!$form || $form->post_type !== 'mksddn_fh_forms') {
+            echo '<!-- Error: Form not found -->';
+            return;
+        }
+
+        // Output hidden fields
+        wp_nonce_field('submit_form_nonce', 'form_nonce');
+        echo '<input type="hidden" name="action" value="submit_form">';
+        echo '<input type="hidden" name="form_id" value="' . esc_attr($form->post_name) . '">';
+        echo '<input type="text" name="mksddn_fh_hp" value="" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true" />';
+    }
+
+    /**
+     * Get form configuration for template integration
+     *
+     * @param string $form_slug Form slug or ID
+     * @return array|null Form configuration or null if not found
+     */
+    public static function get_form_config(string $form_slug): ?array {
+        $form = self::get_form_by_slug($form_slug);
+        if (!$form) {
+            $form = get_post($form_slug);
+        }
+
+        if (!$form || $form->post_type !== 'mksddn_fh_forms') {
+            return null;
+        }
+
+        return [
+            'id'       => $form->ID,
+            'slug'     => $form->post_name,
+            'title'    => $form->post_title,
+            'fields'   => self::get_form_fields_config($form->ID),
+        ];
+    }
+
+    /**
+     * Get REST API endpoint URL for form submission
+     *
+     * @param string $form_slug Form slug
+     * @return string REST API endpoint URL
+     */
+    public static function get_rest_endpoint(string $form_slug): string {
+        return esc_url(rest_url('mksddn-forms-handler/v1/forms/' . sanitize_title($form_slug) . '/submit'));
+    }
+
+    /**
+     * Check if form has file upload fields
+     *
+     * @param string $form_slug Form slug or ID
+     * @return bool True if form has file fields
+     */
+    public static function form_has_file_fields(string $form_slug): bool {
+        $form = self::get_form_by_slug($form_slug);
+        if (!$form) {
+            $form = get_post($form_slug);
+        }
+
+        if (!$form || $form->post_type !== 'mksddn_fh_forms') {
+            return false;
+        }
+
+        $fields = self::get_form_fields_config($form->ID);
+        foreach ($fields as $field) {
+            if (isset($field['type']) && $field['type'] === 'file') {
+                return true;
+            }
+        }
+
+        return false;
+    }
 } 
