@@ -4,7 +4,7 @@ Tags: forms, telegram, google-sheets, rest-api, form-handler
 Requires at least: 5.0
 Tested up to: 6.8
 Requires PHP: 8.0
-Stable tag: 1.0.5
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -46,6 +46,163 @@ MksDdn Forms Handler is a powerful and flexible form processing plugin that allo
 2. Activate the plugin through the 'Plugins' screen in WordPress
 3. Use the Forms menu to create and manage your forms
 4. Use the shortcode `[mksddn_fh_form id="form_id"]` to display forms on your pages
+
+== For Developers ==
+
+= Architecture =
+
+**Component-based structure** following SOLID principles with clear separation of concerns:
+
+**Core Components (includes/)**
+* `PostTypes` - custom post types registration (forms, submissions)
+* `MetaBoxes` - form settings and submission data management
+* `FormsHandler` - main processing logic with REST API support
+* `Shortcodes` - form rendering with AJAX functionality
+* `AdminColumns` - admin interface customization
+* `ExportHandler` - CSV export with filtering
+* `Security` - rate limiting and security checks
+* `Utilities` - helper functions and form creation utilities
+* `GoogleSheetsAdmin` - Google Sheets settings page and OAuth
+* `Template Functions` - global functions for PHP template integration
+
+**Handlers (handlers/)**
+* `TelegramHandler` - Telegram Bot API integration
+* `GoogleSheetsHandler` - Google Sheets API integration
+
+**Assets (assets/)**
+* `css/` - Admin and frontend styles
+* `js/` - Admin and form scripts
+* `images/` - Plugin images
+
+= Technology Stack =
+
+* WordPress 5.0+ - core platform
+* PHP 8.0+ - server-side logic
+* jQuery - client-side form handling
+* REST API - form submission API
+* Google Sheets API - spreadsheet integration
+* Telegram Bot API - notifications
+
+= File Structure =
+
+```
+mksddn-forms-handler/
+├── mksddn-forms-handler.php     # Main plugin file
+├── includes/                     # Core components
+│   ├── class-post-types.php
+│   ├── class-meta-boxes.php
+│   ├── class-forms-handler.php
+│   ├── class-shortcodes.php
+│   ├── class-admin-columns.php
+│   ├── class-export-handler.php
+│   ├── class-security.php
+│   ├── class-utilities.php
+│   ├── class-google-sheets-admin.php
+│   └── template-functions.php
+├── handlers/                     # External service handlers
+│   ├── class-telegram-handler.php
+│   └── class-google-sheets-handler.php
+├── templates/                    # Template files
+│   ├── form-settings-meta-box.php
+│   └── custom-form-examples.php
+├── assets/                       # Static resources
+│   ├── css/
+│   ├── js/
+│   └── images/
+├── languages/                    # Translations
+└── uninstall.php                # Cleanup script
+```
+
+= Integration Methods =
+
+**1. Shortcode (Standard)**
+```php
+[mksddn_fh_form slug="contact-form"]
+```
+Plugin automatically generates HTML form based on configuration.
+
+**2. PHP Templates (Custom Forms)**
+Integrate pre-built forms in theme templates:
+
+```php
+<form method="post" action="<?php echo mksddn_fh_get_form_action(); ?>">
+    <?php mksddn_fh_form_fields('contact-form'); ?>
+    <!-- Your custom fields -->
+    <input type="text" name="name" required>
+    <input type="email" name="email" required>
+    <button type="submit">Send</button>
+</form>
+```
+
+**Available Functions:**
+* `mksddn_fh_get_form_action()` - get form action URL
+* `mksddn_fh_form_fields($slug)` - output hidden fields (nonce, form_id, honeypot)
+* `mksddn_fh_get_form_config($slug)` - get form configuration
+* `mksddn_fh_get_rest_endpoint($slug)` - get REST API endpoint for AJAX
+* `mksddn_fh_form_has_files($slug)` - check for file fields
+* `mksddn_fh_enqueue_form_script()` - enqueue AJAX script
+
+See `/templates/custom-form-examples.php` for detailed examples.
+
+**3. REST API (AJAX)**
+Submit forms via REST API without page reload:
+
+```javascript
+fetch('<?php echo mksddn_fh_get_rest_endpoint("contact-form"); ?>', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(formData)
+});
+```
+
+= Development Standards =
+
+**Coding**
+* WordPress Coding Standards compliance
+* PSR-4 autoloading
+* SOLID principles
+* DRY (Don't Repeat Yourself)
+* KISS (Keep It Simple)
+
+**Security**
+* Input validation for all data
+* Output sanitization
+* Nonce verification (CSRF protection)
+* Capability checks
+* Rate limiting (1 request per 10 seconds per IP per form)
+
+**Performance**
+* Minimal database queries
+* Data caching
+* Lazy loading of resources
+* Conditional script enqueuing
+
+**Compatibility**
+* WordPress 5.0+ minimum
+* PHP 8.0+ minimum
+* Multisite support
+* RTL support
+* Accessibility standards (WCAG)
+
+= Roadmap =
+
+**Short-term (1-3 months)**
+* Bug fixes and stability improvements
+* Complete documentation
+* Extended test coverage
+* Performance optimization
+
+**Mid-term (3-6 months)**
+* New field types and features
+* Additional service integrations
+* UI/UX improvements
+* Advanced validation options
+
+**Long-term (6+ months)**
+* Enterprise scaling support
+* REST API expansion
+* Mobile app support
+* AI-powered form processing
 
 == REST API ==
 
@@ -216,7 +373,20 @@ Fields are configured as JSON in the form settings. Supported types:
 4. Telegram integration setup
 5. Google Sheets integration
 
+== Upgrade Notice ==
+
+= 1.1.0 =
+New feature: Template functions for custom forms integration. Fully backward compatible.
+
 == Changelog ==
+
+= 1.1.0 =
+* Added support for custom forms in PHP templates
+* New template functions for easy integration: mksddn_fh_get_form_action(), mksddn_fh_form_fields(), mksddn_fh_get_form_config()
+* New helper functions: mksddn_fh_get_rest_endpoint(), mksddn_fh_form_has_files(), mksddn_fh_enqueue_form_script()
+* Added comprehensive examples in templates/custom-form-examples.php
+* Extended Utilities class with methods for template integration
+* Full backward compatibility - all existing shortcodes continue to work
 
 = 1.0.5 =
 * REST: Fixed warnings caused by implicit array-to-string conversions (multipart submissions)
