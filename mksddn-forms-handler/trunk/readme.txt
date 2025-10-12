@@ -404,7 +404,7 @@ Fields are configured as JSON in the form settings. Supported types:
 == Upgrade Notice ==
 
 = 1.1.0 =
-New feature: Template functions for custom forms integration. Fully backward compatible.
+New feature: Template functions for custom forms integration. Bug fix: Improved Telegram message formatting. Fully backward compatible.
 
 == Changelog ==
 
@@ -416,6 +416,9 @@ New feature: Template functions for custom forms integration. Fully backward com
 * New filter: mksddn_fh_allowed_fields - dynamically control allowed field names (supports wildcard '*')
 * Added comprehensive examples in templates/custom-form-examples.php
 * Extended Utilities class with methods for template integration
+* Fixed: Telegram message formatting switched from Markdown to HTML to prevent parsing errors
+* Improved: Better handling of special characters in Cyrillic text (dashes, dots, brackets)
+* Added: escape_html_for_telegram() method for proper HTML escaping
 * Full backward compatibility - all existing shortcodes continue to work
 
 = 1.0.5 =

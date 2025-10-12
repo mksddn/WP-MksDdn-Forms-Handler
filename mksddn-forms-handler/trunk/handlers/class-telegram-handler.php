@@ -52,19 +52,28 @@ class TelegramHandler {
     }
     
     /**
+     * Escape HTML special characters for Telegram
+     */
+    private static function escape_html_for_telegram($text): string {
+        return htmlspecialchars($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    }
+
+    /**
      * Build Telegram message
      */
     private static function build_telegram_message($form_data, $form_title): string {
-        $message = "📝 *New Form Submission*\n\n";
-        $message .= "📋 *Form:* " . $form_title . "\n";
-        $message .= "🕐 *Time:* " . current_time('d.m.Y H:i:s') . "\n\n";
-        $message .= "*Form Data:*\n";
+        $message = "📝 <b>New Form Submission</b>\n\n";
+        $message .= "📋 <b>Form:</b> " . self::escape_html_for_telegram($form_title) . "\n";
+        $message .= "🕐 <b>Time:</b> " . current_time('d.m.Y H:i:s') . "\n\n";
+        $message .= "<b>Form Data:</b>\n";
 
         foreach ($form_data as $key => $value) {
             if (is_array($value)) {
                 $value = implode(', ', array_map('strval', $value));
             }
-            $message .= "• *" . ucfirst($key) . ":* " . $value . "\n";
+            $escaped_key = self::escape_html_for_telegram(ucfirst($key));
+            $escaped_value = self::escape_html_for_telegram($value);
+            $message .= "• <b>" . $escaped_key . ":</b> " . $escaped_value . "\n";
         }
 
         return $message;
@@ -80,7 +89,7 @@ class TelegramHandler {
             'body' => [
                 'chat_id'    => $chat_id,
                 'text'       => $message,
-                'parse_mode' => 'Markdown',
+                'parse_mode' => 'HTML',
             ],
             'timeout' => 30,
         ]);
