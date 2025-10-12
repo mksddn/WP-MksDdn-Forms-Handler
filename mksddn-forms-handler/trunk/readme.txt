@@ -208,26 +208,6 @@ add_filter('mksddn_fh_allowed_fields', function($allowed_fields, $form_id, $form
 `mksddn_forms_handler_log_security` - Fired when unauthorized fields are detected
 `mksddn_forms_handler_log_submission` - Fired when form submission is processed
 
-= Roadmap =
-
-**Short-term (1-3 months)**
-* Bug fixes and stability improvements
-* Complete documentation
-* Extended test coverage
-* Performance optimization
-
-**Mid-term (3-6 months)**
-* New field types and features
-* Additional service integrations
-* UI/UX improvements
-* Advanced validation options
-
-**Long-term (6+ months)**
-* Enterprise scaling support
-* REST API expansion
-* Mobile app support
-* AI-powered form processing
-
 == REST API ==
 
 Namespace: `mksddn-forms-handler/v1`
