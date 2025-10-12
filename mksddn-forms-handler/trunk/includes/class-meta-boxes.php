@@ -77,6 +77,7 @@ class MetaBoxes {
         $sheets_spreadsheet_id = get_post_meta($post->ID, '_sheets_spreadsheet_id', true);
         $sheets_sheet_name = get_post_meta($post->ID, '_sheets_sheet_name', true);
         $save_to_admin = get_post_meta($post->ID, '_save_to_admin', true);
+        $allow_any_fields = get_post_meta($post->ID, '_allow_any_fields', true);
 
         if ($json_error && $json_error_value !== false) {
             $fields_config = $json_error_value;
@@ -102,7 +103,7 @@ class MetaBoxes {
                     'type'     => 'textarea',
                     'required' => true,
                 ],
-            ], JSON_PRETTY_PRINT);
+            ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
         }
 
         // Show error notification if invalid JSON
@@ -211,7 +212,7 @@ class MetaBoxes {
             $decoded = json_decode($raw_json, true);
             if (is_array($decoded)) {
                 $sanitized = Utilities::sanitize_fields_config_for_storage($decoded);
-                update_post_meta($post_id, '_fields_config', wp_json_encode($sanitized, JSON_PRETTY_PRINT));
+                update_post_meta($post_id, '_fields_config', wp_json_encode($sanitized, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
             } else {
                 set_transient('mksddn_fh_fields_config_json_error_' . get_current_user_id(), true, 60);
                 set_transient('mksddn_fh_fields_config_json_value_' . get_current_user_id(), $raw_json, 60);
@@ -250,6 +251,12 @@ class MetaBoxes {
             update_post_meta($post_id, '_save_to_admin', '1');
         } else {
             update_post_meta($post_id, '_save_to_admin', '0');
+        }
+
+        if (isset($_POST['allow_any_fields'])) {
+            update_post_meta($post_id, '_allow_any_fields', '1');
+        } else {
+            update_post_meta($post_id, '_allow_any_fields', '0');
         }
     }
 } 

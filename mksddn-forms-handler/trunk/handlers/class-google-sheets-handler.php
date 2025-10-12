@@ -55,7 +55,7 @@ class GoogleSheetsHandler {
                 ],
                 'body'    => json_encode([
                     'values' => [$row_data],
-                ]),
+                ], JSON_UNESCAPED_UNICODE),
                 'timeout' => 30,
             ]
         );

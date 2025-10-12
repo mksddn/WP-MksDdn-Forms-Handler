@@ -62,7 +62,7 @@ class Utilities {
                         'type'     => 'textarea',
                         'required' => true,
                     ],
-                ]);
+                ], JSON_UNESCAPED_UNICODE);
                 update_post_meta($form_id, '_fields_config', $default_fields);
             }
         }

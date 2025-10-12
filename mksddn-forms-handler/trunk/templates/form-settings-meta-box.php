@@ -105,4 +105,24 @@
             <p class="description"><?php echo esc_html__( 'Enable saving form submissions to admin panel for viewing and export', 'mksddn-forms-handler' ); ?></p>
         </td>
     </tr>
+    
+    <tr>
+        <th scope="row" colspan="2">
+            <h3 style="margin: 0; padding: 10px 0; border-bottom: 1px solid #ccc;"><?php echo esc_html__( 'Advanced Settings', 'mksddn-forms-handler' ); ?></h3>
+        </th>
+    </tr>
+    <tr>
+        <th scope="row">
+            <label>
+                <input type="checkbox" name="allow_any_fields" id="allow_any_fields" value="1" <?php checked($allow_any_fields, '1'); ?> />
+                <?php echo esc_html__( 'Accept any fields from frontend', 'mksddn-forms-handler' ); ?>
+            </label>
+        </th>
+        <td>
+            <p class="description">
+                <strong style="color: #d63638;">⚠️ <?php echo esc_html__( 'Warning:', 'mksddn-forms-handler' ); ?></strong>
+                <?php echo esc_html__( 'When enabled, the form will accept ANY field names from frontend submissions without validation against Fields Configuration. Use this for custom forms where you control field names in templates. All fields will still be sanitized but type validation will be skipped.', 'mksddn-forms-handler' ); ?>
+            </p>
+        </td>
+    </tr>
 </table> 

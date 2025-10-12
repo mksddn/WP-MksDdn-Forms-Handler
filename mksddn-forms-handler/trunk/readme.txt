@@ -142,6 +142,9 @@ Integrate pre-built forms in theme templates:
 * `mksddn_fh_form_has_files($slug)` - check for file fields
 * `mksddn_fh_enqueue_form_script()` - enqueue AJAX script
 
+**Accept Any Fields (Advanced):**
+For custom forms where you control field names in templates, enable "Accept any fields from frontend" in form settings to skip field validation. This allows submitting ANY field names without defining them in Fields Configuration. All fields are still sanitized but type validation is skipped.
+
 See `/templates/custom-form-examples.php` for detailed examples.
 
 **3. REST API (AJAX)**
@@ -183,6 +186,27 @@ fetch('<?php echo mksddn_fh_get_rest_endpoint("contact-form"); ?>', {
 * Multisite support
 * RTL support
 * Accessibility standards (WCAG)
+
+= WordPress Hooks & Filters =
+
+**Filters:**
+
+`mksddn_fh_allowed_fields` - Modify allowed field names for a form
+```php
+add_filter('mksddn_fh_allowed_fields', function($allowed_fields, $form_id, $form_slug) {
+    // Allow all fields for specific form
+    if ($form_slug === 'my-custom-form') {
+        return ['*'];
+    }
+    // Add specific fields
+    return array_merge($allowed_fields, ['custom_field_1', 'custom_field_2']);
+}, 10, 3);
+```
+
+**Actions:**
+
+`mksddn_forms_handler_log_security` - Fired when unauthorized fields are detected
+`mksddn_forms_handler_log_submission` - Fired when form submission is processed
 
 = Roadmap =
 
@@ -308,6 +332,10 @@ Yes, the plugin includes comprehensive security measures:
 
 Yes! The plugin provides REST API endpoints for AJAX form submissions. Check the REST API section for details.
 
+= Can I use custom forms from my theme without configuring fields? =
+
+Yes! Enable "Accept any fields from frontend" in form settings (Advanced Settings section). This allows submitting any field names without defining them in Fields Configuration - perfect for custom forms where you control the HTML. All fields are still sanitized, but type validation is skipped. You can also use the `mksddn_fh_allowed_fields` filter in your theme's functions.php to dynamically allow specific fields or all fields (`return ['*']`).
+
 == Supported Field Types ==
 
 Fields are configured as JSON in the form settings. Supported types:
@@ -384,6 +412,8 @@ New feature: Template functions for custom forms integration. Fully backward com
 * Added support for custom forms in PHP templates
 * New template functions for easy integration: mksddn_fh_get_form_action(), mksddn_fh_form_fields(), mksddn_fh_get_form_config()
 * New helper functions: mksddn_fh_get_rest_endpoint(), mksddn_fh_form_has_files(), mksddn_fh_enqueue_form_script()
+* Added "Accept any fields from frontend" option - skip field validation for custom forms (Advanced Settings)
+* New filter: mksddn_fh_allowed_fields - dynamically control allowed field names (supports wildcard '*')
 * Added comprehensive examples in templates/custom-form-examples.php
 * Extended Utilities class with methods for template integration
 * Full backward compatibility - all existing shortcodes continue to work

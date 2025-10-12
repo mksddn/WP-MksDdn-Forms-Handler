@@ -549,13 +549,30 @@ class FormsHandler {
         if (is_wp_error($form_config)) {
             wp_die( esc_html( $form_config->get_error_message() ) );
         }
-        $allowed_fields = $this->get_allowed_fields($form_config['fields_config']);
+        
+        // Check if allow_any_fields is enabled
+        $allow_any_fields = get_post_meta($form_config['form_id'], '_allow_any_fields', true);
         $form_data = [];
-        foreach ($allowed_fields as $field_name) {
-            if (isset($_POST[$field_name])) {
-                // Raw input is unslashed first, then sanitized below
-                $value = wp_unslash($_POST[$field_name]); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-                $form_data[$field_name] = is_array($value) ? array_map('sanitize_text_field', $value) : sanitize_text_field((string)$value);
+        
+        if ($allow_any_fields === '1') {
+            // Accept all fields from POST
+            foreach ($_POST as $field_name => $value) {
+                // Skip system fields
+                if (in_array($field_name, ['form_nonce', 'action', 'form_id', 'mksddn_fh_hp', '_wp_http_referer'], true)) {
+                    continue;
+                }
+                $unslashed = wp_unslash($value); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+                $form_data[$field_name] = is_array($unslashed) ? array_map('sanitize_text_field', $unslashed) : sanitize_text_field((string)$unslashed);
+            }
+        } else {
+            // Use whitelist from configuration
+            $allowed_fields = $this->get_allowed_fields($form_config['fields_config'], $form_config['form_id'], $form_config['form_slug']);
+            foreach ($allowed_fields as $field_name) {
+                if (isset($_POST[$field_name])) {
+                    // Raw input is unslashed first, then sanitized below
+                    $value = wp_unslash($_POST[$field_name]); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+                    $form_data[$field_name] = is_array($value) ? array_map('sanitize_text_field', $value) : sanitize_text_field((string)$value);
+                }
             }
         }
 
@@ -601,7 +618,12 @@ class FormsHandler {
         }
 
         // Filter form data
-        $filtered_form_data = $this->filter_form_data($form_data, $form_config['fields_config']);
+        $filtered_form_data = $this->filter_form_data(
+            $form_data, 
+            $form_config['fields_config'], 
+            $form_config['form_id'], 
+            $form_config['form_slug']
+        );
 
         // Check filtering result
         if (is_wp_error($filtered_form_data)) {
@@ -612,15 +634,22 @@ class FormsHandler {
                 [
                     'status'              => 400,
                     'unauthorized_fields' => $unauthorized_fields,
-                    'allowed_fields'      => $this->get_allowed_fields($form_config['fields_config']),
+                    'allowed_fields'      => $this->get_allowed_fields(
+                        $form_config['fields_config'],
+                        $form_config['form_id'],
+                        $form_config['form_slug']
+                    ),
                 ]
             );
         }
 
-        // Validate data
-        $validation_result = $this->validate_form_data($filtered_form_data, $form_config['fields_config']);
-        if (is_wp_error($validation_result)) {
-            return $validation_result;
+        // Validate data (skip validation if allow_any_fields is enabled)
+        $allow_any_fields = get_post_meta($form_config['form_id'], '_allow_any_fields', true);
+        if ($allow_any_fields !== '1') {
+            $validation_result = $this->validate_form_data($filtered_form_data, $form_config['fields_config']);
+            if (is_wp_error($validation_result)) {
+                return $validation_result;
+            }
         }
 
         // Initialize delivery results
@@ -751,6 +780,7 @@ class FormsHandler {
         // Get all form settings in one query to reduce database calls
         $form_config = [
             'form_id' => $form->ID,
+            'form_slug' => $form->post_name,
             'form_title' => $form->post_title,
             'recipients' => get_post_meta($form->ID, '_recipients', true),
             'bcc_recipient' => get_post_meta($form->ID, '_bcc_recipient', true),
@@ -818,30 +848,93 @@ class FormsHandler {
     }
     
     /**
-     * Get allowed fields list
+     * Get allowed fields list with filter support
+     *
+     * @param string $fields_config JSON fields configuration
+     * @param int    $form_id       Form ID
+     * @param string $form_slug     Form slug
+     * @return array Array of allowed field names
      */
-    private function get_allowed_fields($fields_config): array {
-        if (!$fields_config) {
-            return [];
-        }
-
-        $fields = json_decode((string)$fields_config, true);
-        if (!$fields || !is_array($fields)) {
-            return [];
-        }
-
+    private function get_allowed_fields($fields_config, $form_id = 0, $form_slug = ''): array {
         $allowed_fields = [];
-        foreach ($fields as $field) {
-            $allowed_fields[] = $field['name'];
+        
+        if ($fields_config) {
+            $fields = json_decode((string)$fields_config, true);
+            if ($fields && is_array($fields)) {
+                foreach ($fields as $field) {
+                    if (isset($field['name'])) {
+                        $allowed_fields[] = $field['name'];
+                    }
+                }
+            }
         }
+
+        /**
+         * Filter allowed field names for a form
+         * 
+         * Allows developers to dynamically modify which fields are accepted.
+         * Return ['*'] to allow all fields (bypass field filtering).
+         *
+         * @param array  $allowed_fields Current allowed fields from configuration
+         * @param int    $form_id        Form ID
+         * @param string $form_slug      Form slug
+         * @since 1.1.0
+         */
+        $allowed_fields = apply_filters('mksddn_fh_allowed_fields', $allowed_fields, $form_id, $form_slug);
 
         return $allowed_fields;
     }
     
     /**
-     * Filter form data, keeping only allowed fields
+     * Sanitize all fields without type validation
+     * Used when allow_any_fields is enabled
+     *
+     * @param array $form_data Raw form data
+     * @return array Sanitized form data
      */
-    private function filter_form_data($form_data, $fields_config): \WP_Error|array {
+    private function sanitize_all_fields(array $form_data): array {
+        $sanitized = [];
+        
+        foreach ($form_data as $key => $value) {
+            // Don't sanitize key - it's already sanitized in handle_form_submission()
+            // Just ensure it's a string and not empty
+            $safe_key = (string) $key;
+            
+            // Skip empty keys
+            if ($safe_key === '') {
+                continue;
+            }
+            
+            // Sanitize value
+            if (is_array($value)) {
+                $sanitized[$safe_key] = array_map('sanitize_text_field', $value);
+            } else {
+                $sanitized[$safe_key] = sanitize_text_field($value);
+            }
+        }
+        
+        return $sanitized;
+    }
+    
+    /**
+     * Filter form data, keeping only allowed fields
+     *
+     * @param array  $form_data     Raw form data
+     * @param string $fields_config JSON fields configuration
+     * @param int    $form_id       Form ID
+     * @param string $form_slug     Form slug
+     * @return \WP_Error|array Filtered data or error
+     */
+    private function filter_form_data($form_data, $fields_config, $form_id = 0, $form_slug = ''): \WP_Error|array {
+        // Check if form allows any fields
+        $allow_any_fields = get_post_meta($form_id, '_allow_any_fields', true);
+        
+        // If allow_any_fields is enabled, skip field validation
+        if ($allow_any_fields === '1') {
+            return $this->sanitize_all_fields($form_data);
+        }
+        
+        // Original validation logic
         if (!$fields_config) {
             return new \WP_Error('security_error', 'Form fields configuration is missing', ['status' => 400]);
         }
@@ -854,15 +947,17 @@ class FormsHandler {
         $filtered_data = [];
         $unauthorized_fields = [];
 
-        // Create allowed fields list
-        $allowed_fields = [];
-        foreach ($fields as $field) {
-            $allowed_fields[] = $field['name'];
+        // Get allowed fields with filter support
+        $allowed_fields = $this->get_allowed_fields($fields_config, $form_id, $form_slug);
+        
+        // Check for wildcard (allow all fields)
+        if (in_array('*', $allowed_fields, true)) {
+            return $this->sanitize_all_fields($form_data);
         }
 
         // Extract only allowed fields
         foreach ($form_data as $field_name => $field_value) {
-            if (in_array($field_name, $allowed_fields)) {
+            if (in_array($field_name, $allowed_fields, true)) {
                 $filtered_data[$field_name] = $field_value;
             } else {
                 $unauthorized_fields[] = $field_name;
@@ -1258,7 +1353,7 @@ class FormsHandler {
         // Save meta data
         update_post_meta($submission_id, '_form_id', $form_id);
         update_post_meta($submission_id, '_form_title', $form_title);
-        update_post_meta($submission_id, '_submission_data', json_encode($form_data));
+        update_post_meta($submission_id, '_submission_data', json_encode($form_data, JSON_UNESCAPED_UNICODE));
         update_post_meta($submission_id, '_submission_date', current_time('mysql'));
         update_post_meta($submission_id, '_submission_ip', sanitize_text_field( wp_unslash($_SERVER['REMOTE_ADDR'] ?? 'unknown') ) );
         update_post_meta($submission_id, '_submission_user_agent', sanitize_text_field( wp_unslash($_SERVER['HTTP_USER_AGENT'] ?? 'unknown') ) );
