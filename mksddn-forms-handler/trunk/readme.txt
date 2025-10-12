@@ -4,7 +4,7 @@ Tags: forms, telegram, google-sheets, rest-api, form-handler
 Requires at least: 5.0
 Tested up to: 6.8
 Requires PHP: 8.0
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -383,10 +383,17 @@ Fields are configured as JSON in the form settings. Supported types:
 
 == Upgrade Notice ==
 
+= 1.1.1 =
+Security update: Fixed URL escaping in template examples. Recommended update for WordPress Coding Standards compliance.
+
 = 1.1.0 =
 New feature: Template functions for custom forms integration. Bug fix: Improved Telegram message formatting. Fully backward compatible.
 
 == Changelog ==
+
+= 1.1.1 =
+* Security: Added esc_url() escaping for all URL outputs in custom-form-examples.php template
+* Fixed: WordPress Coding Standards compliance for template output functions
 
 = 1.1.0 =
 * Added support for custom forms in PHP templates

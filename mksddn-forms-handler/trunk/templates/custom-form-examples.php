@@ -23,7 +23,7 @@ This is the simplest way to integrate a custom form in your theme.
 The form will submit via POST and reload the page with a success message.
 -->
 
-<form method="post" action="<?php echo mksddn_fh_get_form_action(); ?>" class="custom-contact-form">
+<form method="post" action="<?php echo esc_url(mksddn_fh_get_form_action()); ?>" class="custom-contact-form">
     <?php mksddn_fh_form_fields('contact-form'); ?>
     
     <div class="form-group">
@@ -62,7 +62,7 @@ $has_files = mksddn_fh_form_has_files($form_slug);
 ?>
 
 <form method="post" 
-      action="<?php echo mksddn_fh_get_form_action(); ?>" 
+      action="<?php echo esc_url(mksddn_fh_get_form_action()); ?>" 
       <?php echo $has_files ? 'enctype="multipart/form-data"' : ''; ?>>
     
     <?php mksddn_fh_form_fields($form_slug); ?>
@@ -105,7 +105,7 @@ if ($form_config):
     $has_files = mksddn_fh_form_has_files($form_config['slug']);
 ?>
     <form method="post" 
-          action="<?php echo mksddn_fh_get_form_action(); ?>"
+          action="<?php echo esc_url(mksddn_fh_get_form_action()); ?>"
           <?php echo $has_files ? 'enctype="multipart/form-data"' : ''; ?>>
         
         <?php mksddn_fh_form_fields($form_config['slug']); ?>
@@ -202,7 +202,7 @@ This example uses JavaScript to submit the form via REST API without page reload
     const form = document.getElementById('custom-ajax-form');
     const submitBtn = document.getElementById('submit-btn');
     const messageDiv = form.querySelector('.form-message');
-    const endpoint = '<?php echo mksddn_fh_get_rest_endpoint('contact-form'); ?>';
+    const endpoint = '<?php echo esc_url(mksddn_fh_get_rest_endpoint('contact-form')); ?>';
     
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
@@ -292,7 +292,7 @@ When uploading files via AJAX, use multipart/form-data instead of JSON.
     const form = document.getElementById('ajax-upload-form');
     const submitBtn = document.getElementById('upload-submit-btn');
     const messageDiv = form.querySelector('.form-message');
-    const endpoint = '<?php echo mksddn_fh_get_rest_endpoint('contact-form'); ?>';
+    const endpoint = '<?php echo esc_url(mksddn_fh_get_rest_endpoint('contact-form')); ?>';
     
     form.addEventListener('submit', async function(e) {
         e.preventDefault();

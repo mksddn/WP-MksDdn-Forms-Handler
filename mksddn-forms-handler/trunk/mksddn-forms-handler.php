@@ -3,7 +3,7 @@
  * Plugin Name: MksDdn Forms Handler
  * Plugin URI: https://github.com/mksddn/WP-MksDdn-Forms-Handler
  * Description: Advanced form processing system with REST API support, Telegram notifications, and Google Sheets integration. Create and manage forms with multiple delivery methods including email, Telegram, Google Sheets, and admin storage.
- * Version: 1.1.0
+ * Version: 1.1.1
  * Requires at least: 5.0
  * Requires PHP: 8.0
  * Author: mksddn
@@ -14,7 +14,7 @@
  * Domain Path: /languages
  * 
  * @package MksDdnFormsHandler
- * @version 1.1.0
+ * @version 1.1.1
  * @author mksddn
  * @license GPL v2 or later
 */
@@ -25,7 +25,7 @@ if (!defined('ABSPATH')) {
     }
 
 // Define plugin constants
-define('MKSDDN_FORMS_HANDLER_VERSION', '1.1.0');
+define('MKSDDN_FORMS_HANDLER_VERSION', '1.1.1');
 define('MKSDDN_FORMS_HANDLER_PLUGIN_DIR', __DIR__);
 define('MKSDDN_FORMS_HANDLER_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('MKSDDN_FORMS_HANDLER_PLUGIN_FILE', __FILE__);
