@@ -39,7 +39,15 @@ class GoogleSheetsHandler {
 
         // Add form data
         foreach ($form_data as $key => $value) {
-            $row_data[] = $value;
+            if (is_array($value) && self::is_array_of_objects($value)) {
+                // Format array of objects as JSON string for Google Sheets
+                $row_data[] = json_encode($value, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+            } elseif (is_array($value)) {
+                // Simple array: join with comma
+                $row_data[] = implode(', ', array_map('strval', $value));
+            } else {
+                $row_data[] = $value;
+            }
         }
 
         // Get sheet name
@@ -215,5 +223,25 @@ class GoogleSheetsHandler {
             'access_type'   => 'offline',
             'prompt'        => 'consent',
         ]);
+    }
+    
+    /**
+     * Check if array contains objects (associative arrays with multiple keys)
+     *
+     * @param array $value Array to check
+     * @return bool True if array contains objects
+     */
+    private static function is_array_of_objects(array $value): bool {
+        if (empty($value)) {
+            return false;
+        }
+        
+        $first = reset($value);
+        if (!is_array($first)) {
+            return false;
+        }
+        
+        $keys = array_keys($first);
+        return !empty($keys) && array_keys($keys) !== $keys;
     }
 } 

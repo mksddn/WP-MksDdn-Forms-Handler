@@ -68,15 +68,72 @@ class TelegramHandler {
         $message .= "<b>Form Data:</b>\n";
 
         foreach ($form_data as $key => $value) {
-            if (is_array($value)) {
-                $value = implode(', ', array_map('strval', $value));
-            }
             $escaped_key = self::escape_html_for_telegram(ucfirst($key));
-            $escaped_value = self::escape_html_for_telegram($value);
-            $message .= "• <b>" . $escaped_key . ":</b> " . $escaped_value . "\n";
+            
+            if (is_array($value) && self::is_array_of_objects($value)) {
+                // Render array of objects (e.g., products)
+                $message .= "• <b>" . $escaped_key . ":</b>\n";
+                $message .= self::format_array_of_objects($value);
+            } elseif (is_array($value)) {
+                // Simple array: render as comma-separated list
+                $value = implode(', ', array_map('strval', $value));
+                $escaped_value = self::escape_html_for_telegram($value);
+                $message .= "• <b>" . $escaped_key . ":</b> " . $escaped_value . "\n";
+            } else {
+                $escaped_value = self::escape_html_for_telegram((string) $value);
+                $message .= "• <b>" . $escaped_key . ":</b> " . $escaped_value . "\n";
+            }
         }
 
         return $message;
+    }
+    
+    /**
+     * Check if array contains objects (associative arrays with multiple keys)
+     *
+     * @param array $value Array to check
+     * @return bool True if array contains objects
+     */
+    private static function is_array_of_objects(array $value): bool {
+        if (empty($value)) {
+            return false;
+        }
+        
+        $first = reset($value);
+        if (!is_array($first)) {
+            return false;
+        }
+        
+        $keys = array_keys($first);
+        return !empty($keys) && array_keys($keys) !== $keys;
+    }
+    
+    /**
+     * Format array of objects for Telegram message
+     *
+     * @param array $items Array of objects/associative arrays
+     * @return string Formatted string
+     */
+    private static function format_array_of_objects(array $items): string {
+        $output = '';
+        $item_num = 1;
+        
+        foreach ($items as $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+            
+            $output .= "  <i>Item #{$item_num}:</i>\n";
+            foreach ($item as $k => $v) {
+                $escaped_k = self::escape_html_for_telegram(ucfirst($k));
+                $escaped_v = is_array($v) ? implode(', ', array_map('strval', $v)) : (string) $v;
+                $escaped_v = self::escape_html_for_telegram($escaped_v);
+                $output .= "    • <b>{$escaped_k}:</b> {$escaped_v}\n";
+            }
+            $item_num++;
+        }
+        
+        return $output;
     }
     
     /**

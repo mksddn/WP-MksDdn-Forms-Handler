@@ -261,16 +261,11 @@ class FormsHandler {
             return new \WP_Error('too_many_fields', __( 'Too many form fields submitted', 'mksddn-forms-handler' ), ['status' => 400]);
         }
 
-        // Check total data size
+        // Check total data size (recursively calculate for nested arrays)
         $total_size = 0;
         foreach ($form_data as $key => $value) {
             $size_key = strlen((string) $key);
-            $size_val = 0;
-            if (is_array($value)) {
-                foreach ($value as $v) { $size_val += strlen((string) $v); }
-            } else {
-                $size_val = strlen((string) $value);
-            }
+            $size_val = $this->calculate_value_size($value);
             $total_size += $size_key + $size_val;
         }
 
@@ -562,7 +557,7 @@ class FormsHandler {
                     continue;
                 }
                 $unslashed = wp_unslash($value); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-                $form_data[$field_name] = is_array($unslashed) ? array_map('sanitize_text_field', $unslashed) : sanitize_text_field((string)$unslashed);
+                $form_data[$field_name] = $this->sanitize_value_recursive($unslashed);
             }
         } else {
             // Use whitelist from configuration
@@ -571,7 +566,7 @@ class FormsHandler {
                 if (isset($_POST[$field_name])) {
                     // Raw input is unslashed first, then sanitized below
                     $value = wp_unslash($_POST[$field_name]); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-                    $form_data[$field_name] = is_array($value) ? array_map('sanitize_text_field', $value) : sanitize_text_field((string)$value);
+                    $form_data[$field_name] = $this->sanitize_value_recursive($value);
                 }
             }
         }
@@ -888,6 +883,7 @@ class FormsHandler {
     /**
      * Sanitize all fields without type validation
      * Used when allow_any_fields is enabled
+     * Recursively sanitizes nested arrays and objects
      *
      * @param array $form_data Raw form data
      * @return array Sanitized form data
@@ -905,15 +901,49 @@ class FormsHandler {
                 continue;
             }
             
-            // Sanitize value
-            if (is_array($value)) {
-                $sanitized[$safe_key] = array_map('sanitize_text_field', $value);
-            } else {
-                $sanitized[$safe_key] = sanitize_text_field($value);
-            }
+            // Recursively sanitize value
+            $sanitized[$safe_key] = $this->sanitize_value_recursive($value);
         }
         
         return $sanitized;
+    }
+    
+    /**
+     * Recursively sanitize a value (handles arrays, objects, and primitives)
+     *
+     * @param mixed $value Value to sanitize
+     * @return mixed Sanitized value
+     */
+    private function sanitize_value_recursive($value) {
+        if (is_array($value)) {
+            $sanitized = [];
+            foreach ($value as $k => $v) {
+                $sanitized_key = is_string($k) ? sanitize_key($k) : $k;
+                $sanitized[$sanitized_key] = $this->sanitize_value_recursive($v);
+            }
+            return $sanitized;
+        }
+        
+        if (is_object($value)) {
+            // Convert object to array and sanitize recursively
+            return $this->sanitize_value_recursive((array) $value);
+        }
+        
+        // Primitive types: sanitize strings, keep numbers and booleans
+        if (is_string($value)) {
+            return sanitize_text_field($value);
+        }
+        
+        if (is_numeric($value)) {
+            return is_float($value) ? (float) $value : (int) $value;
+        }
+        
+        if (is_bool($value)) {
+            return $value;
+        }
+        
+        // Fallback: convert to string and sanitize
+        return sanitize_text_field((string) $value);
     }
     
     /**
@@ -1264,21 +1294,24 @@ class FormsHandler {
         $body .= "<tr style='background-color: #f8f8f8;'><th style='padding: 10px; border: 1px solid #e9e9e9; text-align: left;'>Field</th><th style='padding: 10px; border: 1px solid #e9e9e9; text-align: left;'>Value</th></tr>";
 
         foreach ($form_data as $key => $value) {
-            $display_value = '';
-            if (is_array($value)) {
-                $display_value = implode(', ', array_map('sanitize_text_field', array_map('strval', $value)));
-            } else {
-                $display_value = (string) $value;
-            }
-
             $body .= '<tr>';
             $body .= "<td style='padding: 10px; border: 1px solid #e9e9e9;'><strong>" . esc_html($key) . '</strong></td>';
+            
             if ($this->looks_like_urls($value)) {
                 $urls = is_array($value) ? $value : [$value];
                 $links = array_map(function($u) { $su = esc_url($u); return $su ? '<a href="' . $su . '">' . esc_html($su) . '</a>' : esc_html((string)$u); }, $urls);
                 $body .= "<td style='padding: 10px; border: 1px solid #e9e9e9;'>" . implode('<br>', $links) . '</td>';
-            } else {
+            } elseif (is_array($value) && $this->is_array_of_objects($value)) {
+                // Render array of objects as a nested table (e.g., products)
+                $body .= "<td style='padding: 10px; border: 1px solid #e9e9e9;'>";
+                $body .= $this->render_array_of_objects($value);
+                $body .= '</td>';
+            } elseif (is_array($value)) {
+                // Simple array: render as comma-separated list
+                $display_value = implode(', ', array_map('sanitize_text_field', array_map('strval', $value)));
                 $body .= "<td style='padding: 10px; border: 1px solid #e9e9e9;'>" . esc_html($display_value) . '</td>';
+            } else {
+                $body .= "<td style='padding: 10px; border: 1px solid #e9e9e9;'>" . esc_html((string) $value) . '</td>';
             }
             $body .= '</tr>';
         }
@@ -1286,6 +1319,101 @@ class FormsHandler {
         $body .= '</table>';
 
         return $body . ('<p><small>Sent: ' . current_time('d.m.Y H:i:s') . '</small></p>');
+    }
+    
+    /**
+     * Check if array contains objects (associative arrays with multiple keys)
+     *
+     * @param array $value Array to check
+     * @return bool True if array contains objects
+     */
+    private function is_array_of_objects(array $value): bool {
+        if (empty($value)) {
+            return false;
+        }
+        
+        // Check if first element is an associative array (object-like)
+        $first = reset($value);
+        if (!is_array($first)) {
+            return false;
+        }
+        
+        // Check if it's associative (has string keys)
+        $keys = array_keys($first);
+        return !empty($keys) && array_keys($keys) !== $keys;
+    }
+    
+    /**
+     * Render array of objects as HTML table
+     *
+     * @param array $items Array of objects/associative arrays
+     * @return string HTML table
+     */
+    private function render_array_of_objects(array $items): string {
+        if (empty($items)) {
+            return '';
+        }
+        
+        // Get all unique keys from all items
+        $all_keys = [];
+        foreach ($items as $item) {
+            if (is_array($item)) {
+                $all_keys = array_merge($all_keys, array_keys($item));
+            }
+        }
+        $all_keys = array_unique($all_keys);
+        
+        if (empty($all_keys)) {
+            return '';
+        }
+        
+        $html = '<table style="width: 100%; border-collapse: collapse; margin: 5px 0;">';
+        $html .= '<thead><tr style="background-color: #f0f0f0;">';
+        foreach ($all_keys as $key) {
+            $html .= '<th style="padding: 8px; border: 1px solid #ddd; text-align: left;">' . esc_html($key) . '</th>';
+        }
+        $html .= '</tr></thead><tbody>';
+        
+        foreach ($items as $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+            $html .= '<tr>';
+            foreach ($all_keys as $key) {
+                $val = $item[$key] ?? '';
+                if (is_array($val)) {
+                    $val = implode(', ', array_map('strval', $val));
+                }
+                $html .= '<td style="padding: 8px; border: 1px solid #ddd;">' . esc_html((string) $val) . '</td>';
+            }
+            $html .= '</tr>';
+        }
+        
+        $html .= '</tbody></table>';
+        return $html;
+    }
+    
+    /**
+     * Recursively calculate size of a value for data size validation
+     *
+     * @param mixed $value Value to calculate size for
+     * @return int Size in bytes
+     */
+    private function calculate_value_size($value): int {
+        if (is_array($value)) {
+            $size = 0;
+            foreach ($value as $k => $v) {
+                $size += strlen((string) $k);
+                $size += $this->calculate_value_size($v);
+            }
+            return $size;
+        }
+        
+        if (is_object($value)) {
+            return $this->calculate_value_size((array) $value);
+        }
+        
+        return strlen((string) $value);
     }
 
     /**

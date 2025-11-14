@@ -133,17 +133,26 @@ class MetaBoxes {
             echo '<tr>';
             echo '<th scope="row"><label>' . esc_html($key) . '</label></th>';
             echo '<td>';
-            if (is_array($value)) {
+            
+            if (is_array($value) && $this->is_array_of_objects($value)) {
+                // Render array of objects (e.g., products) as a table
+                echo $this->render_array_of_objects_table($value);
+            } elseif (is_array($value)) {
+                // Simple array: render as comma-separated list
                 $parts = [];
                 foreach ($value as $v) {
-                    $v_str = (string) $v;
-                    if (preg_match('#^https?://#i', $v_str)) {
-                        $parts[] = '<a href="' . esc_url($v_str) . '" target="_blank" rel="noopener noreferrer">' . esc_html($v_str) . '</a>';
+                    if (is_array($v)) {
+                        // Nested array: convert to JSON string
+                        $parts[] = esc_html(wp_json_encode($v, JSON_UNESCAPED_UNICODE));
                     } else {
-                        $parts[] = esc_html($v_str);
+                        $v_str = (string) $v;
+                        if (preg_match('#^https?://#i', $v_str)) {
+                            $parts[] = '<a href="' . esc_url($v_str) . '" target="_blank" rel="noopener noreferrer">' . esc_html($v_str) . '</a>';
+                        } else {
+                            $parts[] = esc_html($v_str);
+                        }
                     }
                 }
-                // Each item in $parts is properly escaped; join with a safe separator
                 echo wp_kses_post(implode(', ', $parts));
             } else {
                 $v_str = (string) $value;
@@ -153,10 +162,81 @@ class MetaBoxes {
                     echo esc_html($v_str);
                 }
             }
+            
             echo '</td>';
             echo '</tr>';
         }
         echo '</table>';
+    }
+    
+    /**
+     * Check if array contains objects (associative arrays with multiple keys)
+     *
+     * @param array $value Array to check
+     * @return bool True if array contains objects
+     */
+    private function is_array_of_objects(array $value): bool {
+        if (empty($value)) {
+            return false;
+        }
+        
+        $first = reset($value);
+        if (!is_array($first)) {
+            return false;
+        }
+        
+        $keys = array_keys($first);
+        return !empty($keys) && array_keys($keys) !== $keys;
+    }
+    
+    /**
+     * Render array of objects as HTML table
+     *
+     * @param array $items Array of objects/associative arrays
+     * @return string HTML table
+     */
+    private function render_array_of_objects_table(array $items): string {
+        if (empty($items)) {
+            return '';
+        }
+        
+        // Get all unique keys from all items
+        $all_keys = [];
+        foreach ($items as $item) {
+            if (is_array($item)) {
+                $all_keys = array_merge($all_keys, array_keys($item));
+            }
+        }
+        $all_keys = array_unique($all_keys);
+        
+        if (empty($all_keys)) {
+            return '';
+        }
+        
+        $html = '<table class="widefat" style="margin-top: 10px;">';
+        $html .= '<thead><tr>';
+        foreach ($all_keys as $key) {
+            $html .= '<th style="padding: 8px; background-color: #f0f0f0; border: 1px solid #ddd;">' . esc_html($key) . '</th>';
+        }
+        $html .= '</tr></thead><tbody>';
+        
+        foreach ($items as $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+            $html .= '<tr>';
+            foreach ($all_keys as $key) {
+                $val = $item[$key] ?? '';
+                if (is_array($val)) {
+                    $val = wp_json_encode($val, JSON_UNESCAPED_UNICODE);
+                }
+                $html .= '<td style="padding: 8px; border: 1px solid #ddd;">' . esc_html((string) $val) . '</td>';
+            }
+            $html .= '</tr>';
+        }
+        
+        $html .= '</tbody></table>';
+        return $html;
     }
     
     /**

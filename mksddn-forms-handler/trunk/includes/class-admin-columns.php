@@ -126,6 +126,26 @@ class AdminColumns {
     }
     
     /**
+     * Check if array contains objects (associative arrays with multiple keys)
+     *
+     * @param array $value Array to check
+     * @return bool True if array contains objects
+     */
+    private function is_array_of_objects(array $value): bool {
+        if (empty($value)) {
+            return false;
+        }
+        
+        $first = reset($value);
+        if (!is_array($first)) {
+            return false;
+        }
+        
+        $keys = array_keys($first);
+        return !empty($keys) && array_keys($keys) !== $keys;
+    }
+    
+    /**
      * Clear submissions cache when submissions are updated
      */
     public function clear_submissions_cache($post_id, $post): void {
@@ -188,7 +208,24 @@ class AdminColumns {
                     $count = 0;
                     foreach ($form_data as $key => $value) {
                         if ($count >= 3) break; // Show only first 3 fields
-                        $preview[] = '<strong>' . esc_html($key) . ':</strong> ' . esc_html(substr((string)$value, 0, 50));
+                        
+                        $display_value = '';
+                        if (is_array($value)) {
+                            if ($this->is_array_of_objects($value)) {
+                                // Array of objects: show count
+                                $display_value = sprintf(esc_html__('%d items', 'mksddn-forms-handler'), count($value));
+                            } else {
+                                // Simple array: join values
+                                $display_value = esc_html(implode(', ', array_map('strval', array_slice($value, 0, 3))));
+                                if (count($value) > 3) {
+                                    $display_value .= '...';
+                                }
+                            }
+                        } else {
+                            $display_value = esc_html(substr((string)$value, 0, 50));
+                        }
+                        
+                        $preview[] = '<strong>' . esc_html($key) . ':</strong> ' . $display_value;
                         $count++;
                     }
                     echo wp_kses_post( implode('<br>', $preview) );

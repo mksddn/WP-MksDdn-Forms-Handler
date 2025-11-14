@@ -4,7 +4,7 @@ Tags: forms, telegram, google-sheets, rest-api, form-handler
 Requires at least: 5.0
 Tested up to: 6.8
 Requires PHP: 8.0
-Stable tag: 1.1.1
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -383,6 +383,9 @@ Fields are configured as JSON in the form settings. Supported types:
 
 == Upgrade Notice ==
 
+= 1.2.0 =
+New feature: Support for nested arrays and objects in form submissions (e.g., product arrays). Improved display of complex data structures in admin, email, and Telegram. Recommended update for e-commerce and complex form integrations.
+
 = 1.1.1 =
 Security update: Fixed URL escaping in template examples. Recommended update for WordPress Coding Standards compliance.
 
@@ -390,6 +393,20 @@ Security update: Fixed URL escaping in template examples. Recommended update for
 New feature: Template functions for custom forms integration. Bug fix: Improved Telegram message formatting. Fully backward compatible.
 
 == Changelog ==
+
+= 1.2.0 =
+* Feature: Added support for nested arrays and objects in REST API submissions
+* Feature: Recursive sanitization for complex data structures (arrays of objects)
+* Improved: Array of objects now displays as formatted tables in email notifications
+* Improved: Array of objects formatted in Telegram messages with proper structure
+* Improved: Array of objects saved as JSON in Google Sheets for better data handling
+* Improved: Admin submission detail view now shows arrays of objects as HTML tables
+* Improved: Admin submissions list shows item count for arrays of objects instead of "Array"
+* Improved: Better handling of nested data structures in all delivery methods
+* Technical: Added recursive value sanitization method (sanitize_value_recursive)
+* Technical: Added recursive data size calculation for nested structures
+* Technical: Added helper methods for detecting and rendering arrays of objects
+* Full backward compatibility - all existing forms continue to work
 
 = 1.1.1 =
 * Security: Added esc_url() escaping for all URL outputs in custom-form-examples.php template
