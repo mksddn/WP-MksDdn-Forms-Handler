@@ -65,15 +65,15 @@ class GoogleSheetsAdmin {
 
                     if (isset($result['refresh_token'])) {
                         update_option('mksddn_fh_google_sheets_refresh_token', $result['refresh_token']);
-                        wp_redirect( esc_url_raw( admin_url('options-general.php?page=mksddn-fh-google-sheets-settings&success=1') ) );
+                        wp_safe_redirect( esc_url_raw( admin_url('options-general.php?page=mksddn-fh-google-sheets-settings&success=1') ) );
                         exit;
                     }
 
-                    wp_redirect( esc_url_raw( admin_url('options-general.php?page=mksddn-fh-google-sheets-settings&error=1') ) );
+                    wp_safe_redirect( esc_url_raw( admin_url('options-general.php?page=mksddn-fh-google-sheets-settings&error=1') ) );
                     exit;
                 }
 
-                wp_redirect( esc_url_raw( admin_url('options-general.php?page=mksddn-fh-google-sheets-settings&error=1') ) );
+                wp_safe_redirect( esc_url_raw( admin_url('options-general.php?page=mksddn-fh-google-sheets-settings&error=1') ) );
                 exit;
             }
         }
@@ -94,7 +94,7 @@ class GoogleSheetsAdmin {
                 update_option('mksddn_fh_google_sheets_client_secret', sanitize_text_field( wp_unslash($_POST['google_sheets_client_secret']) ));
             }
 
-            wp_redirect( esc_url_raw( admin_url('options-general.php?page=mksddn-fh-google-sheets-settings&saved=1') ) );
+            wp_safe_redirect( esc_url_raw( admin_url('options-general.php?page=mksddn-fh-google-sheets-settings&saved=1') ) );
             exit;
         }
 
@@ -102,7 +102,7 @@ class GoogleSheetsAdmin {
         $revoke_nonce = isset($_POST['revoke_auth_nonce']) ? sanitize_text_field( wp_unslash($_POST['revoke_auth_nonce']) ) : '';
         if ($revoke_nonce && wp_verify_nonce( $revoke_nonce, 'revoke_google_sheets_auth')) {
             delete_option('mksddn_fh_google_sheets_refresh_token');
-            wp_redirect( esc_url_raw( admin_url('options-general.php?page=mksddn-fh-google-sheets-settings&revoked=1') ) );
+            wp_safe_redirect( esc_url_raw( admin_url('options-general.php?page=mksddn-fh-google-sheets-settings&revoked=1') ) );
             exit;
         }
 
@@ -113,7 +113,7 @@ class GoogleSheetsAdmin {
             delete_option('mksddn_fh_google_sheets_client_secret');
             delete_option('mksddn_fh_google_sheets_refresh_token');
 
-            wp_redirect( esc_url_raw( admin_url('options-general.php?page=mksddn-fh-google-sheets-settings&cleared=1') ) );
+            wp_safe_redirect( esc_url_raw( admin_url('options-general.php?page=mksddn-fh-google-sheets-settings&cleared=1') ) );
             exit;
         }
     }
@@ -133,16 +133,16 @@ class GoogleSheetsAdmin {
 
         $spreadsheet_id = isset($_POST['spreadsheet_id']) ? sanitize_text_field( wp_unslash($_POST['spreadsheet_id']) ) : '';
         if (!$spreadsheet_id) {
-            wp_redirect( esc_url_raw( admin_url('options-general.php?page=mksddn-fh-google-sheets-settings&error=no_spreadsheet_id') ) );
+            wp_safe_redirect( esc_url_raw( admin_url('options-general.php?page=mksddn-fh-google-sheets-settings&error=no_spreadsheet_id') ) );
             exit;
         }
 
         $result = GoogleSheetsHandler::test_connection($spreadsheet_id);
 
         if ($result['success']) {
-            wp_redirect( esc_url_raw( admin_url('options-general.php?page=mksddn-fh-google-sheets-settings&test_success=1&details=' . urlencode(json_encode($result['details']))) ) );
+            wp_safe_redirect( esc_url_raw( admin_url('options-general.php?page=mksddn-fh-google-sheets-settings&test_success=1&details=' . urlencode(json_encode($result['details']))) ) );
         } else {
-            wp_redirect( esc_url_raw( admin_url('options-general.php?page=mksddn-fh-google-sheets-settings&test_error=' . urlencode($result['message'])) ) );
+            wp_safe_redirect( esc_url_raw( admin_url('options-general.php?page=mksddn-fh-google-sheets-settings&test_error=' . urlencode($result['message'])) ) );
         }
         exit;
     }

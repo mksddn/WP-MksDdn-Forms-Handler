@@ -57,15 +57,15 @@ If your form configuration includes file upload fields, add enctype attribute.
 -->
 
 <?php 
-$form_slug = 'contact-form';
-$has_files = mksddn_fh_form_has_files($form_slug);
+$mksddn_fh_form_slug = 'contact-form';
+$mksddn_fh_has_files = mksddn_fh_form_has_files($mksddn_fh_form_slug);
 ?>
 
 <form method="post" 
       action="<?php echo esc_url(mksddn_fh_get_form_action()); ?>" 
-      <?php echo $has_files ? 'enctype="multipart/form-data"' : ''; ?>>
+      <?php echo $mksddn_fh_has_files ? 'enctype="multipart/form-data"' : ''; ?>>
     
-    <?php mksddn_fh_form_fields($form_slug); ?>
+    <?php mksddn_fh_form_fields($mksddn_fh_form_slug); ?>
     
     <div class="form-group">
         <label for="name">Name *</label>
@@ -99,47 +99,47 @@ Useful when you want to maintain form structure through WordPress admin.
 -->
 
 <?php 
-$form_config = mksddn_fh_get_form_config('contact-form');
+$mksddn_fh_form_config = mksddn_fh_get_form_config('contact-form');
 
-if ($form_config): 
-    $has_files = mksddn_fh_form_has_files($form_config['slug']);
+if ($mksddn_fh_form_config): 
+    $mksddn_fh_has_files = mksddn_fh_form_has_files($mksddn_fh_form_config['slug']);
 ?>
     <form method="post" 
           action="<?php echo esc_url(mksddn_fh_get_form_action()); ?>"
-          <?php echo $has_files ? 'enctype="multipart/form-data"' : ''; ?>>
+          <?php echo $mksddn_fh_has_files ? 'enctype="multipart/form-data"' : ''; ?>>
         
-        <?php mksddn_fh_form_fields($form_config['slug']); ?>
+        <?php mksddn_fh_form_fields($mksddn_fh_form_config['slug']); ?>
         
-        <?php foreach ($form_config['fields'] as $field): ?>
+        <?php foreach ($mksddn_fh_form_config['fields'] as $mksddn_fh_field): ?>
             <div class="form-group">
-                <label for="<?php echo esc_attr($field['name']); ?>">
-                    <?php echo esc_html($field['label']); ?>
-                    <?php if (!empty($field['required']) && $field['required']): ?>
+                <label for="<?php echo esc_attr($mksddn_fh_field['name']); ?>">
+                    <?php echo esc_html($mksddn_fh_field['label']); ?>
+                    <?php if (!empty($mksddn_fh_field['required']) && $mksddn_fh_field['required']): ?>
                         <span class="required">*</span>
                     <?php endif; ?>
                 </label>
                 
-                <?php if ($field['type'] === 'textarea'): ?>
+                <?php if ($mksddn_fh_field['type'] === 'textarea'): ?>
                     <textarea 
-                        name="<?php echo esc_attr($field['name']); ?>" 
-                        id="<?php echo esc_attr($field['name']); ?>"
-                        <?php echo !empty($field['required']) && $field['required'] ? 'required' : ''; ?>
+                        name="<?php echo esc_attr($mksddn_fh_field['name']); ?>" 
+                        id="<?php echo esc_attr($mksddn_fh_field['name']); ?>"
+                        <?php echo !empty($mksddn_fh_field['required']) && $mksddn_fh_field['required'] ? 'required' : ''; ?>
                     ></textarea>
                 
-                <?php elseif ($field['type'] === 'select'): ?>
+                <?php elseif ($mksddn_fh_field['type'] === 'select'): ?>
                     <select 
-                        name="<?php echo esc_attr($field['name']); ?>" 
-                        id="<?php echo esc_attr($field['name']); ?>"
-                        <?php echo !empty($field['required']) && $field['required'] ? 'required' : ''; ?>
+                        name="<?php echo esc_attr($mksddn_fh_field['name']); ?>" 
+                        id="<?php echo esc_attr($mksddn_fh_field['name']); ?>"
+                        <?php echo !empty($mksddn_fh_field['required']) && $mksddn_fh_field['required'] ? 'required' : ''; ?>
                     >
-                        <?php if (!empty($field['options']) && is_array($field['options'])): ?>
-                            <?php foreach ($field['options'] as $option): ?>
+                        <?php if (!empty($mksddn_fh_field['options']) && is_array($mksddn_fh_field['options'])): ?>
+                            <?php foreach ($mksddn_fh_field['options'] as $mksddn_fh_option): ?>
                                 <?php 
-                                $value = is_array($option) ? $option['value'] : $option;
-                                $label = is_array($option) ? $option['label'] : $option;
+                                $mksddn_fh_value = is_array($mksddn_fh_option) ? $mksddn_fh_option['value'] : $mksddn_fh_option;
+                                $mksddn_fh_label = is_array($mksddn_fh_option) ? $mksddn_fh_option['label'] : $mksddn_fh_option;
                                 ?>
-                                <option value="<?php echo esc_attr($value); ?>">
-                                    <?php echo esc_html($label); ?>
+                                <option value="<?php echo esc_attr($mksddn_fh_value); ?>">
+                                    <?php echo esc_html($mksddn_fh_label); ?>
                                 </option>
                             <?php endforeach; ?>
                         <?php endif; ?>
@@ -147,12 +147,12 @@ if ($form_config):
                 
                 <?php else: ?>
                     <input 
-                        type="<?php echo esc_attr($field['type']); ?>" 
-                        name="<?php echo esc_attr($field['name']); ?>" 
-                        id="<?php echo esc_attr($field['name']); ?>"
-                        <?php echo !empty($field['required']) && $field['required'] ? 'required' : ''; ?>
-                        <?php if (!empty($field['placeholder'])): ?>
-                            placeholder="<?php echo esc_attr($field['placeholder']); ?>"
+                        type="<?php echo esc_attr($mksddn_fh_field['type']); ?>" 
+                        name="<?php echo esc_attr($mksddn_fh_field['name']); ?>" 
+                        id="<?php echo esc_attr($mksddn_fh_field['name']); ?>"
+                        <?php echo !empty($mksddn_fh_field['required']) && $mksddn_fh_field['required'] ? 'required' : ''; ?>
+                        <?php if (!empty($mksddn_fh_field['placeholder'])): ?>
+                            placeholder="<?php echo esc_attr($mksddn_fh_field['placeholder']); ?>"
                         <?php endif; ?>
                     >
                 <?php endif; ?>

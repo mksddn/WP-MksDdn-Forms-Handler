@@ -63,13 +63,13 @@ class Security {
         // Check if we're on submission edit page
         if ($pagenow === 'post.php' && $post_type === 'mksddn_fh_submits') {
             // Redirect to submissions list when trying to edit
-            wp_redirect( esc_url_raw( admin_url('edit.php?post_type=mksddn_fh_submits&message=1') ) );
+            wp_safe_redirect( esc_url_raw( admin_url('edit.php?post_type=mksddn_fh_submits&message=1') ) );
             exit;
         }
 
         // Also block new submission creation
         if ($pagenow === 'post-new.php' && $post_type === 'mksddn_fh_submits') {
-            wp_redirect( esc_url_raw( admin_url('edit.php?post_type=mksddn_fh_submits&message=2') ) );
+            wp_safe_redirect( esc_url_raw( admin_url('edit.php?post_type=mksddn_fh_submits&message=2') ) );
             exit;
         }
     }

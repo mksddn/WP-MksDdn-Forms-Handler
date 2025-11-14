@@ -17,10 +17,10 @@ delete_option('mksddn_fh_google_sheets_client_secret');
 delete_option('mksddn_fh_google_sheets_refresh_token');
 
 // Cleanup of transients created by this plugin (best-effort via API)
-$user_id = get_current_user_id();
-if ($user_id) {
-    delete_transient('mksddn_fh_fields_config_json_error_' . $user_id);
-    delete_transient('mksddn_fh_fields_config_json_value_' . $user_id);
+$mksddn_fh_user_id = get_current_user_id();
+if ($mksddn_fh_user_id) {
+    delete_transient('mksddn_fh_fields_config_json_error_' . $mksddn_fh_user_id);
+    delete_transient('mksddn_fh_fields_config_json_value_' . $mksddn_fh_user_id);
 }
 
 // Intentionally keep CPT data (mksddn_fh_forms, mksddn_fh_form_submissions) to avoid data loss

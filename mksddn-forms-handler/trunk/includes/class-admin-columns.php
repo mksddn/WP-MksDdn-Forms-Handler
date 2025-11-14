@@ -213,6 +213,7 @@ class AdminColumns {
                         if (is_array($value)) {
                             if ($this->is_array_of_objects($value)) {
                                 // Array of objects: show count
+                                // translators: %d: number of items in array
                                 $display_value = sprintf(esc_html__('%d items', 'mksddn-forms-handler'), count($value));
                             } else {
                                 // Simple array: join values

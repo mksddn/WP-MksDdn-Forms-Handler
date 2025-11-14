@@ -136,7 +136,7 @@ class MetaBoxes {
             
             if (is_array($value) && $this->is_array_of_objects($value)) {
                 // Render array of objects (e.g., products) as a table
-                echo $this->render_array_of_objects_table($value);
+                echo wp_kses_post($this->render_array_of_objects_table($value));
             } elseif (is_array($value)) {
                 // Simple array: render as comma-separated list
                 $parts = [];
