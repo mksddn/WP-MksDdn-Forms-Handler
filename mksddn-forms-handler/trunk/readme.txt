@@ -4,7 +4,7 @@ Tags: forms, telegram, google-sheets, rest-api, form-handler
 Requires at least: 5.0
 Tested up to: 6.8
 Requires PHP: 8.0
-Stable tag: 1.2.0
+Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -325,6 +325,7 @@ Fields are configured as JSON in the form settings. Supported types:
 * **Text**: textarea
 * **Choice**: checkbox, select (supports multiple), radio
 * **File**: file uploads (form and REST multipart)
+* **Array**: array_of_objects - array of objects with nested field validation
 
 ### Field Configuration Notes
 
@@ -369,8 +370,58 @@ Fields are configured as JSON in the form settings. Supported types:
     "allowed_extensions":["pdf","png","jpg"],
     "max_size_mb":10,
     "max_files":3
+  },
+  {
+    "name":"products",
+    "label":"Products",
+    "type":"array_of_objects",
+    "required":true,
+    "fields":[
+      {"name":"name","label":"Product Name","type":"text","required":true},
+      {"name":"size","label":"Size","type":"text","required":true},
+      {"name":"color","label":"Color","type":"text","required":true},
+      {"name":"quantity","label":"Quantity","type":"number","required":true,"min":1},
+      {"name":"price","label":"Price","type":"number","required":true,"min":0}
+    ]
   }
 ]
+```
+
+### Array of Objects Field Type
+
+The `array_of_objects` type allows you to define arrays with nested field validation. Each item in the array is validated according to the nested `fields` configuration.
+
+**Configuration:**
+- `name`: Field name (required)
+- `label`: Field label (required)
+- `type`: Must be `"array_of_objects"` (required)
+- `required`: Whether the array is required (default: false)
+- `fields`: Array of field configurations for each object in the array (required)
+
+**Nested fields support all standard field types** (text, email, tel, url, number, textarea, etc.) with full validation.
+
+**Example REST API submission:**
+```json
+{
+  "email": "user@example.com",
+  "phone": "+1234567890",
+  "products": [
+    {
+      "name": "T-Shirt",
+      "size": "M",
+      "color": "Red",
+      "quantity": 2,
+      "price": 1500
+    },
+    {
+      "name": "Jeans",
+      "size": "L",
+      "color": "Blue",
+      "quantity": 1,
+      "price": 3000
+    }
+  ]
+}
 ```
 
 == Screenshots ==
@@ -383,6 +434,9 @@ Fields are configured as JSON in the form settings. Supported types:
 
 == Upgrade Notice ==
 
+= 1.3.0 =
+Major feature: New `array_of_objects` field type with full nested field validation. Security improvement: Arrays are now restricted to `array_of_objects` type only. If you have forms using `text` type for arrays, update them to `array_of_objects` with proper field configuration. Recommended update for better security and validation.
+
 = 1.2.0 =
 New feature: Support for nested arrays and objects in form submissions (e.g., product arrays). Improved display of complex data structures in admin, email, and Telegram. Recommended update for e-commerce and complex form integrations.
 
@@ -393,6 +447,20 @@ Security update: Fixed URL escaping in template examples. Recommended update for
 New feature: Template functions for custom forms integration. Bug fix: Improved Telegram message formatting. Fully backward compatible.
 
 == Changelog ==
+
+= 1.3.0 =
+* Feature: New `array_of_objects` field type with full nested field validation
+* Feature: Type-specific validation for nested fields (email, number, tel, url, etc.)
+* Feature: Type-specific sanitization for nested fields in arrays
+* Security: Arrays are now restricted to `array_of_objects` type only - prevents validation bypass
+* Security: Simple field types (text, email, number, etc.) now reject arrays for better security
+* Improved: Each array item is validated according to nested field configuration
+* Improved: Better error messages for array validation with item index
+* Technical: Added `validate_array_of_objects()` method for comprehensive array validation
+* Technical: Added `sanitize_array_of_objects()` method for type-based sanitization
+* Technical: Updated field configuration sanitization to support nested `fields` property
+* Breaking: Forms using `text` type for arrays must be updated to `array_of_objects` type
+* Full backward compatibility for existing form submissions (data format unchanged)
 
 = 1.2.0 =
 * Feature: Added support for nested arrays and objects in REST API submissions

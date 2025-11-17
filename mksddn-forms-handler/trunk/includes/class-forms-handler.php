@@ -549,6 +549,17 @@ class FormsHandler {
         $allow_any_fields = get_post_meta($form_config['form_id'], '_allow_any_fields', true);
         $form_data = [];
         
+        // Build fields map for proper sanitization
+        $fields = json_decode((string)$form_config['fields_config'], true);
+        $fields_map = [];
+        if (is_array($fields)) {
+            foreach ($fields as $field) {
+                if (isset($field['name'])) {
+                    $fields_map[$field['name']] = $field;
+                }
+            }
+        }
+        
         if ($allow_any_fields === '1') {
             // Accept all fields from POST
             foreach ($_POST as $field_name => $value) {
@@ -557,7 +568,8 @@ class FormsHandler {
                     continue;
                 }
                 $unslashed = wp_unslash($value); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-                $form_data[$field_name] = $this->sanitize_value_recursive($unslashed);
+                $field_config = $fields_map[$field_name] ?? null;
+                $form_data[$field_name] = $this->sanitize_value_recursive($unslashed, $field_config);
             }
         } else {
             // Use whitelist from configuration
@@ -566,7 +578,8 @@ class FormsHandler {
                 if (isset($_POST[$field_name])) {
                     // Raw input is unslashed first, then sanitized below
                     $value = wp_unslash($_POST[$field_name]); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-                    $form_data[$field_name] = $this->sanitize_value_recursive($value);
+                    $field_config = $fields_map[$field_name] ?? null;
+                    $form_data[$field_name] = $this->sanitize_value_recursive($value, $field_config);
                 }
             }
         }
@@ -910,11 +923,18 @@ class FormsHandler {
     
     /**
      * Recursively sanitize a value (handles arrays, objects, and primitives)
+     * Optionally uses field configuration for proper type-based sanitization
      *
      * @param mixed $value Value to sanitize
+     * @param array|null $field_config Optional field configuration for type-based sanitization
      * @return mixed Sanitized value
      */
-    private function sanitize_value_recursive($value) {
+    private function sanitize_value_recursive($value, $field_config = null) {
+        // If field config provided and it's array_of_objects, use specialized sanitization
+        if ($field_config && ($field_config['type'] ?? '') === 'array_of_objects' && is_array($value)) {
+            return $this->sanitize_array_of_objects($value, $field_config);
+        }
+        
         if (is_array($value)) {
             $sanitized = [];
             foreach ($value as $k => $v) {
@@ -944,6 +964,61 @@ class FormsHandler {
         
         // Fallback: convert to string and sanitize
         return sanitize_text_field((string) $value);
+    }
+    
+    /**
+     * Sanitize array of objects using field configuration
+     *
+     * @param array $array_value Array of objects to sanitize
+     * @param array $field_config Field configuration with nested fields
+     * @return array Sanitized array
+     */
+    private function sanitize_array_of_objects(array $array_value, array $field_config): array {
+        $nested_fields = $field_config['fields'] ?? [];
+        $sanitized = [];
+        
+        foreach ($array_value as $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+            
+            $sanitized_item = [];
+            
+            // If nested fields config exists, sanitize according to it
+            if (!empty($nested_fields) && is_array($nested_fields)) {
+                foreach ($nested_fields as $nested_field) {
+                    $nested_field_name = $nested_field['name'] ?? '';
+                    $nested_field_type = $nested_field['type'] ?? 'text';
+                    
+                    if (isset($item[$nested_field_name])) {
+                        $nested_value = $item[$nested_field_name];
+                        
+                        // Type-based sanitization
+                        if ($nested_field_type === 'email') {
+                            $sanitized_item[$nested_field_name] = sanitize_email($nested_value);
+                        } elseif ($nested_field_type === 'url') {
+                            $sanitized_item[$nested_field_name] = esc_url_raw($nested_value);
+                        } elseif ($nested_field_type === 'number') {
+                            $sanitized_item[$nested_field_name] = is_numeric($nested_value) ? ($nested_value + 0) : 0;
+                        } elseif (is_array($nested_value)) {
+                            $sanitized_item[$nested_field_name] = $this->sanitize_value_recursive($nested_value);
+                        } else {
+                            $sanitized_item[$nested_field_name] = sanitize_text_field((string) $nested_value);
+                        }
+                    }
+                }
+            } else {
+                // No nested config: sanitize all fields generically
+                foreach ($item as $k => $v) {
+                    $sanitized_key = is_string($k) ? sanitize_key($k) : $k;
+                    $sanitized_item[$sanitized_key] = $this->sanitize_value_recursive($v);
+                }
+            }
+            
+            $sanitized[] = $sanitized_item;
+        }
+        
+        return $sanitized;
     }
     
     /**
@@ -985,10 +1060,22 @@ class FormsHandler {
             return $this->sanitize_all_fields($form_data);
         }
 
-        // Extract only allowed fields
+        // Extract only allowed fields and sanitize using field config
+        $fields = json_decode((string)$fields_config, true);
+        $fields_map = [];
+        if (is_array($fields)) {
+            foreach ($fields as $field) {
+                if (isset($field['name'])) {
+                    $fields_map[$field['name']] = $field;
+                }
+            }
+        }
+        
         foreach ($form_data as $field_name => $field_value) {
             if (in_array($field_name, $allowed_fields, true)) {
-                $filtered_data[$field_name] = $field_value;
+                // Get field config for proper sanitization
+                $field_config = $fields_map[$field_name] ?? null;
+                $filtered_data[$field_name] = $this->sanitize_value_recursive($field_value, $field_config);
             } else {
                 $unauthorized_fields[] = $field_name;
             }
@@ -1050,6 +1137,15 @@ class FormsHandler {
             $field_label = $field['label'] ?? $field_name;
             $is_required = $field['required'] ?? false;
             $field_type = $field['type'] ?? 'text';
+            
+            // Handle array_of_objects type
+            if ($field_type === 'array_of_objects') {
+                $validation_result = $this->validate_array_of_objects($form_data, $field_name, $field_label, $is_required, $field);
+                if (is_wp_error($validation_result)) {
+                    return $validation_result;
+                }
+                continue;
+            }
             $options = [];
             if (($field_type === 'select' || $field_type === 'radio') && isset($field['options']) && is_array($field['options'])) {
                 foreach ($field['options'] as $opt) {
@@ -1060,6 +1156,13 @@ class FormsHandler {
                     }
                 }
                 $options = array_values(array_unique(array_filter($options, fn($v) => $v !== '')));
+            }
+
+            // Security: Reject arrays for simple field types (only array_of_objects allows arrays)
+            // This prevents bypassing validation by sending arrays to simple fields
+            $simple_types = ['text', 'email', 'tel', 'url', 'number', 'date', 'time', 'datetime-local', 'textarea', 'password'];
+            if (in_array($field_type, $simple_types, true) && isset($form_data[$field_name]) && is_array($form_data[$field_name])) {
+                return new \WP_Error('validation_error', sprintf( /* translators: %s: field label */ __( "Field '%s' must be a single value, not an array. Use 'array_of_objects' type for arrays.", 'mksddn-forms-handler' ), $field_label), ['status' => 400]);
             }
 
             // Check required fields
@@ -1245,6 +1348,110 @@ class FormsHandler {
             }
         }
 
+        return true;
+    }
+    
+    /**
+     * Validate array of objects field
+     *
+     * @param array $form_data Form data
+     * @param string $field_name Field name
+     * @param string $field_label Field label
+     * @param bool $is_required Is field required
+     * @param array $field_config Field configuration
+     * @return \WP_Error|bool
+     */
+    private function validate_array_of_objects($form_data, $field_name, $field_label, $is_required, $field_config): \WP_Error|bool {
+        // Check if field is required
+        if ($is_required) {
+            if (!isset($form_data[$field_name]) || !is_array($form_data[$field_name]) || empty($form_data[$field_name])) {
+                return new \WP_Error('validation_error', sprintf( /* translators: %s: field label */ __( "Field '%s' is required and must contain at least one item", 'mksddn-forms-handler' ), $field_label), ['status' => 400]);
+            }
+        }
+        
+        // If field is not set or empty, skip validation
+        if (!isset($form_data[$field_name]) || !is_array($form_data[$field_name]) || empty($form_data[$field_name])) {
+            return true;
+        }
+        
+        // Get nested fields configuration
+        $nested_fields = $field_config['fields'] ?? [];
+        if (empty($nested_fields) || !is_array($nested_fields)) {
+            // If no nested fields config, just validate that it's an array
+            return true;
+        }
+        
+        // Validate each item in the array
+        $array_value = $form_data[$field_name];
+        foreach ($array_value as $item_index => $item) {
+            if (!is_array($item)) {
+                return new \WP_Error('validation_error', sprintf( /* translators: 1: field label, 2: item index */ __( "Field '%1\$s' item #%2\$d must be an object", 'mksddn-forms-handler' ), $field_label, $item_index + 1), ['status' => 400]);
+            }
+            
+            // Validate each nested field
+            foreach ($nested_fields as $nested_field) {
+                $nested_field_name = $nested_field['name'] ?? '';
+                $nested_field_label = $nested_field['label'] ?? $nested_field_name;
+                $nested_is_required = $nested_field['required'] ?? false;
+                $nested_field_type = $nested_field['type'] ?? 'text';
+                
+                // Check required nested fields
+                if ($nested_is_required) {
+                    if (!isset($item[$nested_field_name]) || $item[$nested_field_name] === '' || $item[$nested_field_name] === null) {
+                        return new \WP_Error('validation_error', sprintf( /* translators: 1: nested field label, 2: field label, 3: item index */ __( "Field '%1\$s' in '%2\$s' item #%3\$d is required", 'mksddn-forms-handler' ), $nested_field_label, $field_label, $item_index + 1), ['status' => 400]);
+                    }
+                }
+                
+                // Skip validation if field is not set
+                if (!isset($item[$nested_field_name]) || $item[$nested_field_name] === '') {
+                    continue;
+                }
+                
+                $nested_value = $item[$nested_field_name];
+                
+                // Validate email
+                if ($nested_field_type === 'email') {
+                    if (!is_email($nested_value)) {
+                        return new \WP_Error('validation_error', sprintf( /* translators: 1: nested field label, 2: field label, 3: item index */ __( "Field '%1\$s' in '%2\$s' item #%3\$d must be a valid email", 'mksddn-forms-handler' ), $nested_field_label, $field_label, $item_index + 1), ['status' => 400]);
+                    }
+                }
+                
+                // Validate number
+                if ($nested_field_type === 'number') {
+                    if (!is_numeric($nested_value)) {
+                        return new \WP_Error('validation_error', sprintf( /* translators: 1: nested field label, 2: field label, 3: item index */ __( "Field '%1\$s' in '%2\$s' item #%3\$d must be a number", 'mksddn-forms-handler' ), $nested_field_label, $field_label, $item_index + 1), ['status' => 400]);
+                    }
+                    $num = $nested_value + 0;
+                    if (isset($nested_field['min']) && $nested_field['min'] !== '' && $num < ($nested_field['min'] + 0)) {
+                        return new \WP_Error('validation_error', sprintf( /* translators: 1: nested field label, 2: field label, 3: item index, 4: min value */ __( "Field '%1\$s' in '%2\$s' item #%3\$d must be greater than or equal to %4\$s", 'mksddn-forms-handler' ), $nested_field_label, $field_label, $item_index + 1, $nested_field['min']), ['status' => 400]);
+                    }
+                    if (isset($nested_field['max']) && $nested_field['max'] !== '' && $num > ($nested_field['max'] + 0)) {
+                        return new \WP_Error('validation_error', sprintf( /* translators: 1: nested field label, 2: field label, 3: item index, 4: max value */ __( "Field '%1\$s' in '%2\$s' item #%3\$d must be less than or equal to %4\$s", 'mksddn-forms-handler' ), $nested_field_label, $field_label, $item_index + 1, $nested_field['max']), ['status' => 400]);
+                    }
+                }
+                
+                // Validate tel
+                if ($nested_field_type === 'tel') {
+                    $pattern = $nested_field['pattern'] ?? '^\+?\d{7,15}$';
+                    $delimited = '/'.$pattern.'/';
+                    if (@preg_match($delimited, '') === false) {
+                        $delimited = '/^\+?\d{7,15}$/';
+                    }
+                    if (!preg_match($delimited, (string)$nested_value)) {
+                        return new \WP_Error('validation_error', sprintf( /* translators: 1: nested field label, 2: field label, 3: item index */ __( "Field '%1\$s' in '%2\$s' item #%3\$d must be a valid phone number", 'mksddn-forms-handler' ), $nested_field_label, $field_label, $item_index + 1), ['status' => 400]);
+                    }
+                }
+                
+                // Validate URL
+                if ($nested_field_type === 'url') {
+                    $sanitized_url = esc_url_raw((string) $nested_value);
+                    if ($sanitized_url === '') {
+                        return new \WP_Error('validation_error', sprintf( /* translators: 1: nested field label, 2: field label, 3: item index */ __( "Field '%1\$s' in '%2\$s' item #%3\$d must be a valid URL", 'mksddn-forms-handler' ), $nested_field_label, $field_label, $item_index + 1), ['status' => 400]);
+                    }
+                }
+            }
+        }
+        
         return true;
     }
     

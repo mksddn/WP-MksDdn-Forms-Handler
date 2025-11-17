@@ -178,6 +178,11 @@ class Utilities {
                 $result['options'] = self::sanitize_options_for_storage($value);
                 continue;
             }
+            if ($key === 'fields' && is_array($value)) {
+                // Nested fields for array_of_objects type
+                $result['fields'] = self::sanitize_fields_config_for_storage($value);
+                continue;
+            }
             // Preserve arbitrary keys with recursive sanitization
             $result[$key] = self::sanitize_any_for_storage($value);
         }
