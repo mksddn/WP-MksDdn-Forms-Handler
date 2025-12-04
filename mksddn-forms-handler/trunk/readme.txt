@@ -4,7 +4,7 @@ Tags: forms, telegram, google-sheets, rest-api, form-handler
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 8.0
-Stable tag: 1.3.0
+Stable tag: 1.3.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -434,6 +434,9 @@ The `array_of_objects` type allows you to define arrays with nested field valida
 
 == Upgrade Notice ==
 
+= 1.3.1 =
+Compatibility update: Tested with WordPress 6.9. Recommended update for users upgrading to WordPress 6.9.
+
 = 1.3.0 =
 Major feature: New `array_of_objects` field type with full nested field validation. Security improvement: Arrays are now restricted to `array_of_objects` type only. If you have forms using `text` type for arrays, update them to `array_of_objects` with proper field configuration. Recommended update for better security and validation.
 
@@ -447,6 +450,9 @@ Security update: Fixed URL escaping in template examples. Recommended update for
 New feature: Template functions for custom forms integration. Bug fix: Improved Telegram message formatting. Fully backward compatible.
 
 == Changelog ==
+
+= 1.3.1 =
+* Compatibility: Tested with WordPress 6.9
 
 = 1.3.0 =
 * Feature: New `array_of_objects` field type with full nested field validation
