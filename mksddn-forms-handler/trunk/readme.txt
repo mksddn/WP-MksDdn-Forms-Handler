@@ -45,7 +45,7 @@ MksDdn Forms Handler is a powerful and flexible form processing plugin that allo
 1. Upload the plugin files to the `/wp-content/plugins/mksddn-forms-handler` directory, or install the plugin through the WordPress plugins screen directly.
 2. Activate the plugin through the 'Plugins' screen in WordPress
 3. Use the Forms menu to create and manage your forms
-4. Use the shortcode `[mksddn_fh_form id="form_id"]` to display forms on your pages
+4. Use the shortcode `[mksddn_fh_form id="form_id"]` or `[mksddn_fh_form slug="form-slug"]` to display forms on your pages
 
 == For Developers ==
 
@@ -63,6 +63,7 @@ MksDdn Forms Handler is a powerful and flexible form processing plugin that allo
 * `Security` - rate limiting and security checks
 * `Utilities` - helper functions and form creation utilities
 * `GoogleSheetsAdmin` - Google Sheets settings page and OAuth
+* `Assets` - asset registration and conditional enqueuing
 * `Template Functions` - global functions for PHP template integration
 
 **Handlers (handlers/)**
@@ -85,54 +86,51 @@ MksDdn Forms Handler is a powerful and flexible form processing plugin that allo
 
 = File Structure =
 
-```
-mksddn-forms-handler/
-├── mksddn-forms-handler.php     # Main plugin file
-├── includes/                     # Core components
-│   ├── class-post-types.php
-│   ├── class-meta-boxes.php
-│   ├── class-forms-handler.php
-│   ├── class-shortcodes.php
-│   ├── class-admin-columns.php
-│   ├── class-export-handler.php
-│   ├── class-security.php
-│   ├── class-utilities.php
-│   ├── class-google-sheets-admin.php
-│   └── template-functions.php
-├── handlers/                     # External service handlers
-│   ├── class-telegram-handler.php
-│   └── class-google-sheets-handler.php
-├── templates/                    # Template files
-│   ├── form-settings-meta-box.php
-│   └── custom-form-examples.php
-├── assets/                       # Static resources
-│   ├── css/
-│   ├── js/
-│   └── images/
-├── languages/                    # Translations
-└── uninstall.php                # Cleanup script
-```
+    mksddn-forms-handler/
+    ├── mksddn-forms-handler.php     # Main plugin file
+    ├── includes/                     # Core components
+    │   ├── class-post-types.php
+    │   ├── class-meta-boxes.php
+    │   ├── class-forms-handler.php
+    │   ├── class-shortcodes.php
+    │   ├── class-admin-columns.php
+    │   ├── class-export-handler.php
+    │   ├── class-security.php
+    │   ├── class-utilities.php
+    │   ├── class-google-sheets-admin.php
+    │   ├── class-assets.php
+    │   └── template-functions.php
+    ├── handlers/                     # External service handlers
+    │   ├── class-telegram-handler.php
+    │   └── class-google-sheets-handler.php
+    ├── templates/                    # Template files
+    │   ├── form-settings-meta-box.php
+    │   └── custom-form-examples.php
+    ├── assets/                       # Static resources
+    │   ├── css/
+    │   ├── js/
+    │   └── images/
+    ├── languages/                    # Translations
+    └── uninstall.php                # Cleanup script
 
 = Integration Methods =
 
 **1. Shortcode (Standard)**
-```php
-[mksddn_fh_form slug="contact-form"]
-```
+
+    [mksddn_fh_form slug="contact-form"]
+
 Plugin automatically generates HTML form based on configuration.
 
 **2. PHP Templates (Custom Forms)**
 Integrate pre-built forms in theme templates:
 
-```php
-<form method="post" action="<?php echo mksddn_fh_get_form_action(); ?>">
-    <?php mksddn_fh_form_fields('contact-form'); ?>
-    <!-- Your custom fields -->
-    <input type="text" name="name" required>
-    <input type="email" name="email" required>
-    <button type="submit">Send</button>
-</form>
-```
+    <form method="post" action="<?php echo mksddn_fh_get_form_action(); ?>">
+        <?php mksddn_fh_form_fields('contact-form'); ?>
+        <!-- Your custom fields -->
+        <input type="text" name="name" required>
+        <input type="email" name="email" required>
+        <button type="submit">Send</button>
+    </form>
 
 **Available Functions:**
 * `mksddn_fh_get_form_action()` - get form action URL
@@ -150,19 +148,16 @@ See `/templates/custom-form-examples.php` for detailed examples.
 **3. REST API (AJAX)**
 Submit forms via REST API without page reload:
 
-```javascript
-fetch('<?php echo mksddn_fh_get_rest_endpoint("contact-form"); ?>', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(formData)
-});
-```
+    fetch('<?php echo mksddn_fh_get_rest_endpoint("contact-form"); ?>', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+    });
 
 = Development Standards =
 
 **Coding**
 * WordPress Coding Standards compliance
-* PSR-4 autoloading
 * SOLID principles
 * DRY (Don't Repeat Yourself)
 * KISS (Keep It Simple)
@@ -192,16 +187,15 @@ fetch('<?php echo mksddn_fh_get_rest_endpoint("contact-form"); ?>', {
 **Filters:**
 
 `mksddn_fh_allowed_fields` - Modify allowed field names for a form
-```php
-add_filter('mksddn_fh_allowed_fields', function($allowed_fields, $form_id, $form_slug) {
-    // Allow all fields for specific form
-    if ($form_slug === 'my-custom-form') {
-        return ['*'];
-    }
-    // Add specific fields
-    return array_merge($allowed_fields, ['custom_field_1', 'custom_field_2']);
-}, 10, 3);
-```
+
+    add_filter('mksddn_fh_allowed_fields', function($allowed_fields, $form_id, $form_slug) {
+        // Allow all fields for specific form
+        if ($form_slug === 'my-custom-form') {
+            return ['*'];
+        }
+        // Add specific fields
+        return array_merge($allowed_fields, ['custom_field_1', 'custom_field_2']);
+    }, 10, 3);
 
 **Actions:**
 
@@ -212,62 +206,58 @@ add_filter('mksddn_fh_allowed_fields', function($allowed_fields, $form_id, $form
 
 Namespace: `mksddn-forms-handler/v1`
 
-### List Forms
-- **Method**: GET
-- **Path**: `/wp-json/mksddn-forms-handler/v1/forms`
-- **Query Parameters**:
-  - `per_page` (1–100, default: 10)
-  - `page` (>=1, default: 1)
-  - `search` (string, optional)
-- **Response Headers**: `X-WP-Total`, `X-WP-TotalPages`
+= List Forms =
+* **Method**: GET
+* **Path**: `/wp-json/mksddn-forms-handler/v1/forms`
+* **Query Parameters**:
+  * `per_page` (1–100, default: 10)
+  * `page` (>=1, default: 1)
+  * `search` (string, optional)
+* **Response Headers**: `X-WP-Total`, `X-WP-TotalPages`
 
-### Get Single Form
-- **Method**: GET
-- **Path**: `/wp-json/mksddn-forms-handler/v1/forms/{slug}`
-- **Response**: Includes `id`, `slug`, `title`, `submit_url`, `fields` (sanitized config)
+= Get Single Form =
+* **Method**: GET
+* **Path**: `/wp-json/mksddn-forms-handler/v1/forms/{slug}`
+* **Response**: Includes `id`, `slug`, `title`, `submit_url`, `fields` (sanitized config)
 
-### Submit Form
-- **Method**: POST
-- **Path**: `/wp-json/mksddn-forms-handler/v1/forms/{slug}/submit`
-- **Content Types**: JSON or multipart/form-data
-- **Body (JSON)**: Key/value pairs according to field configuration. The `mksddn_fh_hp` honeypot field may be present and must be empty.
-- **Body (Multipart)**: Fields and file uploads supported. For multiple files, use `name[]`.
+= Submit Form =
+* **Method**: POST
+* **Path**: `/wp-json/mksddn-forms-handler/v1/forms/{slug}/submit`
+* **Content Types**: JSON or multipart/form-data
+* **Body (JSON)**: Key/value pairs according to field configuration. The `mksddn_fh_hp` honeypot field may be present and must be empty.
+* **Body (Multipart)**: Fields and file uploads supported. For multiple files, use `name[]`.
 
-#### Validation & Limits
-- Only configured fields accepted; unauthorized fields return `unauthorized_fields` error
-- Required fields, email, URL, number (min/max/step), tel (pattern), date, time, datetime-local are validated
-- Maximum 50 fields; total payload size ≤ 100 KB
-- Rate limiting: 1 request per 10 seconds per IP per form
+= Validation & Limits =
+* Only configured fields accepted; unauthorized fields return `unauthorized_fields` error
+* Required fields, email, URL, number (min/max/step), tel (pattern), date, time, datetime-local are validated
+* Maximum 50 fields; total payload size ≤ 100 KB
+* Rate limiting: 1 request per 10 seconds per IP per form
 
-#### Examples
+= Examples =
 
 **List forms:**
-```bash
-curl -s 'https://example.com/wp-json/mksddn-forms-handler/v1/forms'
-```
+
+    curl -s 'https://example.com/wp-json/mksddn-forms-handler/v1/forms'
 
 **Get single form:**
-```bash
-curl -s 'https://example.com/wp-json/mksddn-forms-handler/v1/forms/contact'
-```
+
+    curl -s 'https://example.com/wp-json/mksddn-forms-handler/v1/forms/contact'
 
 **Submit form (JSON):**
-```bash
-curl -s -X POST \
-  -H 'Content-Type: application/json' \
-  -d '{"name":"John","email":"john@example.com","message":"Hi","mksddn_fh_hp":""}' \
-  'https://example.com/wp-json/mksddn-forms-handler/v1/forms/contact/submit'
-```
+
+    curl -s -X POST \
+      -H 'Content-Type: application/json' \
+      -d '{"name":"John","email":"john@example.com","message":"Hi","mksddn_fh_hp":""}' \
+      'https://example.com/wp-json/mksddn-forms-handler/v1/forms/contact/submit'
 
 **Submit form with files (multipart):**
-```bash
-curl -s -X POST \
-  -F 'name=John' \
-  -F 'email=john@example.com' \
-  -F 'attachments[]=@/path/to/file1.pdf' \
-  -F 'attachments[]=@/path/to/file2.png' \
-  'https://example.com/wp-json/mksddn-forms-handler/v1/forms/contact/submit'
-```
+
+    curl -s -X POST \
+      -F 'name=John' \
+      -F 'email=john@example.com' \
+      -F 'attachments[]=@/path/to/file1.pdf' \
+      -F 'attachments[]=@/path/to/file2.png' \
+      'https://example.com/wp-json/mksddn-forms-handler/v1/forms/contact/submit'
 
 == Frequently Asked Questions ==
 
@@ -327,7 +317,7 @@ Fields are configured as JSON in the form settings. Supported types:
 * **File**: file uploads (form and REST multipart)
 * **Array**: array_of_objects - array of objects with nested field validation
 
-### Field Configuration Notes
+= Field Configuration Notes =
 
 * `options` can be an array of strings or objects `{ "value": "...", "label": "..." }`
 * For `select` with multiple choice, set `multiple: true` (shortcode renders `name[]`)
@@ -336,93 +326,90 @@ Fields are configured as JSON in the form settings. Supported types:
 * For `date/time/datetime-local`, server validates formats: `YYYY-MM-DD`, `HH:MM`, `YYYY-MM-DDTHH:MM`
 * For REST submissions, send arrays for multiple selects
 
-### File Field Options
+= File Field Options =
 
 * `allowed_extensions`: Array of extensions, e.g. `["pdf","png","jpg"]`
 * `max_size_mb`: Maximum size per file (default: 10)
 * `max_files`: Maximum files per field (default: 5)
 * `multiple`: Allow multiple files
 
-### Example JSON Configuration
+= Example JSON Configuration =
 
-```json
-[
-  {"name":"name","label":"Name","type":"text","required":true,"placeholder":"Your name"},
-  {"name":"email","label":"Email","type":"email","required":true},
-  {"name":"phone","label":"Phone","type":"tel","pattern":"^\\+?\\d{7,15}$"},
-  {"name":"website","label":"Website","type":"url"},
-  {"name":"age","label":"Age","type":"number","min":1,"max":120,"step":1},
-  {"name":"birth","label":"Birth date","type":"date"},
-  {"name":"message","label":"Message","type":"textarea","required":true},
-  {"name":"agree","label":"I agree to Terms","type":"checkbox","required":true},
-  {
-    "name":"services",
-    "label":"Choose services",
-    "type":"select",
-    "multiple":true,
-    "options":["seo","smm","ads"]
-  },
-  {
-    "name":"attachments",
-    "label":"Attach files",
-    "type":"file",
-    "multiple":true,
-    "allowed_extensions":["pdf","png","jpg"],
-    "max_size_mb":10,
-    "max_files":3
-  },
-  {
-    "name":"products",
-    "label":"Products",
-    "type":"array_of_objects",
-    "required":true,
-    "fields":[
-      {"name":"name","label":"Product Name","type":"text","required":true},
-      {"name":"size","label":"Size","type":"text","required":true},
-      {"name":"color","label":"Color","type":"text","required":true},
-      {"name":"quantity","label":"Quantity","type":"number","required":true,"min":1},
-      {"name":"price","label":"Price","type":"number","required":true,"min":0}
+    [
+      {"name":"name","label":"Name","type":"text","required":true,"placeholder":"Your name"},
+      {"name":"email","label":"Email","type":"email","required":true},
+      {"name":"phone","label":"Phone","type":"tel","pattern":"^\\+?\\d{7,15}$"},
+      {"name":"website","label":"Website","type":"url"},
+      {"name":"age","label":"Age","type":"number","min":1,"max":120,"step":1},
+      {"name":"birth","label":"Birth date","type":"date"},
+      {"name":"message","label":"Message","type":"textarea","required":true},
+      {"name":"agree","label":"I agree to Terms","type":"checkbox","required":true},
+      {
+        "name":"services",
+        "label":"Choose services",
+        "type":"select",
+        "multiple":true,
+        "options":["seo","smm","ads"]
+      },
+      {
+        "name":"attachments",
+        "label":"Attach files",
+        "type":"file",
+        "multiple":true,
+        "allowed_extensions":["pdf","png","jpg"],
+        "max_size_mb":10,
+        "max_files":3
+      },
+      {
+        "name":"products",
+        "label":"Products",
+        "type":"array_of_objects",
+        "required":true,
+        "fields":[
+          {"name":"name","label":"Product Name","type":"text","required":true},
+          {"name":"size","label":"Size","type":"text","required":true},
+          {"name":"color","label":"Color","type":"text","required":true},
+          {"name":"quantity","label":"Quantity","type":"number","required":true,"min":1},
+          {"name":"price","label":"Price","type":"number","required":true,"min":0}
+        ]
+      }
     ]
-  }
-]
-```
 
-### Array of Objects Field Type
+= Array of Objects Field Type =
 
 The `array_of_objects` type allows you to define arrays with nested field validation. Each item in the array is validated according to the nested `fields` configuration.
 
 **Configuration:**
-- `name`: Field name (required)
-- `label`: Field label (required)
-- `type`: Must be `"array_of_objects"` (required)
-- `required`: Whether the array is required (default: false)
-- `fields`: Array of field configurations for each object in the array (required)
+* `name`: Field name (required)
+* `label`: Field label (required)
+* `type`: Must be `"array_of_objects"` (required)
+* `required`: Whether the array is required (default: false)
+* `fields`: Array of field configurations for each object in the array (required)
 
 **Nested fields support all standard field types** (text, email, tel, url, number, textarea, etc.) with full validation.
 
 **Example REST API submission:**
-```json
-{
-  "email": "user@example.com",
-  "phone": "+1234567890",
-  "products": [
+
     {
-      "name": "T-Shirt",
-      "size": "M",
-      "color": "Red",
-      "quantity": 2,
-      "price": 1500
-    },
-    {
-      "name": "Jeans",
-      "size": "L",
-      "color": "Blue",
-      "quantity": 1,
-      "price": 3000
+      "email": "user@example.com",
+      "phone": "+1234567890",
+      "products": [
+        {
+          "name": "T-Shirt",
+          "size": "M",
+          "color": "Red",
+          "quantity": 2,
+          "price": 1500
+        },
+        {
+          "name": "Jeans",
+          "size": "L",
+          "color": "Blue",
+          "quantity": 1,
+          "price": 3000
+        }
+      ]
     }
-  ]
-}
-```
 
 == Screenshots ==
 
@@ -544,21 +531,21 @@ New feature: Template functions for custom forms integration. Bug fix: Improved 
 
 This plugin can connect to external services when explicitly enabled in a form's settings:
 
-### Google OAuth2 and Google Sheets API
-- **Purpose**: Authenticate and append rows to a spreadsheet
-- **When**: Only if "Send to Google Sheets" is enabled for a form and valid credentials are provided
-- **Data sent**: Form fields configured for the form, form title, timestamp
-- **Endpoints used**: `https://oauth2.googleapis.com/token`, `https://sheets.googleapis.com/v4/spreadsheets/...`
-- **Terms**: https://policies.google.com/terms
-- **Privacy**: https://policies.google.com/privacy
+= Google OAuth2 and Google Sheets API =
+* **Purpose**: Authenticate and append rows to a spreadsheet
+* **When**: Only if "Send to Google Sheets" is enabled for a form and valid credentials are provided
+* **Data sent**: Form fields configured for the form, form title, timestamp
+* **Endpoints used**: `https://oauth2.googleapis.com/token`, `https://sheets.googleapis.com/v4/spreadsheets/...`
+* **Terms**: https://policies.google.com/terms
+* **Privacy**: https://policies.google.com/privacy
 
-### Telegram Bot API
-- **Purpose**: Send a message with submission content to specified chat(s)
-- **When**: Only if "Send to Telegram" is enabled for a form and bot token + chat IDs are configured
-- **Data sent**: Form fields configured for the form, form title
-- **Endpoint used**: `https://api.telegram.org/bot<token>/sendMessage`
-- **Terms/Privacy**: https://telegram.org/privacy
+= Telegram Bot API =
+* **Purpose**: Send a message with submission content to specified chat(s)
+* **When**: Only if "Send to Telegram" is enabled for a form and bot token + chat IDs are configured
+* **Data sent**: Form fields configured for the form, form title
+* **Endpoint used**: `https://api.telegram.org/bot<token>/sendMessage`
+* **Terms/Privacy**: https://telegram.org/privacy
 
-### Privacy Notes
-- No IP address or user agent is transmitted to external services; only form field values are sent
-- External delivery is opt-in per form and disabled by default
+= Privacy Notes =
+* No IP address or user agent is transmitted to external services; only form field values are sent
+* External delivery is opt-in per form and disabled by default
