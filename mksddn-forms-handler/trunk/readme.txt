@@ -411,14 +411,6 @@ The `array_of_objects` type allows you to define arrays with nested field valida
       ]
     }
 
-== Screenshots ==
-
-1. Form creation interface
-2. Form settings configuration
-3. Submissions management
-4. Telegram integration setup
-5. Google Sheets integration
-
 == Upgrade Notice ==
 
 = 2.0.0 =
