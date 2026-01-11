@@ -4,7 +4,7 @@ Tags: forms, telegram, google-sheets, rest-api, form-handler
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 8.0
-Stable tag: 1.3.1
+Stable tag: 2.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -421,6 +421,9 @@ The `array_of_objects` type allows you to define arrays with nested field valida
 
 == Upgrade Notice ==
 
+= 2.0.0 =
+Major update: Added Russian language support, form customization options (custom submit button text, HTML after button, custom success messages), improved file upload handling via AJAX, and enhanced security with direct access checks. Recommended update for better localization and customization capabilities.
+
 = 1.3.1 =
 Compatibility update: Tested with WordPress 6.9. Recommended update for users upgrading to WordPress 6.9.
 
@@ -437,6 +440,14 @@ Security update: Fixed URL escaping in template examples. Recommended update for
 New feature: Template functions for custom forms integration. Bug fix: Improved Telegram message formatting. Fully backward compatible.
 
 == Changelog ==
+
+= 2.0.0 =
+* Feature: Added Russian language support with complete translation files (.po and .mo)
+* Feature: Form customization - custom submit button text, HTML after button, and custom success messages
+* Feature: Improved file upload handling via AJAX with FormData support
+* Security: Added direct access checks in multiple classes for better security
+* Improved: Enhanced error handling with JSON responses for nonce verification failures
+* Improved: Updated documentation for shortcode usage and asset registration
 
 = 1.3.1 =
 * Compatibility: Tested with WordPress 6.9
