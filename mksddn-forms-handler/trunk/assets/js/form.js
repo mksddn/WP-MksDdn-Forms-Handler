@@ -11,10 +11,12 @@
         $submitButton.prop('disabled', true).text(mksddn_fh_form && mksddn_fh_form.sending_text ? mksddn_fh_form.sending_text : 'Sending...');
         $message.hide();
 
-        $.ajax({
+        // Check if form has file inputs
+        var hasFiles = $form.find('input[type="file"]').length > 0;
+        var formData;
+        var ajaxOptions = {
             url: $form.attr('action'),
             method: 'POST',
-            data: $form.serialize(),
             success: function(response) {
                 if (response && response.success) {
                     var message = response.data && response.data.message ? response.data.message : '';
@@ -102,7 +104,21 @@
             complete: function() {
                 $submitButton.prop('disabled', false).text(mksddn_fh_form && mksddn_fh_form.send_text ? mksddn_fh_form.send_text : 'Send');
             }
-        });
+        };
+
+        // Prepare form data
+        if (hasFiles) {
+            // Use FormData for forms with files
+            formData = new FormData($form[0]);
+            ajaxOptions.data = formData;
+            ajaxOptions.processData = false;
+            ajaxOptions.contentType = false;
+        } else {
+            // Use serialize for forms without files
+            ajaxOptions.data = $form.serialize();
+        }
+
+        $.ajax(ajaxOptions);
     });
 })(jQuery);
 

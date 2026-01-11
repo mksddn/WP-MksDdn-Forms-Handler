@@ -519,7 +519,11 @@ class FormsHandler {
         // Check nonce for security
         $form_nonce_value = isset($_POST['form_nonce']) ? sanitize_text_field( wp_unslash($_POST['form_nonce']) ) : '';
         if (!$form_nonce_value || !wp_verify_nonce( $form_nonce_value, 'submit_form_nonce')) {
-            wp_die('Security check failed');
+            wp_send_json_error([
+                'message' => __( 'Security check failed. Please refresh the page and try again.', 'mksddn-forms-handler' ),
+                'code'    => 'nonce_verification_failed',
+            ]);
+            return;
         }
 
         $form_id = isset($_POST['form_id']) ? sanitize_text_field( wp_unslash($_POST['form_id']) ) : '';
