@@ -8,6 +8,11 @@
 
 namespace MksDdn\FormsHandler;
 
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Handles admin columns for forms and submissions
  */
@@ -108,6 +113,7 @@ class AdminColumns {
             'post_status'    => 'publish',
             'posts_per_page' => -1,
             'fields'         => 'ids', // Only get IDs for better performance
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Required for filtering submissions by form_id
             'meta_query'     => [
                 [
                     'key'     => '_form_id',

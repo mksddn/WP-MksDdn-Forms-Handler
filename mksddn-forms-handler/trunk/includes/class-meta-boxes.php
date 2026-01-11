@@ -8,6 +8,11 @@
 
 namespace MksDdn\FormsHandler;
 
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Handles meta boxes for forms and submissions
  */

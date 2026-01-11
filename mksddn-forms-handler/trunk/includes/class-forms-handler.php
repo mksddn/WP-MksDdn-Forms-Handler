@@ -8,6 +8,11 @@
 
 namespace MksDdn\FormsHandler;
 
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Main forms handler class
  */
@@ -1690,11 +1695,14 @@ class FormsHandler {
         }
 
         // Get page URL from referer or POST
+        // Note: This method is called from process_form_submission which is already protected by nonce verification in handle_form_submission
         $page_url = '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in handle_form_submission
         if (isset($_POST['_wp_http_referer'])) {
-            $raw_url = wp_unslash($_POST['_wp_http_referer']);
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in handle_form_submission
+            $raw_url = sanitize_text_field( wp_unslash( $_POST['_wp_http_referer'] ) );
         } elseif (isset($_SERVER['HTTP_REFERER'])) {
-            $raw_url = wp_unslash($_SERVER['HTTP_REFERER']);
+            $raw_url = sanitize_text_field( wp_unslash( $_SERVER['HTTP_REFERER'] ) );
         } else {
             $raw_url = '';
         }

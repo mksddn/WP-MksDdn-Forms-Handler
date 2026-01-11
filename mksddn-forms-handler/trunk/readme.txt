@@ -438,7 +438,7 @@ The `array_of_objects` type allows you to define arrays with nested field valida
 Compatibility update: Tested with WordPress 6.9. Recommended update for users upgrading to WordPress 6.9.
 
 = 1.3.0 =
-Major feature: New `array_of_objects` field type with full nested field validation. Security improvement: Arrays are now restricted to `array_of_objects` type only. If you have forms using `text` type for arrays, update them to `array_of_objects` with proper field configuration. Recommended update for better security and validation.
+New `array_of_objects` field type with nested validation. Security: Arrays restricted to `array_of_objects` only. Update forms using `text` for arrays. Recommended for better security.
 
 = 1.2.0 =
 New feature: Support for nested arrays and objects in form submissions (e.g., product arrays). Improved display of complex data structures in admin, email, and Telegram. Recommended update for e-commerce and complex form integrations.

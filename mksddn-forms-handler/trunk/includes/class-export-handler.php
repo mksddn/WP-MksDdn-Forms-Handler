@@ -8,6 +8,11 @@
 
 namespace MksDdn\FormsHandler;
 
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Handles CSV export functionality
  */
@@ -124,6 +129,7 @@ class ExportHandler {
             'posts_per_page' => -1,
             'orderby'        => 'date',
             'order'          => 'DESC',
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Required for filtering submissions by form_id
             'meta_query'     => [
                 [
                     'key'     => '_form_id',
@@ -172,6 +178,7 @@ class ExportHandler {
             'post_status'    => 'publish',
             'posts_per_page' => -1,
             'fields'         => 'ids',
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Required for filtering submissions by form_id
             'meta_query'     => [
                 [
                     'key'     => '_form_id',
@@ -294,6 +301,7 @@ class ExportHandler {
                 'post_type'      => 'mksddn_fh_submits',
                 'post_status'    => 'publish',
                 'posts_per_page' => -1,
+                // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Required for filtering submissions by form_id
                 'meta_query'     => [
                     [
                         'key'     => '_form_id',

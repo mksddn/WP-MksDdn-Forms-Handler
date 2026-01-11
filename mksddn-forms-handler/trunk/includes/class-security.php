@@ -8,6 +8,11 @@
 
 namespace MksDdn\FormsHandler;
 
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Handles security restrictions for submissions
  */
