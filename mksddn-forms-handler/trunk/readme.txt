@@ -33,7 +33,7 @@ MksDdn Forms Handler is a powerful and flexible form processing plugin that allo
 
 = Technical Features =
 
-* WordPress 5.0+ compatible
+* WordPress 6.0+ compatible
 * PHP 8.0+ required
 * GPL v2+ licensed
 * Clean, maintainable code
@@ -54,7 +54,7 @@ MksDdn Forms Handler is a powerful and flexible form processing plugin that allo
 **Component-based structure** following SOLID principles with clear separation of concerns:
 
 **Core Components (includes/)**
-* `PostTypes` - custom post types registration (forms, submissions)
+* `PostTypes` - custom post types registration (`mksddn_fh_forms`, `mksddn_fh_submits`)
 * `MetaBoxes` - form settings and submission data management
 * `FormsHandler` - main processing logic with REST API support
 * `Shortcodes` - form rendering with AJAX functionality
