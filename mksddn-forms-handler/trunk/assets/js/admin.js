@@ -180,7 +180,10 @@
 			var formName = $btn.data('form-name') || '';
 			$('#modal-form-filter').val(formId);
 			if (formName) {
-				$('#modal-title').text('Export by Date — ' + formName);
+				var exportByDateText = (typeof mksddn_fh_admin !== 'undefined' && mksddn_fh_admin.export_by_date_text) 
+					? mksddn_fh_admin.export_by_date_text 
+					: 'Export by Date';
+				$('#modal-title').text(exportByDateText + ' — ' + formName);
 			}
 			$('#modal_date_from').val('');
 			$('#modal_date_to').val('');

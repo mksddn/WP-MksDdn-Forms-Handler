@@ -8,6 +8,11 @@
 
 namespace MksDdn\FormsHandler;
 
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Handles admin columns for forms and submissions
  */
@@ -83,7 +88,7 @@ class AdminColumns {
             case 'shortcode':
                 $post = get_post($post_id);
                 if ($post) {
-                    echo '<code>[form id="' . esc_attr($post->post_name) . '"]</code>';
+                    echo '<code>[mksddn_fh_form id="' . esc_attr($post->post_name) . '"]</code>';
                     echo '<br><small style="color: #666;">' . esc_html__( 'Copy to clipboard', 'mksddn-forms-handler' ) . '</small>';
                 }
                 break;
@@ -108,6 +113,7 @@ class AdminColumns {
             'post_status'    => 'publish',
             'posts_per_page' => -1,
             'fields'         => 'ids', // Only get IDs for better performance
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Required for filtering submissions by form_id
             'meta_query'     => [
                 [
                     'key'     => '_form_id',

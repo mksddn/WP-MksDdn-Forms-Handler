@@ -1,0 +1,464 @@
+# Russian translation for MksDdn Forms Handler
+# Copyright (C) 2025 mksddn
+# This file is distributed under the same license as the MksDdn Forms Handler package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: MksDdn Forms Handler 1.3.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-01-27 12:00+0000\n"
+"PO-Revision-Date: 2025-01-27 12:00+0000\n"
+"Last-Translator: mksddn\n"
+"Language-Team: Russian\n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: includes/class-shortcodes.php:34
+msgid "Error: form ID or slug not specified"
+msgstr "Ошибка: не указан ID или slug формы"
+
+#: includes/class-shortcodes.php:44
+msgid "Form not found"
+msgstr "Форма не найдена"
+
+#: includes/class-shortcodes.php:182
+msgid "Send"
+msgstr "Отправить"
+
+#: includes/class-shortcodes.php:195
+msgid "Sending..."
+msgstr "Отправка..."
+
+#: includes/class-meta-boxes.php:28
+msgid "Form Settings"
+msgstr "Настройки формы"
+
+#: includes/class-meta-boxes.php:42
+msgid "Submission Data"
+msgstr "Данные отправки"
+
+#: includes/class-meta-boxes.php:51
+msgid "Submission Info"
+msgstr "Информация об отправке"
+
+#: includes/class-meta-boxes.php:113
+msgid "Error: Invalid JSON in Fields Configuration! Check syntax."
+msgstr "Ошибка: неверный JSON в конфигурации полей! Проверьте синтаксис."
+
+#: includes/class-meta-boxes.php:129
+msgid "No data available"
+msgstr "Данные недоступны"
+
+#: includes/class-meta-boxes.php:255
+msgid "Form:"
+msgstr "Форма:"
+
+#: includes/class-meta-boxes.php:255
+msgid "Unknown"
+msgstr "Неизвестно"
+
+#: includes/class-meta-boxes.php:256
+msgid "Date:"
+msgstr "Дата:"
+
+#: includes/class-meta-boxes.php:259
+msgid "Page URL:"
+msgstr "URL страницы:"
+
+#: includes/class-meta-boxes.php:261
+msgid "IP Address:"
+msgstr "IP-адрес:"
+
+#: includes/class-meta-boxes.php:262
+msgid "User Agent:"
+msgstr "User Agent:"
+
+#: includes/class-admin-columns.php:41
+msgid "Recipients"
+msgstr "Получатели"
+
+#: includes/class-admin-columns.php:42
+msgid "Telegram"
+msgstr "Telegram"
+
+#: includes/class-admin-columns.php:43
+msgid "Google Sheets"
+msgstr "Google Таблицы"
+
+#: includes/class-admin-columns.php:44
+msgid "Admin Storage"
+msgstr "Хранилище админки"
+
+#: includes/class-admin-columns.php:45
+msgid "Shortcode"
+msgstr "Шорткод"
+
+#: includes/class-admin-columns.php:46
+msgid "Export"
+msgstr "Экспорт"
+
+#: includes/class-admin-columns.php:64
+msgid "✓ Enabled"
+msgstr "✓ Включено"
+
+#: includes/class-admin-columns.php:64
+msgid "✗ Disabled"
+msgstr "✗ Выключено"
+
+#: includes/class-admin-columns.php:80
+msgid "No submissions"
+msgstr "Нет отправок"
+
+#: includes/class-admin-columns.php:87
+msgid "Copy to clipboard"
+msgstr "Копировать в буфер обмена"
+
+#: includes/class-admin-columns.php:169
+msgid "Form"
+msgstr "Форма"
+
+#: includes/class-admin-columns.php:170
+msgid "Date"
+msgstr "Дата"
+
+#: includes/class-admin-columns.php:171
+msgid "Data"
+msgstr "Данные"
+
+#: includes/class-admin-columns.php:172
+msgid "Delivery Status"
+msgstr "Статус доставки"
+
+#: includes/class-admin-columns.php:191
+msgid "Form deleted"
+msgstr "Форма удалена"
+
+#: includes/class-admin-columns.php:194
+msgid "Unknown form"
+msgstr "Неизвестная форма"
+
+#: includes/class-admin-columns.php:217
+#, php-format
+msgid "%d items"
+msgstr "%d элементов"
+
+#: includes/class-admin-columns.php:237
+msgid "No data"
+msgstr "Нет данных"
+
+#: includes/class-forms-handler.php:243
+msgid "Spam detected"
+msgstr "Обнаружен спам"
+
+#: includes/class-forms-handler.php:251
+msgid "Too many requests. Please wait a few seconds."
+msgstr "Слишком много запросов. Пожалуйста, подождите несколько секунд."
+
+#: includes/class-forms-handler.php:256
+msgid "Invalid form data"
+msgstr "Неверные данные формы"
+
+#: includes/class-forms-handler.php:261
+msgid "Too many form fields submitted"
+msgstr "Отправлено слишком много полей формы"
+
+#: includes/class-forms-handler.php:273
+msgid "Form data is too large"
+msgstr "Данные формы слишком большие"
+
+#: includes/class-forms-handler.php:523
+msgid "Security check failed. Please refresh the page and try again."
+msgstr "Проверка безопасности не пройдена. Пожалуйста, обновите страницу и попробуйте снова."
+
+#: includes/class-forms-handler.php:645
+#, php-format
+msgid "Unauthorized fields detected: %s"
+msgstr "Обнаружены неавторизованные поля: %s"
+
+#: includes/class-forms-handler.php:755
+msgid "Failed to deliver form submission"
+msgstr "Не удалось доставить отправку формы"
+
+#: includes/class-forms-handler.php:765
+msgid "Form submitted successfully"
+msgstr "Форма успешно отправлена"
+
+#: includes/class-forms-handler.php:811
+msgid "Form is not configured correctly"
+msgstr "Форма настроена неверно"
+
+#: templates/form-settings-meta-box.php:4
+msgid "Recipients (comma separated)"
+msgstr "Получатели (через запятую)"
+
+#: templates/form-settings-meta-box.php:7
+msgid "Email addresses separated by commas"
+msgstr "Email-адреса, разделенные запятыми"
+
+#: templates/form-settings-meta-box.php:11
+msgid "BCC Recipient"
+msgstr "Получатель BCC"
+
+#: templates/form-settings-meta-box.php:17
+msgid "Email Subject"
+msgstr "Тема письма"
+
+#: templates/form-settings-meta-box.php:23
+msgid "Fields Configuration"
+msgstr "Конфигурация полей"
+
+#: templates/form-settings-meta-box.php:26
+msgid "JSON configuration of form fields. Example: [{\"name\": \"name\", \"label\": \"Name\", \"type\": \"text\", \"required\": true}]"
+msgstr "JSON-конфигурация полей формы. Пример: [{\"name\": \"name\", \"label\": \"Имя\", \"type\": \"text\", \"required\": true}]"
+
+#: templates/form-settings-meta-box.php:32
+msgid "Telegram Notifications"
+msgstr "Уведомления Telegram"
+
+#: templates/form-settings-meta-box.php:39
+msgid "Send to Telegram"
+msgstr "Отправлять в Telegram"
+
+#: templates/form-settings-meta-box.php:43
+msgid "Enable Telegram notifications for this form"
+msgstr "Включить уведомления Telegram для этой формы"
+
+#: templates/form-settings-meta-box.php:47
+msgid "Telegram Bot Token"
+msgstr "Токен бота Telegram"
+
+#: templates/form-settings-meta-box.php:50
+msgid "Your Telegram bot token (e.g., 123456789:ABCdefGHIjklMNOpqrsTUVwxyz)"
+msgstr "Токен вашего бота Telegram (например, 123456789:ABCdefGHIjklMNOpqrsTUVwxyz)"
+
+#: templates/form-settings-meta-box.php:54
+msgid "Telegram Chat IDs"
+msgstr "ID чатов Telegram"
+
+#: templates/form-settings-meta-box.php:57
+msgid "Chat IDs separated by commas (e.g., -1001234567890, -1009876543210)"
+msgstr "ID чатов, разделенные запятыми (например, -1001234567890, -1009876543210)"
+
+#: templates/form-settings-meta-box.php:63
+msgid "Google Sheets Integration"
+msgstr "Интеграция с Google Таблицами"
+
+#: templates/form-settings-meta-box.php:70
+msgid "Send to Google Sheets"
+msgstr "Отправлять в Google Таблицы"
+
+#: templates/form-settings-meta-box.php:74
+msgid "Enable Google Sheets integration for this form"
+msgstr "Включить интеграцию с Google Таблицами для этой формы"
+
+#: templates/form-settings-meta-box.php:78
+msgid "Spreadsheet ID"
+msgstr "ID таблицы"
+
+#: templates/form-settings-meta-box.php:81
+msgid "Google Sheets spreadsheet ID (from URL: docs.google.com/spreadsheets/d/SPREADSHEET_ID)"
+msgstr "ID таблицы Google Sheets (из URL: docs.google.com/spreadsheets/d/SPREADSHEET_ID)"
+
+#: templates/form-settings-meta-box.php:85
+msgid "Sheet Name"
+msgstr "Название листа"
+
+#: templates/form-settings-meta-box.php:88
+msgid "Sheet name (optional, defaults to first sheet)"
+msgstr "Название листа (необязательно, по умолчанию первый лист)"
+
+#: templates/form-settings-meta-box.php:94
+msgid "Admin Panel Storage"
+msgstr "Хранилище админ-панели"
+
+#: templates/form-settings-meta-box.php:101
+msgid "Save submissions to admin panel"
+msgstr "Сохранять отправки в админ-панели"
+
+#: templates/form-settings-meta-box.php:105
+msgid "Enable saving form submissions to admin panel for viewing and export"
+msgstr "Включить сохранение отправок формы в админ-панели для просмотра и экспорта"
+
+#: templates/form-settings-meta-box.php:111
+msgid "Shortcode Display Settings"
+msgstr "Отображение формы из шорткода"
+
+#: templates/form-settings-meta-box.php:114
+msgid "Submit Button Text"
+msgstr "Текст кнопки отправки"
+
+#: templates/form-settings-meta-box.php:117
+msgid "Custom text for the submit button. Leave empty to use default \"Send\""
+msgstr "Пользовательский текст для кнопки отправки. Оставьте пустым для использования значения по умолчанию \"Отправить\""
+
+#: templates/form-settings-meta-box.php:121
+msgid "Custom HTML/Text After Button"
+msgstr "Пользовательский HTML/текст после кнопки"
+
+#: templates/form-settings-meta-box.php:124
+msgid "Custom HTML or text to display after the submit button (e.g., privacy policy notice)"
+msgstr "Пользовательский HTML или текст для отображения после кнопки отправки (например, уведомление о политике конфиденциальности)"
+
+#: templates/form-settings-meta-box.php:130
+msgid "Advanced Settings"
+msgstr "Дополнительные настройки"
+
+#: templates/form-settings-meta-box.php:118
+msgid "Accept any fields from frontend"
+msgstr "Принимать любые поля с фронтенда"
+
+#: templates/form-settings-meta-box.php:123
+msgid "Warning:"
+msgstr "Предупреждение:"
+
+#: templates/form-settings-meta-box.php:124
+msgid "When enabled, the form will accept ANY field names from frontend submissions without validation against Fields Configuration. Use this for custom forms where you control field names in templates. All fields will still be sanitized but type validation will be skipped."
+msgstr "При включении форма будет принимать ЛЮБЫЕ имена полей из отправок с фронтенда без проверки по конфигурации полей. Используйте это для пользовательских форм, где вы контролируете имена полей в шаблонах. Все поля все равно будут санитизированы, но проверка типов будет пропущена."
+
+#: includes/class-post-types.php:36
+msgid "Forms"
+msgstr "Формы"
+
+#: includes/class-post-types.php:39
+msgid "Add Form"
+msgstr "Добавить форму"
+
+#: includes/class-post-types.php:40
+msgid "Add New Form"
+msgstr "Добавить новую форму"
+
+#: includes/class-post-types.php:41
+msgid "Edit Form"
+msgstr "Редактировать форму"
+
+#: includes/class-post-types.php:42
+msgid "New Form"
+msgstr "Новая форма"
+
+#: includes/class-post-types.php:43
+msgid "View Form"
+msgstr "Просмотр формы"
+
+#: includes/class-post-types.php:44
+msgid "Search Forms"
+msgstr "Поиск форм"
+
+#: includes/class-post-types.php:45
+msgid "No forms found"
+msgstr "Формы не найдены"
+
+#: includes/class-post-types.php:46
+msgid "No forms found in trash"
+msgstr "В корзине форм не найдено"
+
+#: includes/class-post-types.php:86
+msgid "Form Submissions"
+msgstr "Обращения"
+
+#: includes/class-post-types.php:87
+msgid "Submission"
+msgstr "Обращение"
+
+#: includes/class-post-types.php:88
+msgid "Submissions"
+msgstr "Обращения"
+
+#: includes/class-post-types.php:89
+msgid "Add Submission"
+msgstr "Добавить обращение"
+
+#: includes/class-post-types.php:90
+msgid "Add New Submission"
+msgstr "Добавить новое обращение"
+
+#: includes/class-post-types.php:91
+msgid "Edit Submission"
+msgstr "Редактировать обращение"
+
+#: includes/class-post-types.php:92
+msgid "New Submission"
+msgstr "Новое обращение"
+
+#: includes/class-post-types.php:93
+msgid "View Submission"
+msgstr "Просмотр обращения"
+
+#: includes/class-post-types.php:94
+msgid "Search Submissions"
+msgstr "Поиск обращений"
+
+#: includes/class-post-types.php:95
+msgid "No submissions found"
+msgstr "Обращения не найдены"
+
+#: includes/class-post-types.php:96
+msgid "No submissions found in trash"
+msgstr "В корзине обращений не найдено"
+
+#: includes/class-shortcodes.php:195
+msgid "Thank you! Your message has been sent successfully."
+msgstr "Спасибо! Ваше сообщение успешно отправлено."
+
+#: templates/form-settings-meta-box.php:117
+msgid "Success Message Text"
+msgstr "Текст сообщения об успехе"
+
+#: templates/form-settings-meta-box.php:120
+msgid "Custom text to display after successful form submission. Leave empty to use default message."
+msgstr "Пользовательский текст для отображения после успешной отправки формы. Оставьте пустым для использования сообщения по умолчанию."
+
+#: includes/class-export-handler.php:44
+msgid "Export Submissions"
+msgstr "Экспорт обращений"
+
+#: includes/class-export-handler.php:58
+msgid "Access denied"
+msgstr "Доступ запрещен"
+
+#: includes/class-export-handler.php:64
+msgid "Security check failed"
+msgstr "Проверка безопасности не пройдена"
+
+#: includes/class-export-handler.php:74
+msgid "Please select a form to export."
+msgstr "Пожалуйста, выберите форму для экспорта."
+
+#: includes/class-export-handler.php:80
+msgid "Form not found."
+msgstr "Форма не найдена."
+
+#: includes/class-export-handler.php:211
+msgid "Unknown Form"
+msgstr "Неизвестная форма"
+
+#: includes/class-export-handler.php:312
+msgid "Select a form to export all its submissions to CSV:"
+msgstr "Выберите форму для экспорта всех её обращений в CSV:"
+
+#: includes/class-export-handler.php:318
+msgid "Slug:"
+msgstr "Slug:"
+
+#: includes/class-export-handler.php:326
+msgid "Export All"
+msgstr "Экспортировать все"
+
+#: includes/class-export-handler.php:333
+msgid "Export by Date"
+msgstr "Экспорт по дате"
+
+#: includes/class-export-handler.php:353
+msgid "Date From"
+msgstr "Дата с"
+
+#: includes/class-export-handler.php:361
+msgid "Date To"
+msgstr "Дата по"
+
+#: includes/class-export-handler.php:370
+msgid "Cancel"
+msgstr "Отмена"
+

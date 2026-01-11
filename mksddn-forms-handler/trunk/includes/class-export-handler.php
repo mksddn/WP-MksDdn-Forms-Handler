@@ -8,6 +8,11 @@
 
 namespace MksDdn\FormsHandler;
 
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Handles CSV export functionality
  */
@@ -41,8 +46,8 @@ class ExportHandler {
     public function add_submissions_export_menu(): void {
         add_submenu_page(
             'edit.php?post_type=mksddn_fh_submits',
-            'Export Submissions',
-            'Export Submissions',
+            __( 'Export Submissions', 'mksddn-forms-handler' ),
+            __( 'Export Submissions', 'mksddn-forms-handler' ),
             'manage_options',
             'export-by-form',
             [$this, 'render_export_by_form_page']
@@ -124,6 +129,7 @@ class ExportHandler {
             'posts_per_page' => -1,
             'orderby'        => 'date',
             'order'          => 'DESC',
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Required for filtering submissions by form_id
             'meta_query'     => [
                 [
                     'key'     => '_form_id',
@@ -172,6 +178,7 @@ class ExportHandler {
             'post_status'    => 'publish',
             'posts_per_page' => -1,
             'fields'         => 'ids',
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Required for filtering submissions by form_id
             'meta_query'     => [
                 [
                     'key'     => '_form_id',
@@ -208,7 +215,7 @@ class ExportHandler {
             $row = [
                 $submission->ID,
                 get_the_date('Y-m-d H:i:s', $submission->ID),
-                get_post_meta($submission->ID, '_form_title', true) ?: 'Unknown Form'
+                get_post_meta($submission->ID, '_form_title', true) ?: __( 'Unknown Form', 'mksddn-forms-handler' )
             ];
 
             // Get form data
@@ -294,6 +301,7 @@ class ExportHandler {
                 'post_type'      => 'mksddn_fh_submits',
                 'post_status'    => 'publish',
                 'posts_per_page' => -1,
+                // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Required for filtering submissions by form_id
                 'meta_query'     => [
                     [
                         'key'     => '_form_id',
@@ -308,29 +316,29 @@ class ExportHandler {
 
         ?>
         <div class="wrap">
-            <h1>Export Submissions</h1>
-            <p>Select a form to export all its submissions to CSV:</p>
+            <h1><?php echo esc_html__( 'Export Submissions', 'mksddn-forms-handler' ); ?></h1>
+            <p><?php echo esc_html__( 'Select a form to export all its submissions to CSV:', 'mksddn-forms-handler' ); ?></p>
             
             <div class="form-export-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">
                 <?php foreach ($forms as $form) : ?>
                     <div class="form-export-card" style="border: 1px solid #ddd; padding: 20px; border-radius: 5px; background: #fff;">
                         <h3><?php echo esc_html($form->post_title); ?></h3>
                         <p><strong><?php echo esc_html__( 'Submissions:', 'mksddn-forms-handler' ); ?></strong> <?php echo intval($form_stats[$form->ID]); ?></p>
-                        <p><strong>Slug:</strong> <code><?php echo esc_html($form->post_name); ?></code></p>
+                        <p><strong><?php echo esc_html__( 'Slug:', 'mksddn-forms-handler' ); ?></strong> <code><?php echo esc_html($form->post_name); ?></code></p>
                         
                         <div style="margin-top: 15px;">
                             <a href="<?php echo esc_url( admin_url('admin-post.php?action=export_submissions_csv&form_filter=' . $form->ID . '&export_nonce=' . wp_create_nonce('export_submissions_csv')) ); ?>" 
                                 class="button button-primary" 
                                 target="_blank"
                                 style="margin-right: 10px;">
-                                Export All
+                                <?php echo esc_html__( 'Export All', 'mksddn-forms-handler' ); ?>
                             </a>
                             
                             <button type="button" 
                                     class="button button-secondary export-with-filters" 
                                     data-form-id="<?php echo intval($form->ID); ?>"
                                     data-form-name="<?php echo esc_attr($form->post_title); ?>">
-                                Export by Date
+                                <?php echo esc_html__( 'Export by Date', 'mksddn-forms-handler' ); ?>
                             </button>
                         </div>
                     </div>
@@ -340,7 +348,7 @@ class ExportHandler {
             <!-- Modal for filters -->
             <div id="export-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 100000;">
                 <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 5px; min-width: 400px;">
-                    <h2 id="modal-title">Export by Date</h2>
+                    <h2 id="modal-title"><?php echo esc_html__( 'Export by Date', 'mksddn-forms-handler' ); ?></h2>
                     
                     <form id="export-filters-form" method="post" action="<?php echo esc_url( admin_url('admin-post.php') ); ?>" target="_blank">
                         <input type="hidden" name="action" value="export_submissions_csv">
@@ -350,7 +358,7 @@ class ExportHandler {
                         <table class="form-table">
                             <tr>
                                 <th scope="row">
-                                    <label for="modal_date_from">Date From</label>
+                                    <label for="modal_date_from"><?php echo esc_html__( 'Date From', 'mksddn-forms-handler' ); ?></label>
                                 </th>
                                 <td>
                                     <input type="date" name="date_from" id="modal_date_from" />
@@ -358,7 +366,7 @@ class ExportHandler {
                             </tr>
                             <tr>
                                 <th scope="row">
-                                    <label for="modal_date_to">Date To</label>
+                                    <label for="modal_date_to"><?php echo esc_html__( 'Date To', 'mksddn-forms-handler' ); ?></label>
                                 </th>
                                 <td>
                                     <input type="date" name="date_to" id="modal_date_to" />
@@ -367,8 +375,8 @@ class ExportHandler {
                         </table>
                         
                         <div style="margin-top: 20px; text-align: right;">
-                            <button type="button" class="button" onclick="closeExportModal()">Cancel</button>
-                            <button type="submit" class="button button-primary">Export</button>
+                            <button type="button" class="button" onclick="closeExportModal()"><?php echo esc_html__( 'Cancel', 'mksddn-forms-handler' ); ?></button>
+                            <button type="submit" class="button button-primary"><?php echo esc_html__( 'Export', 'mksddn-forms-handler' ); ?></button>
                         </div>
                     </form>
                 </div>

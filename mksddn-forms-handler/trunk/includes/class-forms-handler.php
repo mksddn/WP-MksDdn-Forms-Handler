@@ -8,6 +8,11 @@
 
 namespace MksDdn\FormsHandler;
 
+// Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Main forms handler class
  */
@@ -519,7 +524,11 @@ class FormsHandler {
         // Check nonce for security
         $form_nonce_value = isset($_POST['form_nonce']) ? sanitize_text_field( wp_unslash($_POST['form_nonce']) ) : '';
         if (!$form_nonce_value || !wp_verify_nonce( $form_nonce_value, 'submit_form_nonce')) {
-            wp_die('Security check failed');
+            wp_send_json_error([
+                'message' => __( 'Security check failed. Please refresh the page and try again.', 'mksddn-forms-handler' ),
+                'code'    => 'nonce_verification_failed',
+            ]);
+            return;
         }
 
         $form_id = isset($_POST['form_id']) ? sanitize_text_field( wp_unslash($_POST['form_id']) ) : '';
@@ -1685,6 +1694,29 @@ class FormsHandler {
             return $submission_id;
         }
 
+        // Get page URL from referer or POST
+        // Note: This method is called from process_form_submission which is already protected by nonce verification in handle_form_submission
+        $page_url = '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in handle_form_submission
+        if (isset($_POST['_wp_http_referer'])) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in handle_form_submission
+            $raw_url = sanitize_text_field( wp_unslash( $_POST['_wp_http_referer'] ) );
+        } elseif (isset($_SERVER['HTTP_REFERER'])) {
+            $raw_url = sanitize_text_field( wp_unslash( $_SERVER['HTTP_REFERER'] ) );
+        } else {
+            $raw_url = '';
+        }
+        
+        if (!empty($raw_url)) {
+            // Check if URL is absolute (starts with http:// or https://)
+            if (preg_match('#^https?://#i', $raw_url)) {
+                $page_url = esc_url_raw($raw_url);
+            } else {
+                // Relative URL - convert to absolute using home_url
+                $page_url = esc_url_raw(home_url($raw_url));
+            }
+        }
+
         // Save meta data
         update_post_meta($submission_id, '_form_id', $form_id);
         update_post_meta($submission_id, '_form_title', $form_title);
@@ -1692,6 +1724,9 @@ class FormsHandler {
         update_post_meta($submission_id, '_submission_date', current_time('mysql'));
         update_post_meta($submission_id, '_submission_ip', sanitize_text_field( wp_unslash($_SERVER['REMOTE_ADDR'] ?? 'unknown') ) );
         update_post_meta($submission_id, '_submission_user_agent', sanitize_text_field( wp_unslash($_SERVER['HTTP_USER_AGENT'] ?? 'unknown') ) );
+        if (!empty($page_url)) {
+            update_post_meta($submission_id, '_submission_page_url', $page_url);
+        }
 
         return $submission_id;
     }
