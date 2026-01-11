@@ -70,6 +70,7 @@ class Assets {
                 [
                     'ajax_url' => admin_url( 'admin-ajax.php' ),
                     'nonce_test_sheets' => wp_create_nonce( 'test_sheets_nonce' ),
+                    'export_by_date_text' => __( 'Export by Date', 'mksddn-forms-handler' ),
                 ]
             );
         }

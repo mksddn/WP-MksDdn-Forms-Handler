@@ -19,42 +19,13 @@
             method: 'POST',
             success: function(response) {
                 if (response && response.success) {
-                    var message = response.data && response.data.message ? response.data.message : '';
+                    // Use custom success message if available, otherwise use default
+                    var message = (mksddn_fh_form && mksddn_fh_form.success_message) 
+                        ? mksddn_fh_form.success_message 
+                        : (response.data && response.data.message ? response.data.message : 'Thank you! Your message has been sent successfully.');
 
-                    if (response.data && response.data.delivery_results) {
-                        var delivery = response.data.delivery_results;
-                        message += '<br><br><strong>Delivery Status:</strong><br>';
-
-                        if (delivery.email && delivery.email.success) {
-                            message += '✅ Email: Sent successfully<br>';
-                        } else if (delivery.email) {
-                            message += '❌ Email: ' + (delivery.email.error || 'Failed') + '<br>';
-                        }
-
-                        if (delivery.telegram && delivery.telegram.enabled) {
-                            if (delivery.telegram.success) {
-                                message += '✅ Telegram: Sent successfully<br>';
-                            } else {
-                                message += '❌ Telegram: ' + (delivery.telegram.error || 'Failed') + '<br>';
-                            }
-                        }
-
-                        if (delivery.google_sheets && delivery.google_sheets.enabled) {
-                            if (delivery.google_sheets.success) {
-                                message += '✅ Google Sheets: Data saved<br>';
-                            } else {
-                                message += '❌ Google Sheets: ' + (delivery.google_sheets.error || 'Failed') + '<br>';
-                            }
-                        }
-
-                        if (delivery.admin_storage && delivery.admin_storage.enabled) {
-                            if (delivery.admin_storage.success) {
-                                message += '✅ Admin Panel: Submission saved<br>';
-                            } else {
-                                message += '❌ Admin Panel: ' + (delivery.admin_storage.error || 'Failed') + '<br>';
-                            }
-                        }
-                    }
+                    // Hide technical delivery information from users on success
+                    // Only show user-friendly message
 
                     $message.removeClass('error').addClass('success').html(message).show();
                     $form[0].reset();

@@ -78,6 +78,30 @@ class MetaBoxes {
         $sheets_sheet_name = get_post_meta($post->ID, '_sheets_sheet_name', true);
         $save_to_admin = get_post_meta($post->ID, '_save_to_admin', true);
         $allow_any_fields = get_post_meta($post->ID, '_allow_any_fields', true);
+        $submit_button_text = get_post_meta($post->ID, '_submit_button_text', true);
+        $custom_html_after_button = get_post_meta($post->ID, '_custom_html_after_button', true);
+        $success_message_text = get_post_meta($post->ID, '_success_message_text', true);
+
+        // Set default values based on language if empty (only for new posts or when not set)
+        $locale = get_locale();
+        
+        // Set default submit button text
+        if (empty($submit_button_text)) {
+            $submit_button_text = __( 'Send', 'mksddn-forms-handler' );
+        }
+        
+        // Set default custom HTML after button for Russian
+        if (empty($custom_html_after_button) && strpos($locale, 'ru') === 0) {
+            // Only set default if this is a new post (auto-draft) or field is truly empty
+            if ($post->post_status === 'auto-draft' || !get_post_meta($post->ID, '_custom_html_after_button', true)) {
+                $custom_html_after_button = '<small>Нажимая кнопку, вы соглашаетесь с <a href="/privacy-policy">политикой конфиденциальности</a></small>';
+            }
+        }
+        
+        // Set default success message text
+        if (empty($success_message_text)) {
+            $success_message_text = __( 'Thank you! Your message has been sent successfully.', 'mksddn-forms-handler' );
+        }
 
         if ($json_error && $json_error_value !== false) {
             $fields_config = $json_error_value;
@@ -247,11 +271,15 @@ class MetaBoxes {
         $submission_date = get_post_meta($post->ID, '_submission_date', true);
         $submission_ip = get_post_meta($post->ID, '_submission_ip', true);
         $user_agent = get_post_meta($post->ID, '_submission_user_agent', true);
+        $page_url = get_post_meta($post->ID, '_submission_page_url', true);
 
         echo '<table class="form-table">';
         echo '<tr><th>' . esc_html__( 'Form:', 'mksddn-forms-handler' ) . '</th><td>' . esc_html($form_title ?: __( 'Unknown', 'mksddn-forms-handler' )) . '</td></tr>';
         $date_display = $submission_date ? wp_date('d.m.Y H:i:s', strtotime($submission_date)) : __( 'Unknown', 'mksddn-forms-handler' );
         echo '<tr><th>' . esc_html__( 'Date:', 'mksddn-forms-handler' ) . '</th><td>' . esc_html($date_display) . '</td></tr>';
+        if (!empty($page_url)) {
+            echo '<tr><th>' . esc_html__( 'Page URL:', 'mksddn-forms-handler' ) . '</th><td><a href="' . esc_url($page_url) . '" target="_blank" rel="noopener noreferrer">' . esc_html($page_url) . '</a></td></tr>';
+        }
         echo '<tr><th>' . esc_html__( 'IP Address:', 'mksddn-forms-handler' ) . '</th><td>' . esc_html($submission_ip ?: __( 'Unknown', 'mksddn-forms-handler' )) . '</td></tr>';
         echo '<tr><th>' . esc_html__( 'User Agent:', 'mksddn-forms-handler' ) . '</th><td>' . esc_html($user_agent ?: __( 'Unknown', 'mksddn-forms-handler' )) . '</td></tr>';
         echo '</table>';
@@ -337,6 +365,19 @@ class MetaBoxes {
             update_post_meta($post_id, '_allow_any_fields', '1');
         } else {
             update_post_meta($post_id, '_allow_any_fields', '0');
+        }
+
+        if (isset($_POST['submit_button_text'])) {
+            update_post_meta($post_id, '_submit_button_text', sanitize_text_field( wp_unslash($_POST['submit_button_text']) ));
+        }
+
+        if (isset($_POST['custom_html_after_button'])) {
+            // Allow HTML but sanitize it
+            update_post_meta($post_id, '_custom_html_after_button', wp_kses_post( wp_unslash($_POST['custom_html_after_button']) ));
+        }
+
+        if (isset($_POST['success_message_text'])) {
+            update_post_meta($post_id, '_success_message_text', sanitize_text_field( wp_unslash($_POST['success_message_text']) ));
         }
     }
 } 

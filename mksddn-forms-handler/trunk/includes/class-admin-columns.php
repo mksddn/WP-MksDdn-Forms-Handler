@@ -83,7 +83,7 @@ class AdminColumns {
             case 'shortcode':
                 $post = get_post($post_id);
                 if ($post) {
-                    echo '<code>[form id="' . esc_attr($post->post_name) . '"]</code>';
+                    echo '<code>[mksddn_fh_form id="' . esc_attr($post->post_name) . '"]</code>';
                     echo '<br><small style="color: #666;">' . esc_html__( 'Copy to clipboard', 'mksddn-forms-handler' ) . '</small>';
                 }
                 break;

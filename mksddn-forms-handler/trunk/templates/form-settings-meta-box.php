@@ -108,6 +108,33 @@
     
     <tr>
         <th scope="row" colspan="2">
+            <h3 style="margin: 0; padding: 10px 0; border-bottom: 1px solid #ccc;"><?php echo esc_html__( 'Shortcode Display Settings', 'mksddn-forms-handler' ); ?></h3>
+        </th>
+    </tr>
+    <tr>
+        <th scope="row"><label for="submit_button_text"><?php echo esc_html__( 'Submit Button Text', 'mksddn-forms-handler' ); ?></label></th>
+        <td>
+            <input type="text" name="submit_button_text" id="submit_button_text" value="<?php echo esc_attr($submit_button_text ?? ''); ?>" class="regular-text" />
+            <p class="description"><?php echo esc_html__( 'Custom text for the submit button. Leave empty to use default "Send"', 'mksddn-forms-handler' ); ?></p>
+        </td>
+    </tr>
+    <tr>
+        <th scope="row"><label for="custom_html_after_button"><?php echo esc_html__( 'Custom HTML/Text After Button', 'mksddn-forms-handler' ); ?></label></th>
+        <td>
+            <textarea name="custom_html_after_button" id="custom_html_after_button" rows="5" cols="50" class="large-text code"><?php echo esc_textarea($custom_html_after_button ?? ''); ?></textarea>
+            <p class="description"><?php echo esc_html__( 'Custom HTML or text to display after the submit button (e.g., privacy policy notice)', 'mksddn-forms-handler' ); ?></p>
+        </td>
+    </tr>
+    <tr>
+        <th scope="row"><label for="success_message_text"><?php echo esc_html__( 'Success Message Text', 'mksddn-forms-handler' ); ?></label></th>
+        <td>
+            <input type="text" name="success_message_text" id="success_message_text" value="<?php echo esc_attr($success_message_text ?? ''); ?>" class="regular-text" />
+            <p class="description"><?php echo esc_html__( 'Custom text to display after successful form submission. Leave empty to use default message.', 'mksddn-forms-handler' ); ?></p>
+        </td>
+    </tr>
+    
+    <tr>
+        <th scope="row" colspan="2">
             <h3 style="margin: 0; padding: 10px 0; border-bottom: 1px solid #ccc;"><?php echo esc_html__( 'Advanced Settings', 'mksddn-forms-handler' ); ?></h3>
         </th>
     </tr>

@@ -46,6 +46,14 @@ class Shortcodes {
 
         $fields_config = get_post_meta($form->ID, '_fields_config', true);
         $fields = json_decode($fields_config, true) ?: [];
+        $submit_button_text = get_post_meta($form->ID, '_submit_button_text', true);
+        $custom_html_after_button = get_post_meta($form->ID, '_custom_html_after_button', true);
+        $success_message_text = get_post_meta($form->ID, '_success_message_text', true);
+
+        // Set default success message if empty
+        if (empty($success_message_text)) {
+            $success_message_text = __( 'Thank you! Your message has been sent successfully.', 'mksddn-forms-handler' );
+        }
 
         ob_start();
         $has_file = false;
@@ -179,8 +187,13 @@ class Shortcodes {
                 <?php endforeach; ?>
                 
                 <div class="form-submit">
-                    <button type="submit" class="submit-button"><?php echo esc_html__( 'Send', 'mksddn-forms-handler' ); ?></button>
+                    <button type="submit" class="submit-button"><?php echo esc_html($submit_button_text ?: __( 'Send', 'mksddn-forms-handler' )); ?></button>
                 </div>
+                <?php if (!empty($custom_html_after_button)) : ?>
+                    <div class="form-custom-html">
+                        <?php echo wp_kses_post($custom_html_after_button); ?>
+                    </div>
+                <?php endif; ?>
             </form>
             
             <div class="form-message" style="display: none;"></div>
@@ -194,6 +207,7 @@ class Shortcodes {
             [
                 'sending_text' => __( 'Sending...', 'mksddn-forms-handler' ),
                 'send_text'    => __( 'Send', 'mksddn-forms-handler' ),
+                'success_message' => $success_message_text,
             ]
         );
         ?>

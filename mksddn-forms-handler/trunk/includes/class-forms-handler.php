@@ -1689,6 +1689,26 @@ class FormsHandler {
             return $submission_id;
         }
 
+        // Get page URL from referer or POST
+        $page_url = '';
+        if (isset($_POST['_wp_http_referer'])) {
+            $raw_url = wp_unslash($_POST['_wp_http_referer']);
+        } elseif (isset($_SERVER['HTTP_REFERER'])) {
+            $raw_url = wp_unslash($_SERVER['HTTP_REFERER']);
+        } else {
+            $raw_url = '';
+        }
+        
+        if (!empty($raw_url)) {
+            // Check if URL is absolute (starts with http:// or https://)
+            if (preg_match('#^https?://#i', $raw_url)) {
+                $page_url = esc_url_raw($raw_url);
+            } else {
+                // Relative URL - convert to absolute using home_url
+                $page_url = esc_url_raw(home_url($raw_url));
+            }
+        }
+
         // Save meta data
         update_post_meta($submission_id, '_form_id', $form_id);
         update_post_meta($submission_id, '_form_title', $form_title);
@@ -1696,6 +1716,9 @@ class FormsHandler {
         update_post_meta($submission_id, '_submission_date', current_time('mysql'));
         update_post_meta($submission_id, '_submission_ip', sanitize_text_field( wp_unslash($_SERVER['REMOTE_ADDR'] ?? 'unknown') ) );
         update_post_meta($submission_id, '_submission_user_agent', sanitize_text_field( wp_unslash($_SERVER['HTTP_USER_AGENT'] ?? 'unknown') ) );
+        if (!empty($page_url)) {
+            update_post_meta($submission_id, '_submission_page_url', $page_url);
+        }
 
         return $submission_id;
     }
