@@ -4,7 +4,7 @@ Tags: forms, telegram, google-sheets, rest-api, form-handler
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 8.0
-Stable tag: 2.0.0
+Stable tag: 2.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -413,8 +413,11 @@ The `array_of_objects` type allows you to define arrays with nested field valida
 
 == Upgrade Notice ==
 
+= 2.1.0 =
+Improvement: Page URL field moved from submission info to submission data section. Page URL is now included in all notifications (email, Telegram, Google Sheets). Recommended update for better notification tracking.
+
 = 2.0.0 =
-Major update: Added Russian language support, form customization options (custom submit button text, HTML after button, custom success messages), improved file upload handling via AJAX, and enhanced security with direct access checks. Recommended update for better localization and customization capabilities.
+Major update: Russian language support, form customization (custom submit button text, HTML after button, custom success messages), improved AJAX file uploads, enhanced security. Recommended update.
 
 = 1.3.1 =
 Compatibility update: Tested with WordPress 6.9. Recommended update for users upgrading to WordPress 6.9.
@@ -432,6 +435,12 @@ Security update: Fixed URL escaping in template examples. Recommended update for
 New feature: Template functions for custom forms integration. Bug fix: Improved Telegram message formatting. Fully backward compatible.
 
 == Changelog ==
+
+= 2.1.0 =
+* Improved: Page URL field moved from "Submission Info" meta box to "Submission Data" section
+* Improved: Page URL is now included in all notifications (email, Telegram, Google Sheets)
+* Technical: Added `get_page_url()` method to extract page URL from referer
+* Improved: Page URL automatically displayed as clickable link in submission data
 
 = 2.0.0 =
 * Feature: Added Russian language support with complete translation files (.po and .mo)

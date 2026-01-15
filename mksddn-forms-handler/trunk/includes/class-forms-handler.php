@@ -669,6 +669,12 @@ class FormsHandler {
             }
         }
 
+        // Add page URL to submission data for notifications
+        $page_url = $this->get_page_url();
+        if (!empty($page_url)) {
+            $filtered_form_data['Page URL'] = $page_url;
+        }
+
         // Initialize delivery results
         $delivery_results = [
             'email'         => [
@@ -1694,8 +1700,33 @@ class FormsHandler {
             return $submission_id;
         }
 
-        // Get page URL from referer or POST
-        // Note: This method is called from process_form_submission which is already protected by nonce verification in handle_form_submission
+        // Get page URL and add to form data if not already present
+        $page_url = $this->get_page_url();
+        if (!empty($page_url) && !isset($form_data['Page URL'])) {
+            $form_data['Page URL'] = $page_url;
+        }
+
+        // Save meta data
+        update_post_meta($submission_id, '_form_id', $form_id);
+        update_post_meta($submission_id, '_form_title', $form_title);
+        update_post_meta($submission_id, '_submission_data', json_encode($form_data, JSON_UNESCAPED_UNICODE));
+        update_post_meta($submission_id, '_submission_date', current_time('mysql'));
+        update_post_meta($submission_id, '_submission_ip', sanitize_text_field( wp_unslash($_SERVER['REMOTE_ADDR'] ?? 'unknown') ) );
+        update_post_meta($submission_id, '_submission_user_agent', sanitize_text_field( wp_unslash($_SERVER['HTTP_USER_AGENT'] ?? 'unknown') ) );
+        if (!empty($page_url)) {
+            update_post_meta($submission_id, '_submission_page_url', $page_url);
+        }
+
+        return $submission_id;
+    }
+    
+    /**
+     * Get page URL from referer or POST
+     *
+     * @return string Page URL or empty string
+     */
+    private function get_page_url(): string {
+        // Note: This method is called from process_form_submission/save_submission which are already protected by nonce verification in handle_form_submission
         $page_url = '';
         // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in handle_form_submission
         if (isset($_POST['_wp_http_referer'])) {
@@ -1716,18 +1747,7 @@ class FormsHandler {
                 $page_url = esc_url_raw(home_url($raw_url));
             }
         }
-
-        // Save meta data
-        update_post_meta($submission_id, '_form_id', $form_id);
-        update_post_meta($submission_id, '_form_title', $form_title);
-        update_post_meta($submission_id, '_submission_data', json_encode($form_data, JSON_UNESCAPED_UNICODE));
-        update_post_meta($submission_id, '_submission_date', current_time('mysql'));
-        update_post_meta($submission_id, '_submission_ip', sanitize_text_field( wp_unslash($_SERVER['REMOTE_ADDR'] ?? 'unknown') ) );
-        update_post_meta($submission_id, '_submission_user_agent', sanitize_text_field( wp_unslash($_SERVER['HTTP_USER_AGENT'] ?? 'unknown') ) );
-        if (!empty($page_url)) {
-            update_post_meta($submission_id, '_submission_page_url', $page_url);
-        }
-
-        return $submission_id;
+        
+        return $page_url;
     }
 } 

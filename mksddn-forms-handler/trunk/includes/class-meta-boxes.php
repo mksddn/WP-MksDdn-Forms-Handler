@@ -276,15 +276,11 @@ class MetaBoxes {
         $submission_date = get_post_meta($post->ID, '_submission_date', true);
         $submission_ip = get_post_meta($post->ID, '_submission_ip', true);
         $user_agent = get_post_meta($post->ID, '_submission_user_agent', true);
-        $page_url = get_post_meta($post->ID, '_submission_page_url', true);
 
         echo '<table class="form-table">';
         echo '<tr><th>' . esc_html__( 'Form:', 'mksddn-forms-handler' ) . '</th><td>' . esc_html($form_title ?: __( 'Unknown', 'mksddn-forms-handler' )) . '</td></tr>';
         $date_display = $submission_date ? wp_date('d.m.Y H:i:s', strtotime($submission_date)) : __( 'Unknown', 'mksddn-forms-handler' );
         echo '<tr><th>' . esc_html__( 'Date:', 'mksddn-forms-handler' ) . '</th><td>' . esc_html($date_display) . '</td></tr>';
-        if (!empty($page_url)) {
-            echo '<tr><th>' . esc_html__( 'Page URL:', 'mksddn-forms-handler' ) . '</th><td><a href="' . esc_url($page_url) . '" target="_blank" rel="noopener noreferrer">' . esc_html($page_url) . '</a></td></tr>';
-        }
         echo '<tr><th>' . esc_html__( 'IP Address:', 'mksddn-forms-handler' ) . '</th><td>' . esc_html($submission_ip ?: __( 'Unknown', 'mksddn-forms-handler' )) . '</td></tr>';
         echo '<tr><th>' . esc_html__( 'User Agent:', 'mksddn-forms-handler' ) . '</th><td>' . esc_html($user_agent ?: __( 'Unknown', 'mksddn-forms-handler' )) . '</td></tr>';
         echo '</table>';
