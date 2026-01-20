@@ -111,26 +111,35 @@ if ($mksddn_fh_form_config):
         <?php mksddn_fh_form_fields($mksddn_fh_form_config['slug']); ?>
         
         <?php foreach ($mksddn_fh_form_config['fields'] as $mksddn_fh_field): ?>
+            <?php 
+            $mksddn_fh_field_label = isset($mksddn_fh_field['label']) ? trim((string) $mksddn_fh_field['label']) : '';
+            $mksddn_fh_has_label = !empty($mksddn_fh_field_label);
+            $mksddn_fh_is_required = !empty($mksddn_fh_field['required']) && $mksddn_fh_field['required'];
+            ?>
             <div class="form-group">
-                <label for="<?php echo esc_attr($mksddn_fh_field['name']); ?>">
-                    <?php echo esc_html($mksddn_fh_field['label']); ?>
-                    <?php if (!empty($mksddn_fh_field['required']) && $mksddn_fh_field['required']): ?>
-                        <span class="required">*</span>
-                    <?php endif; ?>
-                </label>
+                <?php if ($mksddn_fh_has_label): ?>
+                    <label for="<?php echo esc_attr($mksddn_fh_field['name']); ?>">
+                        <?php echo esc_html($mksddn_fh_field_label); ?>
+                        <?php if ($mksddn_fh_is_required): ?>
+                            <span class="required">*</span>
+                        <?php endif; ?>
+                    </label>
+                <?php endif; ?>
                 
                 <?php if ($mksddn_fh_field['type'] === 'textarea'): ?>
                     <textarea 
                         name="<?php echo esc_attr($mksddn_fh_field['name']); ?>" 
                         id="<?php echo esc_attr($mksddn_fh_field['name']); ?>"
-                        <?php echo !empty($mksddn_fh_field['required']) && $mksddn_fh_field['required'] ? 'required' : ''; ?>
+                        <?php echo $mksddn_fh_is_required ? 'required' : ''; ?>
+                        <?php if (!$mksddn_fh_has_label && $mksddn_fh_is_required): ?>aria-label="<?php echo esc_attr(sprintf(/* translators: %s: field name */ __('%s (required)', 'mksddn-forms-handler'), ucfirst(str_replace(['_', '-'], ' ', $mksddn_fh_field['name'])))); ?>"<?php elseif (!$mksddn_fh_has_label): ?>aria-label="<?php echo esc_attr(ucfirst(str_replace(['_', '-'], ' ', $mksddn_fh_field['name']))); ?>"<?php endif; ?>
                     ></textarea>
                 
                 <?php elseif ($mksddn_fh_field['type'] === 'select'): ?>
                     <select 
                         name="<?php echo esc_attr($mksddn_fh_field['name']); ?>" 
                         id="<?php echo esc_attr($mksddn_fh_field['name']); ?>"
-                        <?php echo !empty($mksddn_fh_field['required']) && $mksddn_fh_field['required'] ? 'required' : ''; ?>
+                        <?php echo $mksddn_fh_is_required ? 'required' : ''; ?>
+                        <?php if (!$mksddn_fh_has_label && $mksddn_fh_is_required): ?>aria-label="<?php echo esc_attr(sprintf(/* translators: %s: field name */ __('%s (required)', 'mksddn-forms-handler'), ucfirst(str_replace(['_', '-'], ' ', $mksddn_fh_field['name'])))); ?>"<?php elseif (!$mksddn_fh_has_label): ?>aria-label="<?php echo esc_attr(ucfirst(str_replace(['_', '-'], ' ', $mksddn_fh_field['name']))); ?>"<?php endif; ?>
                     >
                         <?php if (!empty($mksddn_fh_field['options']) && is_array($mksddn_fh_field['options'])): ?>
                             <?php foreach ($mksddn_fh_field['options'] as $mksddn_fh_option): ?>
@@ -150,7 +159,8 @@ if ($mksddn_fh_form_config):
                         type="<?php echo esc_attr($mksddn_fh_field['type']); ?>" 
                         name="<?php echo esc_attr($mksddn_fh_field['name']); ?>" 
                         id="<?php echo esc_attr($mksddn_fh_field['name']); ?>"
-                        <?php echo !empty($mksddn_fh_field['required']) && $mksddn_fh_field['required'] ? 'required' : ''; ?>
+                        <?php echo $mksddn_fh_is_required ? 'required' : ''; ?>
+                        <?php if (!$mksddn_fh_has_label && $mksddn_fh_is_required): ?>aria-label="<?php echo esc_attr(sprintf(/* translators: %s: field name */ __('%s (required)', 'mksddn-forms-handler'), ucfirst(str_replace(['_', '-'], ' ', $mksddn_fh_field['name'])))); ?>"<?php elseif (!$mksddn_fh_has_label): ?>aria-label="<?php echo esc_attr(ucfirst(str_replace(['_', '-'], ' ', $mksddn_fh_field['name']))); ?>"<?php endif; ?>
                         <?php if (!empty($mksddn_fh_field['placeholder'])): ?>
                             placeholder="<?php echo esc_attr($mksddn_fh_field['placeholder']); ?>"
                         <?php endif; ?>

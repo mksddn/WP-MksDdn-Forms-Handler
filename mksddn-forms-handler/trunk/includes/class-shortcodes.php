@@ -71,30 +71,55 @@ class Shortcodes {
                 <input type="text" name="mksddn_fh_hp" value="" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true" />
                 
                 <?php foreach ($fields as $field) : ?>
+                    <?php 
+                    $field_label = isset($field['label']) ? trim((string) $field['label']) : '';
+                    $has_label = !empty($field_label);
+                    $is_required = isset($field['required']) && $field['required'];
+                    ?>
                     <div class="form-field">
-                        <label for="<?php echo esc_attr($field['name']); ?>">
-                            <?php echo esc_html($field['label']); ?>
-                            <?php if (isset($field['required']) && $field['required']) : ?>
-                                <span class="required">*</span>
-                            <?php endif; ?>
-                        </label>
+                        <?php if ($has_label) : ?>
+                            <label for="<?php echo esc_attr($field['name']); ?>">
+                                <?php echo esc_html($field_label); ?>
+                                <?php if ($is_required) : ?>
+                                    <span class="required">*</span>
+                                <?php endif; ?>
+                            </label>
+                        <?php endif; ?>
                         
                         <?php if ($field['type'] === 'textarea') : ?>
                             <textarea 
                                 name="<?php echo esc_attr($field['name']); ?>" 
                                 id="<?php echo esc_attr($field['name']); ?>"
-                                <?php echo (isset($field['required']) && $field['required']) ? 'required' : ''; ?>
+                                <?php echo $is_required ? 'required' : ''; ?>
+                                <?php if (!$has_label && $is_required) : ?>aria-label="<?php echo esc_attr(sprintf(/* translators: %s: field name */ __('%s (required)', 'mksddn-forms-handler'), ucfirst(str_replace(['_', '-'], ' ', $field['name'])))); ?>"<?php elseif (!$has_label) : ?>aria-label="<?php echo esc_attr(ucfirst(str_replace(['_', '-'], ' ', $field['name']))); ?>"<?php endif; ?>
                                 rows="4"
                                 <?php if (!empty($field['placeholder'])) : ?>placeholder="<?php echo esc_attr($field['placeholder']); ?>"<?php endif; ?>
                             ></textarea>
                         <?php elseif ($field['type'] === 'checkbox') : ?>
-                            <input 
-                                type="checkbox" 
-                                name="<?php echo esc_attr($field['name']); ?>" 
-                                id="<?php echo esc_attr($field['name']); ?>" 
-                                value="1"
-                                <?php echo (isset($field['required']) && $field['required']) ? 'required' : ''; ?>
-                            >
+                            <?php if ($has_label) : ?>
+                                <label for="<?php echo esc_attr($field['name']); ?>">
+                                    <input 
+                                        type="checkbox" 
+                                        name="<?php echo esc_attr($field['name']); ?>" 
+                                        id="<?php echo esc_attr($field['name']); ?>" 
+                                        value="1"
+                                        <?php echo $is_required ? 'required' : ''; ?>
+                                    >
+                                    <?php echo esc_html($field_label); ?>
+                                    <?php if ($is_required) : ?>
+                                        <span class="required">*</span>
+                                    <?php endif; ?>
+                                </label>
+                            <?php else : ?>
+                                <input 
+                                    type="checkbox" 
+                                    name="<?php echo esc_attr($field['name']); ?>" 
+                                    id="<?php echo esc_attr($field['name']); ?>" 
+                                    value="1"
+                                    <?php echo $is_required ? 'required' : ''; ?>
+                                    <?php if ($is_required) : ?>aria-label="<?php echo esc_attr(sprintf(/* translators: %s: field name */ __('%s (required)', 'mksddn-forms-handler'), ucfirst(str_replace(['_', '-'], ' ', $field['name'])))); ?>"<?php else : ?>aria-label="<?php echo esc_attr(ucfirst(str_replace(['_', '-'], ' ', $field['name']))); ?>"<?php endif; ?>
+                                >
+                            <?php endif; ?>
                         <?php elseif ($field['type'] === 'select') : ?>
                             <?php 
                             $options = isset($field['options']) && is_array($field['options']) ? $field['options'] : [];
@@ -105,7 +130,8 @@ class Shortcodes {
                                 name="<?php echo esc_attr($name_attr); ?>" 
                                 id="<?php echo esc_attr($field['name']); ?>"
                                 <?php echo $is_multiple ? 'multiple' : ''; ?>
-                                <?php echo (isset($field['required']) && $field['required']) ? 'required' : ''; ?>
+                                <?php echo $is_required ? 'required' : ''; ?>
+                                <?php if (!$has_label && $is_required) : ?>aria-label="<?php echo esc_attr(sprintf(/* translators: %s: field name */ __('%s (required)', 'mksddn-forms-handler'), ucfirst(str_replace(['_', '-'], ' ', $field['name'])))); ?>"<?php elseif (!$has_label) : ?>aria-label="<?php echo esc_attr(ucfirst(str_replace(['_', '-'], ' ', $field['name']))); ?>"<?php endif; ?>
                             >
                                 <?php foreach ($options as $opt) : 
                                     $opt_value = is_array($opt) ? ($opt['value'] ?? '') : (string) $opt;
@@ -119,7 +145,15 @@ class Shortcodes {
                             <?php 
                             $options = isset($field['options']) && is_array($field['options']) ? $field['options'] : [];
                             ?>
-                            <div class="radio-group" role="radiogroup" aria-labelledby="<?php echo esc_attr($field['name']); ?>-label">
+                            <?php if ($has_label) : ?>
+                                <label id="<?php echo esc_attr($field['name']); ?>-label" class="radio-group-label">
+                                    <?php echo esc_html($field_label); ?>
+                                    <?php if ($is_required) : ?>
+                                        <span class="required">*</span>
+                                    <?php endif; ?>
+                                </label>
+                            <?php endif; ?>
+                            <div class="radio-group" role="radiogroup" <?php if ($has_label) : ?>aria-labelledby="<?php echo esc_attr($field['name']); ?>-label"<?php elseif ($is_required) : ?>aria-label="<?php echo esc_attr(sprintf(/* translators: %s: field name */ __('%s (required)', 'mksddn-forms-handler'), ucfirst(str_replace(['_', '-'], ' ', $field['name'])))); ?>"<?php else : ?>aria-label="<?php echo esc_attr(ucfirst(str_replace(['_', '-'], ' ', $field['name']))); ?>"<?php endif; ?>>
                                 <?php foreach ($options as $idx => $opt) : 
                                     $opt_value = is_array($opt) ? ($opt['value'] ?? '') : (string) $opt;
                                     $opt_label = is_array($opt) ? ($opt['label'] ?? $opt_value) : (string) $opt;
@@ -153,7 +187,8 @@ class Shortcodes {
                                 name="<?php echo esc_attr($name_attr); ?>" 
                                 id="<?php echo esc_attr($field['name']); ?>"
                                 <?php echo $is_multiple ? 'multiple' : ''; ?>
-                                <?php echo (isset($field['required']) && $field['required']) ? 'required' : ''; ?>
+                                <?php echo $is_required ? 'required' : ''; ?>
+                                <?php if (!$has_label && $is_required) : ?>aria-label="<?php echo esc_attr(sprintf(/* translators: %s: field name */ __('%s (required)', 'mksddn-forms-handler'), ucfirst(str_replace(['_', '-'], ' ', $field['name'])))); ?>"<?php elseif (!$has_label) : ?>aria-label="<?php echo esc_attr(ucfirst(str_replace(['_', '-'], ' ', $field['name']))); ?>"<?php endif; ?>
                                 <?php echo $accept ? 'accept="' . esc_attr($accept) . '"' : ''; ?>
                             >
                         <?php else : ?>
@@ -174,7 +209,8 @@ class Shortcodes {
                                 type="<?php echo esc_attr($type); ?>" 
                                 name="<?php echo esc_attr($field['name']); ?>" 
                                 id="<?php echo esc_attr($field['name']); ?>"
-                                <?php echo (isset($field['required']) && $field['required']) ? 'required' : ''; ?>
+                                <?php echo $is_required ? 'required' : ''; ?>
+                                <?php if (!$has_label && $is_required) : ?>aria-label="<?php echo esc_attr(sprintf(/* translators: %s: field name */ __('%s (required)', 'mksddn-forms-handler'), ucfirst(str_replace(['_', '-'], ' ', $field['name'])))); ?>"<?php elseif (!$has_label) : ?>aria-label="<?php echo esc_attr(ucfirst(str_replace(['_', '-'], ' ', $field['name']))); ?>"<?php endif; ?>
                                 <?php if (!empty($field['placeholder'])) : ?>placeholder="<?php echo esc_attr($field['placeholder']); ?>"<?php endif; ?>
                                 <?php if ($has_min) : ?>min="<?php echo esc_attr($field['min']); ?>"<?php endif; ?>
                                 <?php if ($has_max) : ?>max="<?php echo esc_attr($field['max']); ?>"<?php endif; ?>
