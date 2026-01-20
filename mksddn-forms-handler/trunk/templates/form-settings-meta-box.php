@@ -11,6 +11,7 @@
         <th scope="row"><label for="bcc_recipient"><?php echo esc_html__( 'BCC Recipient', 'mksddn-forms-handler' ); ?></label></th>
         <td>
             <input type="email" name="bcc_recipient" id="bcc_recipient" value="<?php echo esc_attr($bcc_recipient); ?>" class="regular-text" />
+            <p class="description"><?php echo esc_html__( 'Specified for debugging', 'mksddn-forms-handler' ); ?></p>
         </td>
     </tr>
     <tr>

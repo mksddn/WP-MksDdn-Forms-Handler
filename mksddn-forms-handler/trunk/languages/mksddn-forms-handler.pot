@@ -212,6 +212,10 @@ msgstr ""
 msgid "BCC Recipient"
 msgstr ""
 
+#: templates/form-settings-meta-box.php:14
+msgid "Specified for debugging"
+msgstr ""
+
 #: templates/form-settings-meta-box.php:17
 msgid "Email Subject"
 msgstr ""

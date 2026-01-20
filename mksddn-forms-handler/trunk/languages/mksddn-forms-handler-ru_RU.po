@@ -202,6 +202,10 @@ msgstr "Email-адреса, разделенные запятыми"
 msgid "BCC Recipient"
 msgstr "Получатель BCC"
 
+#: templates/form-settings-meta-box.php:14
+msgid "Specified for debugging"
+msgstr "Указывается для отладки"
+
 #: templates/form-settings-meta-box.php:17
 msgid "Email Subject"
 msgstr "Тема письма"
