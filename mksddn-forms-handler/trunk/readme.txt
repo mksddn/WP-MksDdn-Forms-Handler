@@ -4,7 +4,7 @@ Tags: forms, telegram, google-sheets, rest-api, form-handler
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 8.0
-Stable tag: 2.1.0
+Stable tag: 2.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -413,6 +413,9 @@ The `array_of_objects` type allows you to define arrays with nested field valida
 
 == Upgrade Notice ==
 
+= 2.1.1 =
+Improvement: Enhanced form accessibility with aria-label attributes for required fields without labels. Improved label management and form field handling. Recommended update for better accessibility compliance.
+
 = 2.1.0 =
 Improvement: Page URL field moved from submission info to submission data section. Page URL is now included in all notifications (email, Telegram, Google Sheets). Recommended update for better notification tracking.
 
@@ -435,6 +438,12 @@ Security update: Fixed URL escaping in template examples. Recommended update for
 New feature: Template functions for custom forms integration. Bug fix: Improved Telegram message formatting. Fully backward compatible.
 
 == Changelog ==
+
+= 2.1.1 =
+* Improved: Enhanced form accessibility with aria-label attributes for required fields without labels
+* Improved: Better label management - removed unnecessary label display for fields without labels
+* Improved: Enhanced form examples for consistency in required field handling
+* Technical: Refactored form field handling to improve accessibility compliance
 
 = 2.1.0 =
 * Improved: Page URL field moved from "Submission Info" meta box to "Submission Data" section
