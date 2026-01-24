@@ -32,8 +32,8 @@ class GoogleSheetsAdmin {
     public function add_settings_page(): void {
         add_submenu_page(
             'edit.php?post_type=mksddn_fh_forms',
-            'Google Sheets Settings',
-            'Google Sheets',
+            __( 'Google Sheets Settings', 'mksddn-forms-handler' ),
+            __( 'Google Sheets Settings', 'mksddn-forms-handler' ),
             'manage_options',
             'mksddn-fh-google-sheets-settings',
             [$this, 'render_settings_page']
@@ -197,142 +197,142 @@ class GoogleSheetsAdmin {
 
         ?>
         <div class="wrap">
-            <h1>Google Sheets Settings</h1>
+            <h1><?php esc_html_e( 'Google Sheets Settings', 'mksddn-forms-handler' ); ?></h1>
             
             <?php if ($has_success) : ?>
                 <div class="notice notice-success">
-                    <p>✅ Google Sheets authentication successful! You can now use Google Sheets integration in your forms.</p>
+                    <p><?php esc_html_e( '✅ Google Sheets authentication successful! You can now use Google Sheets integration in your forms.', 'mksddn-forms-handler' ); ?></p>
                 </div>
             <?php endif; ?>
             
             <?php if ($has_error) : ?>
                 <div class="notice notice-error">
-                    <p>❌ Authentication failed. Please try again.</p>
+                    <p><?php esc_html_e( '❌ Authentication failed. Please try again.', 'mksddn-forms-handler' ); ?></p>
                 </div>
             <?php endif; ?>
             
             <?php if ($has_saved) : ?>
                 <div class="notice notice-success">
-                    <p>Settings saved successfully!</p>
+                    <p><?php esc_html_e( 'Settings saved successfully!', 'mksddn-forms-handler' ); ?></p>
                 </div>
             <?php endif; ?>
             
             <?php if ($has_revoked) : ?>
                 <div class="notice notice-warning">
-                    <p>✅ Google Sheets authentication has been revoked. You can now re-authenticate with different credentials.</p>
+                    <p><?php esc_html_e( '✅ Google Sheets authentication has been revoked. You can now re-authenticate with different credentials.', 'mksddn-forms-handler' ); ?></p>
                 </div>
             <?php endif; ?>
             
             <?php if ($has_cleared) : ?>
                 <div class="notice notice-info">
-                    <p>🗑️ All Google Sheets settings have been cleared. You can start fresh setup.</p>
+                    <p><?php esc_html_e( '🗑️ All Google Sheets settings have been cleared. You can start fresh setup.', 'mksddn-forms-handler' ); ?></p>
                 </div>
             <?php endif; ?>
             
             <div class="card">
-                <h2>Step 1: Google Cloud Console Setup</h2>
+                <h2><?php esc_html_e( 'Step 1: Google Cloud Console Setup', 'mksddn-forms-handler' ); ?></h2>
                 <ol>
-                    <li>Go to <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a></li>
-                    <li>Create a new project or select existing one</li>
-                    <li>Enable Google Sheets API:
+                    <li><?php esc_html_e( 'Go to', 'mksddn-forms-handler' ); ?> <a href="https://console.cloud.google.com/" target="_blank"><?php esc_html_e( 'Google Cloud Console', 'mksddn-forms-handler' ); ?></a></li>
+                    <li><?php esc_html_e( 'Create a new project or select existing one', 'mksddn-forms-handler' ); ?></li>
+                    <li><?php esc_html_e( 'Enable Google Sheets API:', 'mksddn-forms-handler' ); ?>
                         <ul>
-                            <li>Go to "APIs &amp; Services" → "Library"</li>
-                            <li>Search for "Google Sheets API"</li>
-                            <li>Click "Enable"</li>
+                            <li><?php esc_html_e( 'Go to "APIs &amp; Services" → "Library"', 'mksddn-forms-handler' ); ?></li>
+                            <li><?php esc_html_e( 'Search for "Google Sheets API"', 'mksddn-forms-handler' ); ?></li>
+                            <li><?php esc_html_e( 'Click "Enable"', 'mksddn-forms-handler' ); ?></li>
                         </ul>
                     </li>
-                    <li>Create OAuth 2.0 credentials:
+                    <li><?php esc_html_e( 'Create OAuth 2.0 credentials:', 'mksddn-forms-handler' ); ?>
                         <ul>
-                            <li>Go to "APIs &amp; Services" → "Credentials"</li>
-                            <li>Click "Create Credentials" → "OAuth 2.0 Client IDs"</li>
-                            <li>Choose "Web application"</li>
-                            <li>Add authorized redirect URI: <code><?php echo esc_html( admin_url('admin.php?page=mksddn-fh-google-sheets-settings') ); ?></code></li>
-                            <li><strong>Important:</strong> Make sure this exact URL is added to your Google Cloud Console OAuth credentials</li>
-                            <li>Save Client ID and Client Secret</li>
+                            <li><?php esc_html_e( 'Go to "APIs &amp; Services" → "Credentials"', 'mksddn-forms-handler' ); ?></li>
+                            <li><?php esc_html_e( 'Click "Create Credentials" → "OAuth 2.0 Client IDs"', 'mksddn-forms-handler' ); ?></li>
+                            <li><?php esc_html_e( 'Choose "Web application"', 'mksddn-forms-handler' ); ?></li>
+                            <li><?php esc_html_e( 'Add authorized redirect URI:', 'mksddn-forms-handler' ); ?> <code><?php echo esc_html( admin_url('admin.php?page=mksddn-fh-google-sheets-settings') ); ?></code></li>
+                            <li><strong><?php esc_html_e( 'Important:', 'mksddn-forms-handler' ); ?></strong> <?php esc_html_e( 'Make sure this exact URL is added to your Google Cloud Console OAuth credentials', 'mksddn-forms-handler' ); ?></li>
+                            <li><?php esc_html_e( 'Save Client ID and Client Secret', 'mksddn-forms-handler' ); ?></li>
                         </ul>
                     </li>
                 </ol>
             </div>
             
             <div class="card">
-                <h2>Step 2: Enter Credentials</h2>
+                <h2><?php esc_html_e( 'Step 2: Enter Credentials', 'mksddn-forms-handler' ); ?></h2>
                 <form method="post" action="">
                     <?php wp_nonce_field('save_google_sheets_settings', 'google_sheets_settings_nonce'); ?>
                     
                     <table class="form-table">
                         <tr>
-                            <th scope="row"><label for="google_sheets_client_id">Client ID</label></th>
+                            <th scope="row"><label for="google_sheets_client_id"><?php esc_html_e( 'Client ID', 'mksddn-forms-handler' ); ?></label></th>
                             <td>
                                 <input type="text" name="google_sheets_client_id" id="google_sheets_client_id" 
                                         value="<?php echo esc_attr($client_id); ?>" class="regular-text" />
-                                <p class="description">OAuth 2.0 Client ID from Google Cloud Console</p>
+                                <p class="description"><?php esc_html_e( 'OAuth 2.0 Client ID from Google Cloud Console', 'mksddn-forms-handler' ); ?></p>
                             </td>
                         </tr>
                         <tr>
-                            <th scope="row"><label for="google_sheets_client_secret">Client Secret</label></th>
+                            <th scope="row"><label for="google_sheets_client_secret"><?php esc_html_e( 'Client Secret', 'mksddn-forms-handler' ); ?></label></th>
                             <td>
                                 <input type="password" name="google_sheets_client_secret" id="google_sheets_client_secret"
                                         value="<?php echo esc_attr($client_secret); ?>" class="regular-text" />
-                                <p class="description">OAuth 2.0 Client Secret from Google Cloud Console</p>
+                                <p class="description"><?php esc_html_e( 'OAuth 2.0 Client Secret from Google Cloud Console', 'mksddn-forms-handler' ); ?></p>
                             </td>
                         </tr>
                     </table>
                     
                     <p class="submit">
-                        <input type="submit" name="submit" id="submit" class="button button-primary" value="Save Credentials">
+                        <input type="submit" name="submit" id="submit" class="button button-primary" value="<?php esc_attr_e( 'Save Credentials', 'mksddn-forms-handler' ); ?>">
                     </p>
                 </form>
             </div>
             
             <div class="card">
-                <h2>Step 3: Authorize Access</h2>
+                <h2><?php esc_html_e( 'Step 3: Authorize Access', 'mksddn-forms-handler' ); ?></h2>
                 <?php if ($refresh_token) : ?>
                     <div class="notice notice-success">
-                        <p>✅ <strong>Authenticated!</strong> Google Sheets integration is ready to use.</p>
-                        <p>Refresh Token: <code><?php echo esc_html( substr($refresh_token, 0, 20) . '...' ); ?></code></p>
+                        <p><?php esc_html_e( '✅ Authenticated! Google Sheets integration is ready to use.', 'mksddn-forms-handler' ); ?></p>
+                        <p><?php esc_html_e( 'Refresh Token:', 'mksddn-forms-handler' ); ?> <code><?php echo esc_html( substr($refresh_token, 0, 20) . '...' ); ?></code></p>
                     </div>
                     
                     <div style="margin-top: 15px; padding: 15px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px;">
-                        <h4>🔐 Authentication Management</h4>
-                        <p>If you need to switch to a different Google account or re-authenticate:</p>
+                        <h4><?php esc_html_e( '🔐 Authentication Management', 'mksddn-forms-handler' ); ?></h4>
+                        <p><?php esc_html_e( 'If you need to switch to a different Google account or re-authenticate:', 'mksddn-forms-handler' ); ?></p>
                         <form method="post" action="" style="display: inline;">
                             <?php wp_nonce_field('revoke_google_sheets_auth', 'revoke_auth_nonce'); ?>
-                            <button type="submit" class="button button-secondary" onclick="return confirm('Are you sure you want to revoke Google Sheets authentication? This will disconnect the current integration.')">
-                                🚫 Revoke Authentication
+                            <button type="submit" class="button button-secondary" onclick="return confirm('<?php esc_attr_e( 'Are you sure you want to revoke Google Sheets authentication? This will disconnect the current integration.', 'mksddn-forms-handler' ); ?>')">
+                                <?php esc_html_e( '🚫 Revoke Authentication', 'mksddn-forms-handler' ); ?>
                             </button>
                         </form>
                         <p style="margin-top: 10px; font-size: 12px; color: #666;">
-                            <strong>Note:</strong> This will remove the current authentication. You'll need to re-authenticate to use Google Sheets integration again.
+                            <strong><?php esc_html_e( 'Note:', 'mksddn-forms-handler' ); ?></strong> <?php esc_html_e( "This will remove the current authentication. You'll need to re-authenticate to use Google Sheets integration again.", 'mksddn-forms-handler' ); ?>
                         </p>
                     </div>
                 <?php elseif ($client_id && $client_secret) : ?>
-                    <p>Click the button below to authorize access to Google Sheets:</p>
+                    <p><?php esc_html_e( 'Click the button below to authorize access to Google Sheets:', 'mksddn-forms-handler' ); ?></p>
                     <a href="<?php echo esc_url( \MksDdn\FormsHandler\GoogleSheetsHandler::get_auth_url() ); ?>" class="button button-primary">
-                        🔐 Authorize Google Sheets Access
+                        <?php esc_html_e( '🔐 Authorize Google Sheets Access', 'mksddn-forms-handler' ); ?>
                     </a>
                 <?php else : ?>
                     <div class="notice notice-warning">
-                        <p>⚠️ Please save your Client ID and Client Secret first.</p>
+                        <p><?php esc_html_e( '⚠️ Please save your Client ID and Client Secret first.', 'mksddn-forms-handler' ); ?></p>
                     </div>
                 <?php endif; ?>
             </div>
             
             <?php if ($refresh_token) : ?>
                 <div class="card">
-                    <h2>Step 4: Test Connection</h2>
-                    <p>Test your Google Sheets connection:</p>
+                    <h2><?php esc_html_e( 'Step 4: Test Connection', 'mksddn-forms-handler' ); ?></h2>
+                    <p><?php esc_html_e( 'Test your Google Sheets connection:', 'mksddn-forms-handler' ); ?></p>
                     <table class="form-table">
                         <tr>
-                            <th scope="row"><label for="test_spreadsheet_id">Spreadsheet ID</label></th>
+                            <th scope="row"><label for="test_spreadsheet_id"><?php esc_html_e( 'Spreadsheet ID', 'mksddn-forms-handler' ); ?></label></th>
                             <td>
                                 <input type="text" id="test_spreadsheet_id" class="regular-text" 
                                        placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms" />
-                                <p class="description">Enter a spreadsheet ID to test the connection</p>
+                                <p class="description"><?php esc_html_e( 'Enter a spreadsheet ID to test the connection', 'mksddn-forms-handler' ); ?></p>
                             </td>
                         </tr>
                     </table>
                     <button type="button" id="test-sheets-btn" class="button button-secondary">
-                        Test Google Sheets Connection
+                        <?php esc_html_e( 'Test Google Sheets Connection', 'mksddn-forms-handler' ); ?>
                     </button>
                     <div id="test-result" style="margin-top: 10px;"></div>
                 </div>
@@ -340,32 +340,32 @@ class GoogleSheetsAdmin {
             <?php endif; ?>
             
             <div class="card">
-                <h2>Usage</h2>
-                <p>Once configured, you can enable Google Sheets integration in your forms:</p>
+                <h2><?php esc_html_e( 'Usage', 'mksddn-forms-handler' ); ?></h2>
+                <p><?php esc_html_e( 'Once configured, you can enable Google Sheets integration in your forms:', 'mksddn-forms-handler' ); ?></p>
                 <ol>
-                    <li>Go to <strong>Forms</strong> → <strong>Add New</strong> or edit existing form</li>
-                    <li>In the <strong>Google Sheets Integration</strong> section:</li>
+                    <li><?php esc_html_e( 'Go to', 'mksddn-forms-handler' ); ?> <strong><?php esc_html_e( 'Forms', 'mksddn-forms-handler' ); ?></strong> → <strong><?php esc_html_e( 'Add New', 'mksddn-forms-handler' ); ?></strong> <?php esc_html_e( 'or edit existing form', 'mksddn-forms-handler' ); ?></li>
+                    <li><?php esc_html_e( 'In the', 'mksddn-forms-handler' ); ?> <strong><?php esc_html_e( 'Google Sheets Integration', 'mksddn-forms-handler' ); ?></strong> <?php esc_html_e( 'section:', 'mksddn-forms-handler' ); ?></li>
                     <ul>
-                        <li>Check "Send to Google Sheets"</li>
-                        <li>Enter your Spreadsheet ID (from URL: docs.google.com/spreadsheets/d/SPREADSHEET_ID)</li>
-                        <li>Optionally specify Sheet Name</li>
+                        <li><?php esc_html_e( 'Check "Send to Google Sheets"', 'mksddn-forms-handler' ); ?></li>
+                        <li><?php esc_html_e( 'Enter your Spreadsheet ID (from URL: docs.google.com/spreadsheets/d/SPREADSHEET_ID)', 'mksddn-forms-handler' ); ?></li>
+                        <li><?php esc_html_e( 'Optionally specify Sheet Name', 'mksddn-forms-handler' ); ?></li>
                     </ul>
-                    <li>Save the form</li>
+                    <li><?php esc_html_e( 'Save the form', 'mksddn-forms-handler' ); ?></li>
                 </ol>
             </div>
             
             <?php if ($client_id || $client_secret || $refresh_token) : ?>
             <div class="card" style="border-color: #dc3545;">
-                <h2 style="color: #dc3545;">⚠️ Clear All Settings</h2>
-                <p>If you want to completely remove all Google Sheets settings and start over:</p>
+                <h2 style="color: #dc3545;"><?php esc_html_e( '⚠️ Clear All Settings', 'mksddn-forms-handler' ); ?></h2>
+                <p><?php esc_html_e( 'If you want to completely remove all Google Sheets settings and start over:', 'mksddn-forms-handler' ); ?></p>
                 <form method="post" action="" style="display: inline;">
                     <?php wp_nonce_field('clear_google_sheets_all', 'clear_all_nonce'); ?>
-                    <button type="submit" class="button button-secondary" style="background: #dc3545; border-color: #dc3545; color: white;" onclick="return confirm('⚠️ WARNING: This will permanently delete ALL Google Sheets settings including Client ID, Client Secret, and Refresh Token. This action cannot be undone. Are you absolutely sure?')">
-                         🗑️ Clear All Google Sheets Settings
+                    <button type="submit" class="button button-secondary" style="background: #dc3545; border-color: #dc3545; color: white;" onclick="return confirm('<?php esc_attr_e( '⚠️ WARNING: This will permanently delete ALL Google Sheets settings including Client ID, Client Secret, and Refresh Token. This action cannot be undone. Are you absolutely sure?', 'mksddn-forms-handler' ); ?>')">
+                         <?php esc_html_e( '🗑️ Clear All Google Sheets Settings', 'mksddn-forms-handler' ); ?>
                     </button>
                 </form>
                 <p style="margin-top: 10px; font-size: 12px; color: #666;">
-                    <strong>Use this when:</strong> You want to switch to different Google account, fix OAuth issues, or start fresh setup.
+                    <strong><?php esc_html_e( 'Use this when:', 'mksddn-forms-handler' ); ?></strong> <?php esc_html_e( 'You want to switch to different Google account, fix OAuth issues, or start fresh setup.', 'mksddn-forms-handler' ); ?>
                 </p>
             </div>
             <?php endif; ?>

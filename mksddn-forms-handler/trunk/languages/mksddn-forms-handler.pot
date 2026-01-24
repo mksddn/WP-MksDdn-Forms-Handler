@@ -460,6 +460,262 @@ msgstr ""
 msgid "Export"
 msgstr ""
 
+#: includes/class-admin-columns.php:43 includes/class-google-sheets-admin.php:36
+msgid "Google Sheets Settings"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:36
+msgid "Google Sheets"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:202
+msgid "✅ Google Sheets authentication successful! You can now use Google Sheets integration in your forms."
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:207
+msgid "❌ Authentication failed. Please try again."
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:213
+msgid "Settings saved successfully!"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:219
+msgid "✅ Google Sheets authentication has been revoked. You can now re-authenticate with different credentials."
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:226
+msgid "🗑️ All Google Sheets settings have been cleared. You can start fresh setup."
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:231
+msgid "Step 1: Google Cloud Console Setup"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:233
+msgid "Go to"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:234
+msgid "Google Cloud Console"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:235
+msgid "Create a new project or select existing one"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:236
+msgid "Enable Google Sheets API:"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:237
+msgid "Go to \"APIs &amp; Services\" → \"Library\""
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:238
+msgid "Search for \"Google Sheets API\""
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:239
+msgid "Click \"Enable\""
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:241
+msgid "Create OAuth 2.0 credentials:"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:242
+msgid "Go to \"APIs &amp; Services\" → \"Credentials\""
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:243
+msgid "Click \"Create Credentials\" → \"OAuth 2.0 Client IDs\""
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:244
+msgid "Choose \"Web application\""
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:245
+msgid "Add authorized redirect URI:"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:246
+msgid "Important:"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:246
+msgid "Make sure this exact URL is added to your Google Cloud Console OAuth credentials"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:247
+msgid "Save Client ID and Client Secret"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:252
+msgid "Step 2: Enter Credentials"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:259
+msgid "Client ID"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:263
+msgid "OAuth 2.0 Client ID from Google Cloud Console"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:267
+msgid "Client Secret"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:271
+msgid "OAuth 2.0 Client Secret from Google Cloud Console"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:277
+msgid "Save Credentials"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:282
+msgid "Step 3: Authorize Access"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:285
+msgid "✅ Authenticated! Google Sheets integration is ready to use."
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:286
+msgid "Refresh Token:"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:290
+msgid "🔐 Authentication Management"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:291
+msgid "If you need to switch to a different Google account or re-authenticate:"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:293
+msgid "Are you sure you want to revoke Google Sheets authentication? This will disconnect the current integration."
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:295
+msgid "🚫 Revoke Authentication"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:299
+msgid "Note:"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:299
+msgid "This will remove the current authentication. You'll need to re-authenticate to use Google Sheets integration again."
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:303
+msgid "Click the button below to authorize access to Google Sheets:"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:304
+msgid "🔐 Authorize Google Sheets Access"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:308
+msgid "⚠️ Please save your Client ID and Client Secret first."
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:313
+msgid "Step 4: Test Connection"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:314
+msgid "Test your Google Sheets connection:"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:317
+msgid "Spreadsheet ID"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:321
+msgid "Enter a spreadsheet ID to test the connection"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:325
+msgid "Test Google Sheets Connection"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:331
+msgid "Usage"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:332
+msgid "Once configured, you can enable Google Sheets integration in your forms:"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:334
+msgid "Forms"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:334
+msgid "Add New"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:334
+msgid "or edit existing form"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:335
+msgid "In the"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:335
+msgid "Google Sheets Integration"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:335
+msgid "section:"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:337
+msgid "Check \"Send to Google Sheets\""
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:338
+msgid "Enter your Spreadsheet ID (from URL: docs.google.com/spreadsheets/d/SPREADSHEET_ID)"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:339
+msgid "Optionally specify Sheet Name"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:341
+msgid "Save the form"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:346
+msgid "⚠️ Clear All Settings"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:347
+msgid "If you want to completely remove all Google Sheets settings and start over:"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:351
+msgid "⚠️ WARNING: This will permanently delete ALL Google Sheets settings including Client ID, Client Secret, and Refresh Token. This action cannot be undone. Are you absolutely sure?"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:353
+msgid "🗑️ Clear All Google Sheets Settings"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:357
+msgid "Use this when:"
+msgstr ""
+
+#: includes/class-google-sheets-admin.php:357
+msgid "You want to switch to different Google account, fix OAuth issues, or start fresh setup."
+msgstr ""
+
 
 #: templates/form-settings-meta-box.php:114
 msgid "Submit Button Text"
