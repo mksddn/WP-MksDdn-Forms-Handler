@@ -133,6 +133,13 @@
             <p class="description"><?php echo esc_html__( 'Custom text to display after successful form submission. Leave empty to use default message.', 'mksddn-forms-handler' ); ?></p>
         </td>
     </tr>
+    <tr>
+        <th scope="row"><label for="form_custom_classes"><?php echo esc_html__( 'Custom CSS Classes', 'mksddn-forms-handler' ); ?></label></th>
+        <td>
+            <input type="text" name="form_custom_classes" id="form_custom_classes" value="<?php echo esc_attr($form_custom_classes ?? ''); ?>" class="regular-text" />
+            <p class="description"><?php echo esc_html__( 'Additional CSS classes to add to the form element. Separate multiple classes with spaces.', 'mksddn-forms-handler' ); ?></p>
+        </td>
+    </tr>
     
     <tr>
         <th scope="row" colspan="2">

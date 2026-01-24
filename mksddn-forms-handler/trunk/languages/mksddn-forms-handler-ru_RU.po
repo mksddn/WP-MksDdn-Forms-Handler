@@ -414,6 +414,14 @@ msgstr "Текст сообщения об успехе"
 msgid "Custom text to display after successful form submission. Leave empty to use default message."
 msgstr "Пользовательский текст для отображения после успешной отправки формы. Оставьте пустым для использования сообщения по умолчанию."
 
+#: templates/form-settings-meta-box.php:137
+msgid "Custom CSS Classes"
+msgstr "Пользовательские CSS классы"
+
+#: templates/form-settings-meta-box.php:140
+msgid "Additional CSS classes to add to the form element. Separate multiple classes with spaces."
+msgstr "Дополнительные CSS классы для добавления к элементу формы. Разделяйте несколько классов пробелами."
+
 #: includes/class-export-handler.php:44
 msgid "Export Submissions"
 msgstr "Экспорт обращений"

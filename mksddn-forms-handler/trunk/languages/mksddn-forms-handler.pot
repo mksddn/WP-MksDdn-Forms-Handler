@@ -308,6 +308,14 @@ msgstr ""
 msgid "Custom text to display after successful form submission. Leave empty to use default message."
 msgstr ""
 
+#: templates/form-settings-meta-box.php:137
+msgid "Custom CSS Classes"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:140
+msgid "Additional CSS classes to add to the form element. Separate multiple classes with spaces."
+msgstr ""
+
 #: includes/class-post-types.php:36
 msgid "Forms"
 msgstr ""
