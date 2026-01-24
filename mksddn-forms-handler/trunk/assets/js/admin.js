@@ -18,12 +18,15 @@
             this.bindEvents();
             this.initFormBuilder();
             this.initValidation();
+            this.initTabs();
         },
 
         /**
          * Bind event handlers
          */
         bindEvents: function() {
+            var self = this;
+            
             // Form field management
             $(document).on('click', '.mksddn-add-field', this.addField);
             $(document).on('click', '.mksddn-remove-field', this.removeField);
@@ -37,8 +40,10 @@
 			$(document).on('click', '.export-with-filters', this.openExportModal);
 			$(document).on('click', '#export-modal', this.overlayCloseExportModal);
             
-            // Settings tabs
-            $(document).on('click', '.mksddn-tab-nav a', this.switchTab);
+            // Settings tabs - use direct binding for better compatibility
+            $(document).on('click', '.mksddn-tab-nav', function(e) {
+                self.switchTab.call(this, e);
+            });
         },
 
         /**
@@ -207,22 +212,85 @@
 		},
 
         /**
+         * Initialize tabs
+         */
+        initTabs: function() {
+            // Show first tab by default if no active tab is set
+            var $tabs = $('.mksddn-form-tabs');
+            if ($tabs.length) {
+                // Hide all tab contents first
+                $tabs.find('.mksddn-form-tab-content').removeClass('active').hide();
+                
+                // Check if there's already an active tab
+                var $activeTab = $tabs.find('.mksddn-tab-nav.active');
+                var $activeContent = null;
+                
+                if ($activeTab.length > 0) {
+                    // Use existing active tab
+                    var activeHref = $activeTab.attr('href');
+                    if (activeHref) {
+                        $activeContent = $(activeHref);
+                    }
+                }
+                
+                // If no active tab or content found, activate first tab
+                if (!$activeContent || !$activeContent.length) {
+                    var $firstTab = $tabs.find('.mksddn-tab-nav').first();
+                    $tabs.find('.mksddn-tab-nav').removeClass('active');
+                    $firstTab.addClass('active');
+                    
+                    var firstTabHref = $firstTab.attr('href');
+                    if (firstTabHref) {
+                        $activeContent = $(firstTabHref);
+                    }
+                }
+                
+                // Show active content
+                if ($activeContent && $activeContent.length) {
+                    $activeContent.addClass('active').show();
+                }
+            }
+        },
+
+        /**
          * Switch tabs
          */
         switchTab: function(e) {
-            e.preventDefault();
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
             
-            var target = $(this).attr('href');
+            var $link = $(this);
+            var target = $link.attr('href');
             
-            // Hide all tabs
-            $('.mksddn-tab-content').hide();
+            if (!target) {
+                return false;
+            }
             
-            // Show target tab
-            $(target).show();
+            var $tabs = $link.closest('.mksddn-form-tabs');
+            if (!$tabs.length) {
+                $tabs = $('.mksddn-form-tabs').first();
+            }
             
-            // Update active tab
-            $('.mksddn-tab-nav a').removeClass('active');
-            $(this).addClass('active');
+            if (!$tabs.length) {
+                return false;
+            }
+            
+            // Hide all tab contents
+            $tabs.find('.mksddn-form-tab-content').removeClass('active').hide();
+            
+            // Show target tab content
+            var $targetContent = $(target);
+            if ($targetContent.length) {
+                $targetContent.addClass('active').show();
+            }
+            
+            // Update active tab nav
+            $tabs.find('.mksddn-tab-nav').removeClass('active');
+            $link.addClass('active');
+            
+            return false;
         },
 
         /**
@@ -328,6 +396,25 @@
     $(document).ready(function() {
         MksDdnFormsHandler.init();
     });
+
+    // Also initialize on window load for meta boxes that load dynamically
+    $(window).on('load', function() {
+        if ($('.mksddn-form-tabs').length && !$('.mksddn-form-tabs').data('initialized')) {
+            MksDdnFormsHandler.initTabs();
+            $('.mksddn-form-tabs').data('initialized', true);
+        }
+    });
+
+    // Handle dynamically loaded meta boxes (WordPress sometimes loads them via AJAX)
+    if (typeof wp !== 'undefined' && wp.domReady) {
+        wp.domReady(function() {
+            setTimeout(function() {
+                if ($('.mksddn-form-tabs').length) {
+                    MksDdnFormsHandler.initTabs();
+                }
+            }, 100);
+        });
+    }
 
     // Provide global close function used in PHP markup (onclick)
     window.closeExportModal = function() {

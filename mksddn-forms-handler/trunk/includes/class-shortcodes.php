@@ -49,6 +49,7 @@ class Shortcodes {
         $submit_button_text = get_post_meta($form->ID, '_submit_button_text', true);
         $custom_html_after_button = get_post_meta($form->ID, '_custom_html_after_button', true);
         $success_message_text = get_post_meta($form->ID, '_success_message_text', true);
+        $form_custom_classes = get_post_meta($form->ID, '_form_custom_classes', true);
 
         // Set default success message if empty
         if (empty($success_message_text)) {
@@ -64,7 +65,7 @@ class Shortcodes {
         }
         ?>
         <div class="form-container" data-form-id="<?php echo esc_attr($form->post_name); ?>">
-            <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" class="wp-form" <?php echo $has_file ? 'enctype="multipart/form-data"' : ''; ?>>
+            <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" class="mksddn-form<?php echo $form_custom_classes ? ' ' . esc_attr($form_custom_classes) : ''; ?>" <?php echo $has_file ? 'enctype="multipart/form-data"' : ''; ?>>
                 <?php wp_nonce_field('submit_form_nonce', 'form_nonce'); ?>
                 <input type="hidden" name="action" value="submit_form">
                 <input type="hidden" name="form_id" value="<?php echo esc_attr($form->post_name); ?>">

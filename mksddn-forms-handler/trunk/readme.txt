@@ -4,7 +4,7 @@ Tags: forms, telegram, google-sheets, rest-api, form-handler
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 8.0
-Stable tag: 2.1.1
+Stable tag: 2.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -413,6 +413,9 @@ The `array_of_objects` type allows you to define arrays with nested field valida
 
 == Upgrade Notice ==
 
+= 2.2.0 =
+New feature: Tabbed interface for form settings with better organization. Improved localization for Google Sheets settings page. Admin structure improvements for better usability. Recommended update.
+
 = 2.1.1 =
 Improvement: Enhanced form accessibility with aria-label attributes for required fields without labels. Improved label management and form field handling. Recommended update for better accessibility compliance.
 
@@ -438,6 +441,13 @@ Security update: Fixed URL escaping in template examples. Recommended update for
 New feature: Template functions for custom forms integration. Bug fix: Improved Telegram message formatting. Fully backward compatible.
 
 == Changelog ==
+
+= 2.2.0 =
+* Feature: Tabbed interface for form settings - improved organization with separate tabs for Form Fields, Email Settings, Telegram, Google Sheets, Admin Storage, Display, and Advanced options
+* Improved: Google Sheets settings page moved to a submenu under Forms section for better admin structure
+* Improved: Enhanced localization support for Google Sheets settings page with Russian and English translations
+* Technical: Updated redirect URIs to point to the correct admin page with improved consistency
+* Technical: Added tab navigation functionality with JavaScript for seamless settings management
 
 = 2.1.1 =
 * Improved: Enhanced form accessibility with aria-label attributes for required fields without labels

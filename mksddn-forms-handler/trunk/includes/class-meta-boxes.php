@@ -86,6 +86,7 @@ class MetaBoxes {
         $submit_button_text = get_post_meta($post->ID, '_submit_button_text', true);
         $custom_html_after_button = get_post_meta($post->ID, '_custom_html_after_button', true);
         $success_message_text = get_post_meta($post->ID, '_success_message_text', true);
+        $form_custom_classes = get_post_meta($post->ID, '_form_custom_classes', true);
 
         // Set default values based on language if empty (only for new posts or when not set)
         $locale = get_locale();
@@ -379,6 +380,10 @@ class MetaBoxes {
 
         if (isset($_POST['success_message_text'])) {
             update_post_meta($post_id, '_success_message_text', sanitize_text_field( wp_unslash($_POST['success_message_text']) ));
+        }
+
+        if (isset($_POST['form_custom_classes'])) {
+            update_post_meta($post_id, '_form_custom_classes', sanitize_text_field( wp_unslash($_POST['form_custom_classes']) ));
         }
     }
 } 
