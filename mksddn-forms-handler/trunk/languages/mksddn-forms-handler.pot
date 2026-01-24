@@ -477,6 +477,34 @@ msgstr ""
 msgid "Custom HTML or text to display after the submit button (e.g., privacy policy notice)"
 msgstr ""
 
+#: templates/form-settings-meta-box.php:5
+msgid "Form Fields"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:6
+msgid "Email Settings"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:7
+msgid "Telegram"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:8
+msgid "Google Sheets"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:9
+msgid "Admin Storage"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:10
+msgid "Display"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:11
+msgid "Advanced"
+msgstr ""
+
 #: templates/form-settings-meta-box.php:130
 msgid "Advanced Settings"
 msgstr ""

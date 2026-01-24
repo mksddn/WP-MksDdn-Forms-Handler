@@ -20,6 +20,22 @@ msgstr ""
 msgid "Error: form ID or slug not specified"
 msgstr "Ошибка: не указан ID или slug формы"
 
+#: templates/form-settings-meta-box.php:5
+msgid "Form Fields"
+msgstr "Поля формы"
+
+#: templates/form-settings-meta-box.php:6
+msgid "Email Settings"
+msgstr "Настройки email"
+
+#: templates/form-settings-meta-box.php:10
+msgid "Display"
+msgstr "Отображение"
+
+#: templates/form-settings-meta-box.php:11
+msgid "Advanced"
+msgstr "Расширенные"
+
 #: includes/class-shortcodes.php:44
 msgid "Form not found"
 msgstr "Форма не найдена"
@@ -305,10 +321,6 @@ msgstr "Пользовательский HTML/текст после кнопки
 #: templates/form-settings-meta-box.php:124
 msgid "Custom HTML or text to display after the submit button (e.g., privacy policy notice)"
 msgstr "Пользовательский HTML или текст для отображения после кнопки отправки (например, уведомление о политике конфиденциальности)"
-
-#: templates/form-settings-meta-box.php:130
-msgid "Advanced Settings"
-msgstr "Дополнительные настройки"
 
 #: templates/form-settings-meta-box.php:118
 msgid "Accept any fields from frontend"
