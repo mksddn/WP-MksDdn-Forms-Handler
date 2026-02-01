@@ -151,8 +151,12 @@ class FormsHandler {
                     'post_status'    => 'inherit',
                 ], $file_path);
                 if (!is_wp_error($attachment_id)) {
-                    require_once ABSPATH . 'wp-admin/includes/image.php';
-                    wp_update_attachment_metadata($attachment_id, wp_generate_attachment_metadata($attachment_id, $file_path));
+                    // Only generate metadata for images to avoid slow processing for large JPEG files
+                    $file_type = wp_check_filetype($file_path);
+                    if (strpos($file_type['type'] ?? '', 'image/') === 0) {
+                        require_once ABSPATH . 'wp-admin/includes/image.php';
+                        wp_update_attachment_metadata($attachment_id, wp_generate_attachment_metadata($attachment_id, $file_path));
+                    }
                 }
 
                 $urls[] = $file_url;
