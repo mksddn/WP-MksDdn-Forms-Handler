@@ -200,9 +200,10 @@ class Shortcodes {
                             $has_step = isset($field['step']) && $field['step'] !== '';
                             $pattern = '';
                             if (!empty($field['pattern'])) {
+                                // Use pattern from field config (already validated during save)
                                 $pattern = (string) $field['pattern'];
                             } elseif ($type === 'tel') {
-                                // Reasonable default pattern for phone numbers (E.164-like)
+                                // Default pattern for phone numbers (E.164-like)
                                 $pattern = '^\\+?\\d{7,15}$';
                             }
                             ?>

@@ -34,7 +34,7 @@ class Utilities {
             if ($form_id && !is_wp_error($form_id)) {
                 // Set meta fields
                 update_post_meta($form_id, '_recipients', get_option('admin_email'));
-                update_post_meta($form_id, '_subject', 'New message from website');
+                update_post_meta($form_id, '_subject', __( 'New message from website', 'mksddn-forms-handler' ));
 
                 // Default fields configuration
                 $default_fields = json_encode([
@@ -170,6 +170,11 @@ class Utilities {
                 $result[$key] = $truthy ? '1' : '0';
                 continue;
             }
+            if ($key === 'pattern') {
+                // Special handling for regex patterns - preserve backslashes
+                $result['pattern'] = self::sanitize_pattern_for_storage($value);
+                continue;
+            }
             if ($key === 'label' || $key === 'description' || $key === 'placeholder' || $key === 'help') {
                 $result[$key] = is_string($value) ? sanitize_text_field($value) : self::sanitize_any_for_storage($value);
                 continue;
@@ -222,6 +227,48 @@ class Utilities {
             return $sanitized;
         }
         return sanitize_text_field((string) $value);
+    }
+
+    /**
+     * Sanitize pattern for storage with validation.
+     * Preserves backslashes and validates regex syntax.
+     *
+     * @param mixed $value Raw pattern value
+     * @return string Sanitized pattern or empty string if invalid
+     */
+    public static function sanitize_pattern_for_storage($value): string {
+        if (!is_string($value) || $value === '') {
+            return '';
+        }
+
+        // Store original for logging
+        $original = $value;
+
+        // Remove any HTML tags
+        $pattern = wp_strip_all_tags($value);
+        
+        // Trim whitespace
+        $pattern = trim($pattern);
+        
+        if ($pattern === '') {
+            return '';
+        }
+
+        // Validate regex by attempting to compile it
+        $delimited = '/' . $pattern . '/';
+        if (@preg_match($delimited, '') === false) {
+            // Invalid regex - log and return empty string
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+                error_log(sprintf(
+                    'MksDdn Forms Handler: Invalid regex pattern rejected: "%s"',
+                    esc_html($original)
+                ));
+            }
+            return '';
+        }
+
+        return $pattern;
     }
 
     /**

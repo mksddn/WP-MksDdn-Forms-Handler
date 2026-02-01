@@ -151,8 +151,12 @@ class FormsHandler {
                     'post_status'    => 'inherit',
                 ], $file_path);
                 if (!is_wp_error($attachment_id)) {
-                    require_once ABSPATH . 'wp-admin/includes/image.php';
-                    wp_update_attachment_metadata($attachment_id, wp_generate_attachment_metadata($attachment_id, $file_path));
+                    // Only generate metadata for images to avoid slow processing for large JPEG files
+                    $file_type = wp_check_filetype($file_path);
+                    if (strpos($file_type['type'] ?? '', 'image/') === 0) {
+                        require_once ABSPATH . 'wp-admin/includes/image.php';
+                        wp_update_attachment_metadata($attachment_id, wp_generate_attachment_metadata($attachment_id, $file_path));
+                    }
                 }
 
                 $urls[] = $file_url;
@@ -536,7 +540,7 @@ class FormsHandler {
         // Honeypot check
         $honeypot = isset($_POST['mksddn_fh_hp']) ? sanitize_text_field( wp_unslash($_POST['mksddn_fh_hp']) ) : '';
         if (!empty($honeypot)) {
-            wp_die('Spam detected');
+            wp_die( esc_html__( 'Spam detected', 'mksddn-forms-handler' ) );
         }
 
         // Simple rate limiting per IP+form: 1 request per 10 seconds
@@ -544,7 +548,7 @@ class FormsHandler {
         $rl_key = 'mksddn_fh_rate_' . md5($form_id . '|' . $ip);
         $last_ts = get_transient($rl_key);
         if ($last_ts && (time() - (int)$last_ts) < 10) {
-            wp_die('Too many requests. Please wait a few seconds.');
+            wp_die( esc_html__( 'Too many requests. Please wait a few seconds.', 'mksddn-forms-handler' ) );
         }
         set_transient($rl_key, time(), 15);
 
@@ -611,7 +615,7 @@ class FormsHandler {
         }
 
         if (!$form_id || (!$form_data && empty($email_attachments))) {
-            wp_die('Invalid form data');
+            wp_die( esc_html__( 'Invalid form data', 'mksddn-forms-handler' ) );
         }
 
         $result = $this->process_form_submission($form_id, $form_data, $email_attachments);
@@ -705,7 +709,8 @@ class FormsHandler {
             $form_config['subject'], 
             $filtered_form_data, 
             $form_config['form_title'],
-            $email_attachments
+            $email_attachments,
+            $form_config['fields_config']
         );
         $delivery_results['email']['success'] = !is_wp_error($email_result);
         if (is_wp_error($email_result)) {
@@ -719,7 +724,8 @@ class FormsHandler {
                 $form_config['telegram_bot_token'], 
                 $form_config['telegram_chat_ids'], 
                 $filtered_form_data, 
-                $form_config['form_title']
+                $form_config['form_title'],
+                $form_config['fields_config']
             );
             $delivery_results['telegram']['success'] = !is_wp_error($telegram_result);
             if (is_wp_error($telegram_result)) {
@@ -1473,7 +1479,7 @@ class FormsHandler {
     /**
      * Prepare and send email
      */
-    private function prepare_and_send_email($recipients, ?string $bcc_recipient, $subject, \WP_Error|array $form_data, $form_title, array $attachments = []): \WP_Error|bool {
+    private function prepare_and_send_email($recipients, ?string $bcc_recipient, $subject, \WP_Error|array $form_data, $form_title, array $attachments = [], $fields_config = null): \WP_Error|bool {
         $recipients_array = array_map('trim', explode(',', (string)$recipients));
 
         // Validate email addresses
@@ -1491,7 +1497,7 @@ class FormsHandler {
         }
 
         // Form email body
-        $body = $this->build_email_body($form_data, $form_title);
+        $body = $this->build_email_body($form_data, $form_title, $fields_config);
 
         // Set headers
         $headers = ['Content-Type: text/html; charset=UTF-8'];
@@ -1510,14 +1516,19 @@ class FormsHandler {
     /**
      * Build email body
      */
-    private function build_email_body(\WP_Error|array $form_data, $form_title): string {
-        $body = sprintf('<h2>Form Data: %s</h2>', $form_title);
+    private function build_email_body(\WP_Error|array $form_data, $form_title, $fields_config = null): string {
+        // Build field name to label mapping
+        $field_labels_map = $this->build_field_labels_map($fields_config);
+
+        /* translators: %s: form title */
+        $body = sprintf( '<h2>' . __( 'Form Data: %s', 'mksddn-forms-handler' ) . '</h2>', esc_html( $form_title ) );
         $body .= "<table style='width: 100%; border-collapse: collapse;'>";
-        $body .= "<tr style='background-color: #f8f8f8;'><th style='padding: 10px; border: 1px solid #e9e9e9; text-align: left;'>Field</th><th style='padding: 10px; border: 1px solid #e9e9e9; text-align: left;'>Value</th></tr>";
+        $body .= '<tr style="background-color: #f8f8f8;"><th style="padding: 10px; border: 1px solid #e9e9e9; text-align: left;">' . esc_html__( 'Field', 'mksddn-forms-handler' ) . '</th><th style="padding: 10px; border: 1px solid #e9e9e9; text-align: left;">' . esc_html__( 'Value', 'mksddn-forms-handler' ) . '</th></tr>';
 
         foreach ($form_data as $key => $value) {
+            $field_label = $field_labels_map[ $key ] ?? $this->get_system_field_label( $key );
             $body .= '<tr>';
-            $body .= "<td style='padding: 10px; border: 1px solid #e9e9e9;'><strong>" . esc_html($key) . '</strong></td>';
+            $body .= "<td style='padding: 10px; border: 1px solid #e9e9e9;'><strong>" . esc_html($field_label) . '</strong></td>';
             
             if ($this->looks_like_urls($value)) {
                 $urls = is_array($value) ? $value : [$value];
@@ -1526,7 +1537,7 @@ class FormsHandler {
             } elseif (is_array($value) && $this->is_array_of_objects($value)) {
                 // Render array of objects as a nested table (e.g., products)
                 $body .= "<td style='padding: 10px; border: 1px solid #e9e9e9;'>";
-                $body .= $this->render_array_of_objects($value);
+                $body .= $this->render_array_of_objects($value, $fields_config, $key);
                 $body .= '</td>';
             } elseif (is_array($value)) {
                 // Simple array: render as comma-separated list
@@ -1540,7 +1551,52 @@ class FormsHandler {
 
         $body .= '</table>';
 
-        return $body . ('<p><small>Sent: ' . current_time('d.m.Y H:i:s') . '</small></p>');
+        /* translators: %s: date and time */
+        return $body . ( '<p><small>' . sprintf( __( 'Sent: %s', 'mksddn-forms-handler' ), current_time( 'd.m.Y H:i:s' ) ) . '</small></p>' );
+    }
+
+    /**
+     * Get localized label for system-added field keys (e.g. Page URL).
+     *
+     * @param string $key Field key.
+     * @return string Label for display.
+     */
+    private function get_system_field_label( string $key ): string {
+        if ( $key === 'Page URL' ) {
+            return __( 'Page URL', 'mksddn-forms-handler' );
+        }
+        return $key;
+    }
+
+    /**
+     * Build field name to label mapping from fields configuration
+     * Priority: notification_label → label → name
+     *
+     * @param string|null $fields_config JSON fields configuration
+     * @return array Associative array mapping field names to labels
+     */
+    private function build_field_labels_map($fields_config): array {
+        $labels_map = [];
+        
+        if (!$fields_config) {
+            return $labels_map;
+        }
+        
+        $fields = json_decode((string)$fields_config, true);
+        if (!is_array($fields)) {
+            return $labels_map;
+        }
+        
+        foreach ($fields as $field) {
+            if (isset($field['name'])) {
+                $field_name = $field['name'];
+                // Priority: notification_label → label → name
+                $field_label = $field['notification_label'] ?? $field['label'] ?? $field_name;
+                $labels_map[$field_name] = $field_label;
+            }
+        }
+        
+        return $labels_map;
     }
     
     /**
@@ -1569,11 +1625,34 @@ class FormsHandler {
      * Render array of objects as HTML table
      *
      * @param array $items Array of objects/associative arrays
+     * @param string|null $fields_config Fields configuration JSON
+     * @param string|null $parent_field_name Parent field name for nested fields lookup
      * @return string HTML table
      */
-    private function render_array_of_objects(array $items): string {
+    private function render_array_of_objects(array $items, $fields_config = null, $parent_field_name = null): string {
         if (empty($items)) {
             return '';
+        }
+        
+        // Build nested field labels map if parent field config exists
+        $nested_labels_map = [];
+        if ($fields_config && $parent_field_name) {
+            $fields = json_decode((string)$fields_config, true);
+            if (is_array($fields)) {
+                foreach ($fields as $field) {
+                    if (($field['name'] ?? '') === $parent_field_name && isset($field['fields']) && is_array($field['fields'])) {
+                        foreach ($field['fields'] as $nested_field) {
+                            $nested_name = $nested_field['name'] ?? '';
+                            // Priority: notification_label → label → name
+                            $nested_label = $nested_field['notification_label'] ?? $nested_field['label'] ?? $nested_name;
+                            if ($nested_name) {
+                                $nested_labels_map[$nested_name] = $nested_label;
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
         }
         
         // Get all unique keys from all items
@@ -1592,7 +1671,8 @@ class FormsHandler {
         $html = '<table style="width: 100%; border-collapse: collapse; margin: 5px 0;">';
         $html .= '<thead><tr style="background-color: #f0f0f0;">';
         foreach ($all_keys as $key) {
-            $html .= '<th style="padding: 8px; border: 1px solid #ddd; text-align: left;">' . esc_html($key) . '</th>';
+            $header_label = $nested_labels_map[$key] ?? $key;
+            $html .= '<th style="padding: 8px; border: 1px solid #ddd; text-align: left;">' . esc_html($header_label) . '</th>';
         }
         $html .= '</tr></thead><tbody>';
         

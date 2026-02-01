@@ -322,7 +322,9 @@ class MetaBoxes {
             $decoded = json_decode($raw_json, true);
             if (is_array($decoded)) {
                 $sanitized = Utilities::sanitize_fields_config_for_storage($decoded);
-                update_post_meta($post_id, '_fields_config', wp_json_encode($sanitized, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+                $json_encoded = wp_json_encode($sanitized, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                // WordPress will strip slashes when loading, so we need to add them before saving
+                update_post_meta($post_id, '_fields_config', wp_slash($json_encoded));
             } else {
                 set_transient('mksddn_fh_fields_config_json_error_' . get_current_user_id(), true, 60);
                 set_transient('mksddn_fh_fields_config_json_value_' . get_current_user_id(), $raw_json, 60);
