@@ -228,6 +228,15 @@ msgstr ""
 msgid "JSON configuration of form fields. Example: [{\"name\": \"name\", \"label\": \"Name\", \"type\": \"text\", \"required\": true}]"
 msgstr ""
 
+#. translators: Note about regex patterns in JSON
+#: templates/form-settings-meta-box.php:27
+msgid "Pattern note:"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:27
+msgid "For regex patterns, use double backslashes in JSON (e.g., \"pattern\": \"^\\\\+?\\\\d{7,15}$\")"
+msgstr ""
+
 #: templates/form-settings-meta-box.php:32
 msgid "Telegram Notifications"
 msgstr ""

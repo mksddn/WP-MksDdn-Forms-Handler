@@ -234,6 +234,15 @@ msgstr "Конфигурация полей"
 msgid "JSON configuration of form fields. Example: [{\"name\": \"name\", \"label\": \"Name\", \"type\": \"text\", \"required\": true}]"
 msgstr "JSON-конфигурация полей формы. Пример: [{\"name\": \"name\", \"label\": \"Имя\", \"type\": \"text\", \"required\": true}]"
 
+#. translators: Note about regex patterns in JSON
+#: templates/form-settings-meta-box.php:27
+msgid "Pattern note:"
+msgstr "О паттернах:"
+
+#: templates/form-settings-meta-box.php:27
+msgid "For regex patterns, use double backslashes in JSON (e.g., \"pattern\": \"^\\\\+?\\\\d{7,15}$\")"
+msgstr "Для regex-паттернов используйте двойные обратные слеши в JSON (например, \"pattern\": \"^\\\\+?\\\\d{7,15}$\")"
+
 #: templates/form-settings-meta-box.php:32
 msgid "Telegram Notifications"
 msgstr "Уведомления Telegram"

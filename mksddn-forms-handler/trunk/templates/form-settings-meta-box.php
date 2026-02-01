@@ -18,7 +18,10 @@
                 <th scope="row"><label for="fields_config"><?php echo esc_html__( 'Fields Configuration', 'mksddn-forms-handler' ); ?></label></th>
                 <td>
                     <textarea name="fields_config" id="fields_config" rows="15" cols="50" class="large-text code"><?php echo esc_textarea($fields_config); ?></textarea>
-                    <p class="description"><?php echo esc_html__( 'JSON configuration of form fields. Example: [{"name": "name", "label": "Name", "type": "text", "required": true}]', 'mksddn-forms-handler' ); ?></p>
+                    <p class="description">
+                        <?php echo esc_html__( 'JSON configuration of form fields. Example: [{"name": "name", "label": "Name", "type": "text", "required": true}]', 'mksddn-forms-handler' ); ?><br>
+                        <strong><?php /* translators: Note about regex patterns in JSON */ echo esc_html__( 'Pattern note:', 'mksddn-forms-handler' ); ?></strong> <?php echo esc_html__( 'For regex patterns, use double backslashes in JSON (e.g., "pattern": "^\\\\+?\\\\d{7,15}$")', 'mksddn-forms-handler' ); ?>
+                    </p>
                 </td>
             </tr>
         </table>
