@@ -259,6 +259,7 @@ class Utilities {
         if (@preg_match($delimited, '') === false) {
             // Invalid regex - log and return empty string
             if (defined('WP_DEBUG') && WP_DEBUG) {
+                // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
                 error_log(sprintf(
                     'MksDdn Forms Handler: Invalid regex pattern rejected: "%s"',
                     esc_html($original)

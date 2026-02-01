@@ -176,6 +176,7 @@ class GoogleSheetsAdmin {
         if ($result['success']) {
             wp_send_json_success( __( '✅ Google Sheets connection successful!', 'mksddn-forms-handler' ) );
         } else {
+            /* translators: %s: Error message */
             wp_send_json_error( sprintf( __( '❌ Google Sheets connection failed: %s', 'mksddn-forms-handler' ), $result['message'] ) );
         }
     }

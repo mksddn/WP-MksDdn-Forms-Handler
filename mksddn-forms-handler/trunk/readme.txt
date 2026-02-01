@@ -4,7 +4,7 @@ Tags: forms, telegram, google-sheets, rest-api, form-handler
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 8.0
-Stable tag: 2.2.0
+Stable tag: 2.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -33,7 +33,7 @@ MksDdn Forms Handler is a powerful and flexible form processing plugin that allo
 
 = Technical Features =
 
-* WordPress 6.0+ compatible
+* WordPress 5.0+ compatible (tested up to 6.9)
 * PHP 8.0+ required
 * GPL v2+ licensed
 * Clean, maintainable code
@@ -224,7 +224,7 @@ Namespace: `mksddn-forms-handler/v1`
 * **Method**: POST
 * **Path**: `/wp-json/mksddn-forms-handler/v1/forms/{slug}/submit`
 * **Content Types**: JSON or multipart/form-data
-* **Body (JSON)**: Key/value pairs according to field configuration. The `mksddn_fh_hp` honeypot field may be present and must be empty.
+* **Body (JSON)**: Key/value pairs according to field configuration. The `mksddn_fh_hp` honeypot field may be present and must be empty (spam protection).
 * **Body (Multipart)**: Fields and file uploads supported. For multiple files, use `name[]`.
 
 = Validation & Limits =
@@ -319,12 +319,18 @@ Fields are configured as JSON in the form settings. Supported types:
 
 = Field Configuration Notes =
 
+* `name` - field name (required, used as form input name)
+* `label` - field label displayed in forms and admin (optional, falls back to `name`)
+* `notification_label` - custom label for Telegram/email notifications (optional, priority: notification_label → label → name)
+* `type` - field type (required)
+* `required` - whether field is required (boolean, default: false)
 * `options` can be an array of strings or objects `{ "value": "...", "label": "..." }`
 * For `select` with multiple choice, set `multiple: true` (shortcode renders `name[]`)
 * For `number`, optional attributes: `min`, `max`, `step`
 * For `tel`, optional `pattern` (default server validation uses `^\+?\d{7,15}$`)
 * For `date/time/datetime-local`, server validates formats: `YYYY-MM-DD`, `HH:MM`, `YYYY-MM-DDTHH:MM`
 * For REST submissions, send arrays for multiple selects
+* Pattern validation: use standard regex syntax (backslashes are preserved, invalid patterns are rejected)
 
 = File Field Options =
 
@@ -337,8 +343,8 @@ Fields are configured as JSON in the form settings. Supported types:
 
     [
       {"name":"name","label":"Name","type":"text","required":true,"placeholder":"Your name"},
-      {"name":"email","label":"Email","type":"email","required":true},
-      {"name":"phone","label":"Phone","type":"tel","pattern":"^\\+?\\d{7,15}$"},
+      {"name":"email","label":"Email","notification_label":"Email Address","type":"email","required":true},
+      {"name":"phone","label":"Phone","type":"tel","pattern":"^\\\\+?\\\\d{7,15}$"},
       {"name":"website","label":"Website","type":"url"},
       {"name":"age","label":"Age","type":"number","min":1,"max":120,"step":1},
       {"name":"birth","label":"Birth date","type":"date"},
@@ -375,6 +381,23 @@ Fields are configured as JSON in the form settings. Supported types:
       }
     ]
 
+= Pattern Validation Examples =
+
+Common regex patterns for validation (use in JSON with double backslashes):
+
+* Phone (international): `"pattern": "^\\+?\\d{7,15}$"`
+* Phone (US): `"pattern": "^\\(\\d{3}\\)\\s?\\d{3}-\\d{4}$"`
+* Postal code (US): `"pattern": "^\\d{5}(-\\d{4})?$"`
+* Postal code (RU): `"pattern": "^\\d{6}$"`
+* Only letters: `"pattern": "^[a-zA-Z]+$"`
+* Alphanumeric: `"pattern": "^[a-zA-Z0-9]+$"`
+* URL slug: `"pattern": "^[a-z0-9-]+$"`
+
+**Important notes:**
+* In JSON, backslashes must be doubled (e.g., `\\d` instead of `\d`, `\\+` instead of `\+`)
+* HTML tags in patterns will be automatically removed for security
+* Invalid regex patterns will be rejected silently (check debug.log if WP_DEBUG is enabled)
+
 = Array of Objects Field Type =
 
 The `array_of_objects` type allows you to define arrays with nested field validation. Each item in the array is validated according to the nested `fields` configuration.
@@ -382,11 +405,12 @@ The `array_of_objects` type allows you to define arrays with nested field valida
 **Configuration:**
 * `name`: Field name (required)
 * `label`: Field label (required)
+* `notification_label`: Custom label for notifications (optional, priority: notification_label → label → name)
 * `type`: Must be `"array_of_objects"` (required)
 * `required`: Whether the array is required (default: false)
 * `fields`: Array of field configurations for each object in the array (required)
 
-**Nested fields support all standard field types** (text, email, tel, url, number, textarea, etc.) with full validation.
+**Nested fields support all standard field types** (text, email, tel, url, number, textarea, etc.) with full validation. Nested fields also support `notification_label` for custom labels in Telegram/email notifications.
 
 **Example REST API submission:**
 
@@ -412,6 +436,9 @@ The `array_of_objects` type allows you to define arrays with nested field valida
     }
 
 == Upgrade Notice ==
+
+= 2.3.0 =
+Improvement: Localization for error messages and Telegram/email/Google Sheets UI. Telegram and email notifications use field labels from form config. Regex pattern validation fix. Attachment metadata generated only for images (faster uploads). Recommended update.
 
 = 2.2.0 =
 New feature: Tabbed interface for form settings with better organization. Improved localization for Google Sheets settings page. Admin structure improvements for better usability. Recommended update.
@@ -441,6 +468,14 @@ Security update: Fixed URL escaping in template examples. Recommended update for
 New feature: Template functions for custom forms integration. Bug fix: Improved Telegram message formatting. Fully backward compatible.
 
 == Changelog ==
+
+= 2.3.0 =
+* Improved: Localization — error messages (spam, rate limit, invalid data), notification labels (Telegram/email), default email subject, and Google Sheets connection messages are now translatable
+* Improved: Telegram and email notifications use field labels from form configuration (notification_label → label → name), including nested fields in array_of_objects; Google Sheets continues to receive values only (no label mapping)
+* Improved: Regex pattern validation on form config save — preserves backslashes, validates syntax; invalid patterns rejected with debug log
+* Improved: Fields config JSON stored with wp_slash to prevent backslash stripping; pattern note added in Fields Configuration UI
+* Improved: Attachment metadata (thumbnails, etc.) generated only for image MIME types — faster handling of large non-image uploads
+* Technical: TelegramHandler and FormsHandler::build_email_body() accept optional fields_config for label mapping; Utilities::sanitize_pattern_for_storage() for pattern sanitization
 
 = 2.2.0 =
 * Feature: Tabbed interface for form settings - improved organization with separate tabs for Form Fields, Email Settings, Telegram, Google Sheets, Admin Storage, Display, and Advanced options
