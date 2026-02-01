@@ -84,6 +84,34 @@ msgstr "Дата:"
 msgid "Page URL:"
 msgstr "URL страницы:"
 
+#: includes/class-forms-handler.php (email/telegram notifications)
+msgid "Form Data: %s"
+msgstr "Данные формы: %s"
+
+msgid "Field"
+msgstr "Поле"
+
+msgid "Value"
+msgstr "Значение"
+
+msgid "Sent: %s"
+msgstr "Отправлено: %s"
+
+msgid "Page URL"
+msgstr "URL страницы"
+
+msgid "New Form Submission"
+msgstr "Новая отправка формы"
+
+msgid "Time:"
+msgstr "Время:"
+
+msgid "Form Data:"
+msgstr "Данные формы:"
+
+msgid "New message from website"
+msgstr "Новое сообщение с сайта"
+
 #: includes/class-meta-boxes.php:261
 msgid "IP Address:"
 msgstr "IP-адрес:"
@@ -495,6 +523,18 @@ msgstr "Дата по"
 msgid "Cancel"
 msgstr "Отмена"
 
+#: includes/class-google-sheets-admin.php:171
+msgid "Spreadsheet ID is required."
+msgstr "Укажите ID таблицы."
+
+#: includes/class-google-sheets-admin.php:177
+msgid "✅ Google Sheets connection successful!"
+msgstr "✅ Подключение к Google Таблицам успешно!"
+
+#: includes/class-google-sheets-admin.php:179
+#, php-format
+msgid "❌ Google Sheets connection failed: %s"
+msgstr "❌ Ошибка подключения к Google Таблицам: %s"
 
 #: includes/class-google-sheets-admin.php:202
 msgid "✅ Google Sheets authentication successful! You can now use Google Sheets integration in your forms."

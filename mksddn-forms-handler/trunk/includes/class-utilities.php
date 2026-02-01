@@ -34,7 +34,7 @@ class Utilities {
             if ($form_id && !is_wp_error($form_id)) {
                 // Set meta fields
                 update_post_meta($form_id, '_recipients', get_option('admin_email'));
-                update_post_meta($form_id, '_subject', 'New message from website');
+                update_post_meta($form_id, '_subject', __( 'New message from website', 'mksddn-forms-handler' ));
 
                 // Default fields configuration
                 $default_fields = json_encode([

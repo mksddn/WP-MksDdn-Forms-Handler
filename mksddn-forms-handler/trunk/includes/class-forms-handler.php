@@ -540,7 +540,7 @@ class FormsHandler {
         // Honeypot check
         $honeypot = isset($_POST['mksddn_fh_hp']) ? sanitize_text_field( wp_unslash($_POST['mksddn_fh_hp']) ) : '';
         if (!empty($honeypot)) {
-            wp_die('Spam detected');
+            wp_die( esc_html__( 'Spam detected', 'mksddn-forms-handler' ) );
         }
 
         // Simple rate limiting per IP+form: 1 request per 10 seconds
@@ -548,7 +548,7 @@ class FormsHandler {
         $rl_key = 'mksddn_fh_rate_' . md5($form_id . '|' . $ip);
         $last_ts = get_transient($rl_key);
         if ($last_ts && (time() - (int)$last_ts) < 10) {
-            wp_die('Too many requests. Please wait a few seconds.');
+            wp_die( esc_html__( 'Too many requests. Please wait a few seconds.', 'mksddn-forms-handler' ) );
         }
         set_transient($rl_key, time(), 15);
 
@@ -615,7 +615,7 @@ class FormsHandler {
         }
 
         if (!$form_id || (!$form_data && empty($email_attachments))) {
-            wp_die('Invalid form data');
+            wp_die( esc_html__( 'Invalid form data', 'mksddn-forms-handler' ) );
         }
 
         $result = $this->process_form_submission($form_id, $form_data, $email_attachments);
@@ -1519,13 +1519,14 @@ class FormsHandler {
     private function build_email_body(\WP_Error|array $form_data, $form_title, $fields_config = null): string {
         // Build field name to label mapping
         $field_labels_map = $this->build_field_labels_map($fields_config);
-        
-        $body = sprintf('<h2>Form Data: %s</h2>', $form_title);
+
+        /* translators: %s: form title */
+        $body = sprintf( '<h2>' . __( 'Form Data: %s', 'mksddn-forms-handler' ) . '</h2>', esc_html( $form_title ) );
         $body .= "<table style='width: 100%; border-collapse: collapse;'>";
-        $body .= "<tr style='background-color: #f8f8f8;'><th style='padding: 10px; border: 1px solid #e9e9e9; text-align: left;'>Field</th><th style='padding: 10px; border: 1px solid #e9e9e9; text-align: left;'>Value</th></tr>";
+        $body .= '<tr style="background-color: #f8f8f8;"><th style="padding: 10px; border: 1px solid #e9e9e9; text-align: left;">' . esc_html__( 'Field', 'mksddn-forms-handler' ) . '</th><th style="padding: 10px; border: 1px solid #e9e9e9; text-align: left;">' . esc_html__( 'Value', 'mksddn-forms-handler' ) . '</th></tr>';
 
         foreach ($form_data as $key => $value) {
-            $field_label = $field_labels_map[$key] ?? $key;
+            $field_label = $field_labels_map[ $key ] ?? $this->get_system_field_label( $key );
             $body .= '<tr>';
             $body .= "<td style='padding: 10px; border: 1px solid #e9e9e9;'><strong>" . esc_html($field_label) . '</strong></td>';
             
@@ -1550,9 +1551,23 @@ class FormsHandler {
 
         $body .= '</table>';
 
-        return $body . ('<p><small>Sent: ' . current_time('d.m.Y H:i:s') . '</small></p>');
+        /* translators: %s: date and time */
+        return $body . ( '<p><small>' . sprintf( __( 'Sent: %s', 'mksddn-forms-handler' ), current_time( 'd.m.Y H:i:s' ) ) . '</small></p>' );
     }
-    
+
+    /**
+     * Get localized label for system-added field keys (e.g. Page URL).
+     *
+     * @param string $key Field key.
+     * @return string Label for display.
+     */
+    private function get_system_field_label( string $key ): string {
+        if ( $key === 'Page URL' ) {
+            return __( 'Page URL', 'mksddn-forms-handler' );
+        }
+        return $key;
+    }
+
     /**
      * Build field name to label mapping from fields configuration
      * Priority: notification_label → label → name

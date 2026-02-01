@@ -129,12 +129,12 @@ class GoogleSheetsAdmin {
      */
     public function handle_test_connection(): void {
         if (!current_user_can('manage_options')) {
-            wp_die('Access denied');
+            wp_die( esc_html__( 'Access denied', 'mksddn-forms-handler' ) );
         }
 
         $test_nonce = isset($_POST['test_connection_nonce']) ? sanitize_text_field( wp_unslash($_POST['test_connection_nonce']) ) : '';
         if (!$test_nonce || !wp_verify_nonce( $test_nonce, 'test_google_sheets_connection')) {
-            wp_die('Security check failed');
+            wp_die( esc_html__( 'Security check failed', 'mksddn-forms-handler' ) );
         }
 
         $spreadsheet_id = isset($_POST['spreadsheet_id']) ? sanitize_text_field( wp_unslash($_POST['spreadsheet_id']) ) : '';
@@ -158,25 +158,25 @@ class GoogleSheetsAdmin {
      */
     public function handle_ajax_test_connection(): void {
         if (!current_user_can('manage_options')) {
-            wp_die('Access denied');
+            wp_die( esc_html__( 'Access denied', 'mksddn-forms-handler' ) );
         }
 
         $ajax_nonce = isset($_POST['nonce']) ? sanitize_text_field( wp_unslash($_POST['nonce']) ) : '';
         if (!$ajax_nonce || !wp_verify_nonce( $ajax_nonce, 'test_sheets_nonce')) {
-            wp_die('Security check failed');
+            wp_die( esc_html__( 'Security check failed', 'mksddn-forms-handler' ) );
         }
 
         $spreadsheet_id = isset($_POST['spreadsheet_id']) ? sanitize_text_field( wp_unslash($_POST['spreadsheet_id']) ) : '';
         if (!$spreadsheet_id) {
-            wp_send_json_error('Spreadsheet ID is required.');
+            wp_send_json_error( __( 'Spreadsheet ID is required.', 'mksddn-forms-handler' ) );
         }
 
         $result = GoogleSheetsHandler::test_connection($spreadsheet_id);
 
         if ($result['success']) {
-            wp_send_json_success('✅ Google Sheets connection successful!');
+            wp_send_json_success( __( '✅ Google Sheets connection successful!', 'mksddn-forms-handler' ) );
         } else {
-            wp_send_json_error('❌ Google Sheets connection failed: ' . $result['message']);
+            wp_send_json_error( sprintf( __( '❌ Google Sheets connection failed: %s', 'mksddn-forms-handler' ), $result['message'] ) );
         }
     }
     

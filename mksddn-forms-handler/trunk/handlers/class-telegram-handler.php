@@ -64,14 +64,14 @@ class TelegramHandler {
     private static function build_telegram_message($form_data, $form_title, $fields_config = null): string {
         // Build field name to label mapping
         $field_labels_map = self::build_field_labels_map($fields_config);
-        
-        $message = "📝 <b>New Form Submission</b>\n\n";
-        $message .= "📋 <b>Form:</b> " . self::escape_html_for_telegram($form_title) . "\n";
-        $message .= "🕐 <b>Time:</b> " . current_time('d.m.Y H:i:s') . "\n\n";
-        $message .= "<b>Form Data:</b>\n";
+
+        $message = '📝 <b>' . self::escape_html_for_telegram( __( 'New Form Submission', 'mksddn-forms-handler' ) ) . "</b>\n\n";
+        $message .= '📋 <b>' . self::escape_html_for_telegram( __( 'Form:', 'mksddn-forms-handler' ) ) . '</b> ' . self::escape_html_for_telegram( $form_title ) . "\n";
+        $message .= '🕐 <b>' . self::escape_html_for_telegram( __( 'Time:', 'mksddn-forms-handler' ) ) . '</b> ' . current_time( 'd.m.Y H:i:s' ) . "\n\n";
+        $message .= '<b>' . self::escape_html_for_telegram( __( 'Form Data:', 'mksddn-forms-handler' ) ) . "</b>\n";
 
         foreach ($form_data as $key => $value) {
-            $field_label = $field_labels_map[$key] ?? $key;
+            $field_label = $field_labels_map[ $key ] ?? self::get_system_field_label( $key );
             $escaped_key = self::escape_html_for_telegram($field_label);
             
             if (is_array($value) && self::is_array_of_objects($value)) {
@@ -91,7 +91,20 @@ class TelegramHandler {
 
         return $message;
     }
-    
+
+    /**
+     * Get localized label for system-added field keys (e.g. Page URL).
+     *
+     * @param string $key Field key.
+     * @return string Label for display.
+     */
+    private static function get_system_field_label( string $key ): string {
+        if ( $key === 'Page URL' ) {
+            return __( 'Page URL', 'mksddn-forms-handler' );
+        }
+        return $key;
+    }
+
     /**
      * Check if array contains objects (associative arrays with multiple keys)
      *
