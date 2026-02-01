@@ -19,7 +19,7 @@ class TelegramHandler {
     /**
      * Send message to Telegram
      */
-    public static function send_message($bot_token, $chat_ids, $form_data, $form_title): \WP_Error|bool {
+    public static function send_message($bot_token, $chat_ids, $form_data, $form_title, $fields_config = null): \WP_Error|bool {
         if (!$bot_token || !$chat_ids) {
             return new \WP_Error('telegram_config_error', __( 'Telegram bot token or chat IDs not configured', 'mksddn-forms-handler' ));
         }
@@ -34,7 +34,7 @@ class TelegramHandler {
                 continue;
             }
 
-            $message = self::build_telegram_message($form_data, $form_title);
+            $message = self::build_telegram_message($form_data, $form_title, $fields_config);
             $result = self::send_telegram_request($bot_token, $chat_id, $message);
 
             if (is_wp_error($result)) {
@@ -61,19 +61,23 @@ class TelegramHandler {
     /**
      * Build Telegram message
      */
-    private static function build_telegram_message($form_data, $form_title): string {
+    private static function build_telegram_message($form_data, $form_title, $fields_config = null): string {
+        // Build field name to label mapping
+        $field_labels_map = self::build_field_labels_map($fields_config);
+        
         $message = "📝 <b>New Form Submission</b>\n\n";
         $message .= "📋 <b>Form:</b> " . self::escape_html_for_telegram($form_title) . "\n";
         $message .= "🕐 <b>Time:</b> " . current_time('d.m.Y H:i:s') . "\n\n";
         $message .= "<b>Form Data:</b>\n";
 
         foreach ($form_data as $key => $value) {
-            $escaped_key = self::escape_html_for_telegram(ucfirst($key));
+            $field_label = $field_labels_map[$key] ?? $key;
+            $escaped_key = self::escape_html_for_telegram($field_label);
             
             if (is_array($value) && self::is_array_of_objects($value)) {
                 // Render array of objects (e.g., products)
                 $message .= "• <b>" . $escaped_key . ":</b>\n";
-                $message .= self::format_array_of_objects($value);
+                $message .= self::format_array_of_objects($value, $fields_config, $key);
             } elseif (is_array($value)) {
                 // Simple array: render as comma-separated list
                 $value = implode(', ', array_map('strval', $value));
@@ -112,9 +116,32 @@ class TelegramHandler {
      * Format array of objects for Telegram message
      *
      * @param array $items Array of objects/associative arrays
+     * @param string|null $fields_config Fields configuration JSON
+     * @param string|null $parent_field_name Parent field name for nested fields lookup
      * @return string Formatted string
      */
-    private static function format_array_of_objects(array $items): string {
+    private static function format_array_of_objects(array $items, $fields_config = null, $parent_field_name = null): string {
+        // Build nested field labels map if parent field config exists
+        $nested_labels_map = [];
+        if ($fields_config && $parent_field_name) {
+            $fields = json_decode((string)$fields_config, true);
+            if (is_array($fields)) {
+                foreach ($fields as $field) {
+                    if (($field['name'] ?? '') === $parent_field_name && isset($field['fields']) && is_array($field['fields'])) {
+                        foreach ($field['fields'] as $nested_field) {
+                            $nested_name = $nested_field['name'] ?? '';
+                            // Priority: notification_label → label → name
+                            $nested_label = $nested_field['notification_label'] ?? $nested_field['label'] ?? $nested_name;
+                            if ($nested_name) {
+                                $nested_labels_map[$nested_name] = $nested_label;
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        
         $output = '';
         $item_num = 1;
         
@@ -125,7 +152,8 @@ class TelegramHandler {
             
             $output .= "  <i>Item #{$item_num}:</i>\n";
             foreach ($item as $k => $v) {
-                $escaped_k = self::escape_html_for_telegram(ucfirst($k));
+                $nested_label = $nested_labels_map[$k] ?? $k;
+                $escaped_k = self::escape_html_for_telegram($nested_label);
                 $escaped_v = is_array($v) ? implode(', ', array_map('strval', $v)) : (string) $v;
                 $escaped_v = self::escape_html_for_telegram($escaped_v);
                 $output .= "    • <b>{$escaped_k}:</b> {$escaped_v}\n";
@@ -134,6 +162,37 @@ class TelegramHandler {
         }
         
         return $output;
+    }
+    
+    /**
+     * Build field name to label mapping from fields configuration
+     * Priority: notification_label → label → name
+     *
+     * @param string|null $fields_config JSON fields configuration
+     * @return array Associative array mapping field names to labels
+     */
+    private static function build_field_labels_map($fields_config): array {
+        $labels_map = [];
+        
+        if (!$fields_config) {
+            return $labels_map;
+        }
+        
+        $fields = json_decode((string)$fields_config, true);
+        if (!is_array($fields)) {
+            return $labels_map;
+        }
+        
+        foreach ($fields as $field) {
+            if (isset($field['name'])) {
+                $field_name = $field['name'];
+                // Priority: notification_label → label → name
+                $field_label = $field['notification_label'] ?? $field['label'] ?? $field_name;
+                $labels_map[$field_name] = $field_label;
+            }
+        }
+        
+        return $labels_map;
     }
     
     /**
