@@ -174,6 +174,13 @@
                     <p class="description"><?php echo esc_html__( 'Additional CSS classes to add to the form element. Separate multiple classes with spaces.', 'mksddn-forms-handler' ); ?></p>
                 </td>
             </tr>
+            <tr>
+                <th scope="row"><label for="redirect_url"><?php echo esc_html__( 'Redirect URL After Submission', 'mksddn-forms-handler' ); ?></label></th>
+                <td>
+                    <input type="text" name="redirect_url" id="redirect_url" value="<?php echo esc_attr($redirect_url ?? ''); ?>" class="regular-text" />
+                    <p class="description"><?php echo esc_html__( 'URL or relative path to redirect to after successful form submission (e.g., https://example.com/page or /thank-you). Leave empty to show success message without redirect.', 'mksddn-forms-handler' ); ?></p>
+                </td>
+            </tr>
         </table>
     </div>
 

@@ -87,6 +87,7 @@ class MetaBoxes {
         $submit_button_text = get_post_meta($post->ID, '_submit_button_text', true);
         $custom_html_after_button = get_post_meta($post->ID, '_custom_html_after_button', true);
         $success_message_text = get_post_meta($post->ID, '_success_message_text', true);
+        $redirect_url = get_post_meta($post->ID, '_redirect_url', true);
         $form_custom_classes = get_post_meta($post->ID, '_form_custom_classes', true);
 
         // Set default values based on language if empty (only for new posts or when not set)
@@ -389,6 +390,25 @@ class MetaBoxes {
 
         if (isset($_POST['success_message_text'])) {
             update_post_meta($post_id, '_success_message_text', sanitize_text_field( wp_unslash($_POST['success_message_text']) ));
+        }
+
+        if (isset($_POST['redirect_url'])) {
+            $raw_url = trim( wp_unslash($_POST['redirect_url']) );
+            if (!empty($raw_url)) {
+                // Check if URL is absolute (starts with http:// or https://)
+                if (preg_match('#^https?://#i', $raw_url)) {
+                    $redirect_url = esc_url_raw($raw_url);
+                } else {
+                    // Relative path - sanitize and ensure it starts with /
+                    $redirect_url = sanitize_text_field($raw_url);
+                    if (!empty($redirect_url) && !preg_match('#^/#', $redirect_url)) {
+                        $redirect_url = '/' . ltrim($redirect_url, '/');
+                    }
+                }
+                update_post_meta($post_id, '_redirect_url', $redirect_url);
+            } else {
+                delete_post_meta($post_id, '_redirect_url');
+            }
         }
 
         if (isset($_POST['form_custom_classes'])) {

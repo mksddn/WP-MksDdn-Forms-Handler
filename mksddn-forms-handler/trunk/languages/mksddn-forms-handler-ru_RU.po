@@ -849,6 +849,20 @@ msgstr ""
 "Дополнительные CSS классы для добавления к элементу формы. Разделяйте "
 "несколько классов пробелами."
 
+#: templates/form-settings-meta-box.php:177
+msgid "Redirect URL After Submission"
+msgstr "URL для редиректа после отправки"
+
+#: templates/form-settings-meta-box.php:181
+msgid ""
+"URL or relative path to redirect to after successful form submission (e.g., "
+"https://example.com/page or /thank-you). Leave empty to show success message "
+"without redirect."
+msgstr ""
+"URL или относительный путь для перенаправления после успешной отправки формы "
+"(например, https://example.com/page или /thank-you). Оставьте пустым, чтобы "
+"показать сообщение об успехе без редиректа."
+
 #: templates/form-settings-meta-box.php:187
 msgid "Accept any fields from frontend"
 msgstr "Принимать любые поля с фронтенда"

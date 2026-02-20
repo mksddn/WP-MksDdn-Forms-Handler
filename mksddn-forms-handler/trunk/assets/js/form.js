@@ -20,6 +20,13 @@
             method: 'POST',
             success: function(response) {
                 if (response && response.success) {
+                    // Check if redirect URL is configured
+                    if (i18n.redirect_url && i18n.redirect_url.trim() !== '') {
+                        // Redirect to specified URL
+                        window.location.href = i18n.redirect_url;
+                        return;
+                    }
+
                     // Use custom success message if available, otherwise use default
                     var message = i18n.success_message 
                         ? i18n.success_message 
