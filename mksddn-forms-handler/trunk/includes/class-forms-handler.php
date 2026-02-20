@@ -391,12 +391,12 @@ class FormsHandler {
         $slug = $request->get_param('slug');
         $slug = is_string($slug) ? sanitize_title($slug) : '';
         if ($slug === '') {
-            return new \WP_REST_Response(['message' => 'Invalid slug'], 400);
+            return new \WP_REST_Response(['message' => __( 'Invalid slug', 'mksddn-forms-handler' )], 400);
         }
 
         $post = get_page_by_path($slug, OBJECT, 'mksddn_fh_forms');
         if (!$post) {
-            return new \WP_REST_Response(['message' => 'Form not found'], 404);
+            return new \WP_REST_Response(['message' => __( 'Form not found', 'mksddn-forms-handler' )], 404);
         }
 
         // Read and sanitize fields configuration preserving arbitrary attributes
@@ -807,7 +807,7 @@ class FormsHandler {
         }
 
         if (!$form || $form->post_type !== 'mksddn_fh_forms') {
-            return new \WP_Error('form_not_found', 'Form not found', ['status' => 404]);
+            return new \WP_Error('form_not_found', __( 'Form not found', 'mksddn-forms-handler' ), ['status' => 404]);
         }
 
         // Get all form settings in one query to reduce database calls
@@ -1068,7 +1068,7 @@ class FormsHandler {
         
         // Original validation logic
         if (!$fields_config) {
-            return new \WP_Error('security_error', 'Form fields configuration is missing', ['status' => 400]);
+            return new \WP_Error('security_error', __( 'Form fields configuration is missing', 'mksddn-forms-handler' ), ['status' => 400]);
         }
 
         $fields = json_decode((string)$fields_config, true);
@@ -1128,7 +1128,7 @@ class FormsHandler {
             // Return error if unauthorized fields present
             return new \WP_Error(
                 'unauthorized_fields',
-                'Unauthorized fields detected: ' . implode(', ', $unauthorized_fields),
+                sprintf( /* translators: %s: field names */ __( 'Unauthorized fields detected: %s', 'mksddn-forms-handler' ), implode(', ', $unauthorized_fields) ),
                 ['status' => 400]
             );
         }
@@ -1516,7 +1516,7 @@ class FormsHandler {
             return true;
         }
 
-        return new \WP_Error('email_send_error', 'Failed to send email', ['status' => 500]);
+        return new \WP_Error('email_send_error', __( 'Failed to send email', 'mksddn-forms-handler' ), ['status' => 500]);
     }
     
     /**

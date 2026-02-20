@@ -224,7 +224,7 @@ class TelegramHandler {
         ]);
 
         if (is_wp_error($response)) {
-            return new \WP_Error('telegram_request_error', 'Failed to send Telegram request: ' . $response->get_error_message());
+            return new \WP_Error('telegram_request_error', __( 'Failed to send Telegram request:', 'mksddn-forms-handler' ) . ' ' . $response->get_error_message());
         }
 
         $body = wp_remote_retrieve_body($response);

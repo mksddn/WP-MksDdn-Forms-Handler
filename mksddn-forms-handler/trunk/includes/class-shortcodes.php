@@ -244,8 +244,20 @@ class Shortcodes {
             'mksddn_fh_form',
             [
                 'sending_text' => __( 'Sending...', 'mksddn-forms-handler' ),
-                'send_text'    => __( 'Send', 'mksddn-forms-handler' ),
+                'send_text' => __( 'Send', 'mksddn-forms-handler' ),
                 'success_message' => $success_message_text,
+                'error_default' => __( 'Error', 'mksddn-forms-handler' ),
+                'error_sending' => __( 'An error occurred while sending the form', 'mksddn-forms-handler' ),
+                'unauthorized_fields_label' => __( 'Unauthorized fields:', 'mksddn-forms-handler' ),
+                'allowed_fields_label' => __( 'Allowed fields:', 'mksddn-forms-handler' ),
+                'delivery_status_label' => __( 'Delivery Status:', 'mksddn-forms-handler' ),
+                'email_sent_successfully' => __( 'Email: Sent successfully', 'mksddn-forms-handler' ),
+                'email_label' => __( 'Email:', 'mksddn-forms-handler' ),
+                'telegram_sent_successfully' => __( 'Telegram: Sent successfully', 'mksddn-forms-handler' ),
+                'telegram_label' => __( 'Telegram:', 'mksddn-forms-handler' ),
+                'google_sheets_data_saved' => __( 'Google Sheets: Data saved', 'mksddn-forms-handler' ),
+                'google_sheets_label' => __( 'Google Sheets:', 'mksddn-forms-handler' ),
+                'failed' => __( 'Failed', 'mksddn-forms-handler' ),
             ]
         );
         ?>

@@ -8,7 +8,8 @@
         var $message = $form.siblings('.form-message');
         var $submitButton = $form.find('.submit-button');
 
-        $submitButton.prop('disabled', true).text(mksddn_fh_form && mksddn_fh_form.sending_text ? mksddn_fh_form.sending_text : 'Sending...');
+        var i18n = mksddn_fh_form || {};
+        $submitButton.prop('disabled', true).text(i18n.sending_text || 'Sending...');
         $message.hide();
 
         // Check if form has file inputs
@@ -20,8 +21,8 @@
             success: function(response) {
                 if (response && response.success) {
                     // Use custom success message if available, otherwise use default
-                    var message = (mksddn_fh_form && mksddn_fh_form.success_message) 
-                        ? mksddn_fh_form.success_message 
+                    var message = i18n.success_message 
+                        ? i18n.success_message 
                         : (response.data && response.data.message ? response.data.message : 'Thank you! Your message has been sent successfully.');
 
                     // Hide technical delivery information from users on success
@@ -30,38 +31,38 @@
                     $message.removeClass('error').addClass('success').html(message).show();
                     $form[0].reset();
                 } else {
-                    var errorMessage = (response && response.data && response.data.message) ? response.data.message : 'Error';
+                    var errorMessage = (response && response.data && response.data.message) ? response.data.message : (i18n.error_default || 'Error');
 
                     if (response && response.data && response.data.unauthorized_fields && response.data.unauthorized_fields.length > 0) {
-                        errorMessage += '<br><br><strong>Unauthorized fields:</strong> ' + response.data.unauthorized_fields.join(', ');
+                        errorMessage += '<br><br><strong>' + (i18n.unauthorized_fields_label || 'Unauthorized fields:') + '</strong> ' + response.data.unauthorized_fields.join(', ');
                         if (response.data.allowed_fields && response.data.allowed_fields.length > 0) {
-                            errorMessage += '<br><strong>Allowed fields:</strong> ' + response.data.allowed_fields.join(', ');
+                            errorMessage += '<br><strong>' + (i18n.allowed_fields_label || 'Allowed fields:') + '</strong> ' + response.data.allowed_fields.join(', ');
                         }
                     }
 
                     if (response && response.data && response.data.delivery_results) {
-                        errorMessage += '<br><br><strong>Delivery Status:</strong><br>';
+                        errorMessage += '<br><br><strong>' + (i18n.delivery_status_label || 'Delivery Status:') + '</strong><br>';
                         var delivery = response.data.delivery_results;
 
                         if (delivery.email && delivery.email.success) {
-                            errorMessage += '✅ Email: Sent successfully<br>';
+                            errorMessage += '✅ ' + (i18n.email_sent_successfully || 'Email: Sent successfully') + '<br>';
                         } else if (delivery.email) {
-                            errorMessage += '❌ Email: ' + (delivery.email.error || 'Failed') + '<br>';
+                            errorMessage += '❌ ' + (i18n.email_label || 'Email:') + ' ' + (delivery.email.error || (i18n.failed || 'Failed')) + '<br>';
                         }
 
                         if (delivery.telegram && delivery.telegram.enabled) {
                             if (delivery.telegram.success) {
-                                errorMessage += '✅ Telegram: Sent successfully<br>';
+                                errorMessage += '✅ ' + (i18n.telegram_sent_successfully || 'Telegram: Sent successfully') + '<br>';
                             } else {
-                                errorMessage += '❌ Telegram: ' + (delivery.telegram.error || 'Failed') + '<br>';
+                                errorMessage += '❌ ' + (i18n.telegram_label || 'Telegram:') + ' ' + (delivery.telegram.error || (i18n.failed || 'Failed')) + '<br>';
                             }
                         }
 
                         if (delivery.google_sheets && delivery.google_sheets.enabled) {
                             if (delivery.google_sheets.success) {
-                                errorMessage += '✅ Google Sheets: Data saved<br>';
+                                errorMessage += '✅ ' + (i18n.google_sheets_data_saved || 'Google Sheets: Data saved') + '<br>';
                             } else {
-                                errorMessage += '❌ Google Sheets: ' + (delivery.google_sheets.error || 'Failed') + '<br>';
+                                errorMessage += '❌ ' + (i18n.google_sheets_label || 'Google Sheets:') + ' ' + (delivery.google_sheets.error || (i18n.failed || 'Failed')) + '<br>';
                             }
                         }
                     }
@@ -70,10 +71,10 @@
                 }
             },
             error: function() {
-                $message.removeClass('success').addClass('error').html('An error occurred while sending the form').show();
+                $message.removeClass('success').addClass('error').html(i18n.error_sending || 'An error occurred while sending the form').show();
             },
             complete: function() {
-                $submitButton.prop('disabled', false).text(mksddn_fh_form && mksddn_fh_form.send_text ? mksddn_fh_form.send_text : 'Send');
+                $submitButton.prop('disabled', false).text(i18n.send_text || 'Send');
             }
         };
 
