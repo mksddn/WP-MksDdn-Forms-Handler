@@ -92,6 +92,36 @@
                     <p class="description"><?php echo esc_html__( 'Chat IDs separated by commas (e.g., -1001234567890, -1009876543210)', 'mksddn-forms-handler' ); ?></p>
                 </td>
             </tr>
+            <tr>
+                <th scope="row">
+                    <label>
+                        <input type="checkbox" name="use_custom_telegram_template" id="use_custom_telegram_template" value="1" <?php checked($use_custom_telegram_template, '1'); ?> />
+                        <?php echo esc_html__( 'Use Custom Template', 'mksddn-forms-handler' ); ?>
+                    </label>
+                </th>
+                <td>
+                    <p class="description"><?php echo esc_html__( 'Enable custom template for Telegram notifications', 'mksddn-forms-handler' ); ?></p>
+                </td>
+            </tr>
+            <tr class="mksddn-telegram-template-row" style="<?php echo $use_custom_telegram_template ? '' : 'display: none;'; ?>"<?php echo !empty($default_telegram_template) ? ' data-default-template="' . esc_attr($default_telegram_template) . '"' : ''; ?>>
+                <th scope="row"><label for="telegram_template"><?php echo esc_html__( 'Telegram Template', 'mksddn-forms-handler' ); ?></label></th>
+                <td>
+                    <textarea name="telegram_template" id="telegram_template" rows="15" cols="50" class="large-text code"><?php echo esc_textarea($telegram_template); ?></textarea>
+                    <p class="description">
+                        <?php echo esc_html__( 'Custom template for Telegram notifications. Use placeholders:', 'mksddn-forms-handler' ); ?><br>
+                        <strong><?php echo esc_html__( 'System placeholders:', 'mksddn-forms-handler' ); ?></strong><br>
+                        <code>{form_title}</code> - <?php echo esc_html__( 'Form title', 'mksddn-forms-handler' ); ?><br>
+                        <code>{date}</code> - <?php echo esc_html__( 'Date (d.m.Y)', 'mksddn-forms-handler' ); ?><br>
+                        <code>{time}</code> - <?php echo esc_html__( 'Time (H:i:s)', 'mksddn-forms-handler' ); ?><br>
+                        <code>{datetime}</code> - <?php echo esc_html__( 'Date and time (d.m.Y H:i:s)', 'mksddn-forms-handler' ); ?><br>
+                        <code>{page_url}</code> - <?php echo esc_html__( 'Page URL', 'mksddn-forms-handler' ); ?><br>
+                        <strong><?php echo esc_html__( 'Field placeholders:', 'mksddn-forms-handler' ); ?></strong><br>
+                        <code>{field:field_name}</code> - <?php echo esc_html__( 'Field value (replace field_name with actual field name)', 'mksddn-forms-handler' ); ?><br>
+                        <code>{field_label:field_name}</code> - <?php echo esc_html__( 'Field label (replace field_name with actual field name)', 'mksddn-forms-handler' ); ?><br>
+                        <strong><?php echo esc_html__( 'Note:', 'mksddn-forms-handler' ); ?></strong> <?php echo esc_html__( 'You can use HTML tags supported by Telegram (b, i, u, s, code, pre, a).', 'mksddn-forms-handler' ); ?>
+                    </p>
+                </td>
+            </tr>
         </table>
     </div>
 

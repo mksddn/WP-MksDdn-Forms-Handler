@@ -44,6 +44,7 @@ require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/includes/class-google-sheets-ad
 require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/includes/class-assets.php';
 
 // Load handlers
+require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/handlers/class-template-parser.php';
 require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/handlers/class-telegram-handler.php';
 require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/handlers/class-google-sheets-handler.php';
 

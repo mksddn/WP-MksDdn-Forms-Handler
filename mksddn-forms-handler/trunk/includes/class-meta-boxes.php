@@ -79,6 +79,19 @@ class MetaBoxes {
         $telegram_bot_token = get_post_meta($post->ID, '_telegram_bot_token', true);
         $telegram_chat_ids = get_post_meta($post->ID, '_telegram_chat_ids', true);
         $send_to_telegram = get_post_meta($post->ID, '_send_to_telegram', true);
+        $use_custom_telegram_template = get_post_meta($post->ID, '_use_custom_telegram_template', true);
+        $telegram_template = get_post_meta($post->ID, '_telegram_template', true);
+        
+        // Generate default template for JavaScript (always generate if fields_config exists)
+        $default_telegram_template = '';
+        if ($fields_config) {
+            $default_telegram_template = TemplateParser::get_default_template($fields_config);
+        }
+        
+        // If custom template is enabled but template is empty, use default template
+        if ($use_custom_telegram_template && empty($telegram_template) && $fields_config) {
+            $telegram_template = $default_telegram_template;
+        }
         $send_to_sheets = get_post_meta($post->ID, '_send_to_sheets', true);
         $sheets_spreadsheet_id = get_post_meta($post->ID, '_sheets_spreadsheet_id', true);
         $sheets_sheet_name = get_post_meta($post->ID, '_sheets_sheet_name', true);
@@ -351,6 +364,31 @@ class MetaBoxes {
 
         if (isset($_POST['telegram_chat_ids'])) {
             update_post_meta($post_id, '_telegram_chat_ids', sanitize_text_field( wp_unslash($_POST['telegram_chat_ids']) ));
+        }
+
+        if (isset($_POST['use_custom_telegram_template'])) {
+            update_post_meta($post_id, '_use_custom_telegram_template', '1');
+            
+            // If template is empty, generate default template
+            $fields_config = get_post_meta($post_id, '_fields_config', true);
+            $current_template = isset($_POST['telegram_template']) ? wp_unslash($_POST['telegram_template']) : '';
+            
+            if (empty(trim($current_template)) && $fields_config) {
+                $default_template = TemplateParser::get_default_template($fields_config);
+                update_post_meta($post_id, '_telegram_template', sanitize_textarea_field($default_template));
+            } elseif (isset($_POST['telegram_template'])) {
+                // Sanitize template but preserve placeholders and HTML tags
+                $template = wp_unslash($_POST['telegram_template']);
+                update_post_meta($post_id, '_telegram_template', sanitize_textarea_field($template));
+            }
+        } else {
+            update_post_meta($post_id, '_use_custom_telegram_template', '0');
+            
+            // Save template even if checkbox is unchecked (user might want to re-enable later)
+            if (isset($_POST['telegram_template'])) {
+                $template = wp_unslash($_POST['telegram_template']);
+                update_post_meta($post_id, '_telegram_template', sanitize_textarea_field($template));
+            }
         }
 
         if (isset($_POST['send_to_sheets'])) {

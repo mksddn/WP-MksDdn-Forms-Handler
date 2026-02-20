@@ -44,6 +44,12 @@
             $(document).on('click', '.mksddn-tab-nav', function(e) {
                 self.switchTab.call(this, e);
             });
+            
+            // Telegram custom template toggle
+            $(document).on('change', '#use_custom_telegram_template', this.toggleTelegramTemplate);
+            
+            // Initialize telegram template visibility on page load
+            this.initTelegramTemplate();
         },
 
         /**
@@ -389,6 +395,54 @@
                     $(this).remove();
                 });
             }, 3000);
+        },
+
+        /**
+         * Toggle Telegram template field visibility
+         */
+        toggleTelegramTemplate: function() {
+            var $checkbox = $(this);
+            var $templateRow = $('.mksddn-telegram-template-row');
+            
+            if ($checkbox.is(':checked')) {
+                $templateRow.slideDown();
+                
+                    // If template is empty, populate with default template from data attribute
+                    var $templateField = $('#telegram_template');
+                    if (!$templateField.val() || $templateField.val().trim() === '') {
+                        var defaultTemplate = $templateRow.data('default-template');
+                        if (defaultTemplate) {
+                            $templateField.val(defaultTemplate);
+                        }
+                    }
+            } else {
+                $templateRow.slideUp();
+            }
+        },
+
+        /**
+         * Initialize Telegram template visibility on page load
+         */
+        initTelegramTemplate: function() {
+            var $checkbox = $('#use_custom_telegram_template');
+            if ($checkbox.length) {
+                // Set initial visibility state
+                var $templateRow = $('.mksddn-telegram-template-row');
+                if ($checkbox.is(':checked')) {
+                    $templateRow.show();
+                    
+                    // If template is empty, populate with default template from data attribute
+                    var $templateField = $('#telegram_template');
+                    if (!$templateField.val() || $templateField.val().trim() === '') {
+                        var defaultTemplate = $templateRow.data('default-template');
+                        if (defaultTemplate) {
+                            $templateField.val(defaultTemplate);
+                        }
+                    }
+                } else {
+                    $templateRow.hide();
+                }
+            }
         }
     };
 

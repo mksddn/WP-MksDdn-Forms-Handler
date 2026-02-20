@@ -903,3 +903,67 @@ msgstr ""
 #: handlers/class-google-sheets-handler.php:131
 msgid "Spreadsheet ID is required"
 msgstr ""
+
+#: templates/form-settings-meta-box.php:99
+msgid "Use Custom Template"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:103
+msgid "Enable custom template for Telegram notifications"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:107
+msgid "Telegram Template"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:111
+msgid "Custom template for Telegram notifications. Use placeholders:"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:112
+msgid "System placeholders:"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:113
+msgid "Form title"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:114
+msgid "Date (d.m.Y)"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:115
+msgid "Time (H:i:s)"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:116
+msgid "Date and time (d.m.Y H:i:s)"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:117
+msgid "Page URL"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:118
+msgid "Field placeholders:"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:119
+msgid "Field value (replace field_name with actual field name)"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:120
+msgid "Field label (replace field_name with actual field name)"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:121
+msgid "Note:"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:121
+msgid "You can use HTML tags supported by Telegram (b, i, u, s, code, pre, a)."
+msgstr ""
+
+#: handlers/class-template-parser.php:192
+msgid "Page URL:"
+msgstr ""

@@ -724,12 +724,20 @@ class FormsHandler {
         // Send to Telegram
         if ($form_config['send_to_telegram'] && $form_config['telegram_bot_token'] && $form_config['telegram_chat_ids']) {
             $delivery_results['telegram']['enabled'] = true;
+            
+            // Get custom template if enabled
+            $custom_template = null;
+            if ($form_config['use_custom_telegram_template'] && !empty($form_config['telegram_template'])) {
+                $custom_template = $form_config['telegram_template'];
+            }
+            
             $telegram_result = \MksDdn\FormsHandler\TelegramHandler::send_message(
                 $form_config['telegram_bot_token'], 
                 $form_config['telegram_chat_ids'], 
                 $filtered_form_data, 
                 $form_config['form_title'],
-                $form_config['fields_config']
+                $form_config['fields_config'],
+                $custom_template
             );
             $delivery_results['telegram']['success'] = !is_wp_error($telegram_result);
             if (is_wp_error($telegram_result)) {
@@ -823,6 +831,8 @@ class FormsHandler {
             'send_to_telegram' => get_post_meta($form->ID, '_send_to_telegram', true),
             'telegram_bot_token' => get_post_meta($form->ID, '_telegram_bot_token', true),
             'telegram_chat_ids' => get_post_meta($form->ID, '_telegram_chat_ids', true),
+            'use_custom_telegram_template' => get_post_meta($form->ID, '_use_custom_telegram_template', true),
+            'telegram_template' => get_post_meta($form->ID, '_telegram_template', true),
             'send_to_sheets' => get_post_meta($form->ID, '_send_to_sheets', true),
             'sheets_spreadsheet_id' => get_post_meta($form->ID, '_sheets_spreadsheet_id', true),
             'sheets_sheet_name' => get_post_meta($form->ID, '_sheets_sheet_name', true),

@@ -18,8 +18,16 @@ class TelegramHandler {
     
     /**
      * Send message to Telegram
+     *
+     * @param string $bot_token Telegram bot token
+     * @param string $chat_ids Comma-separated chat IDs
+     * @param array $form_data Form submission data
+     * @param string $form_title Form title
+     * @param string|null $fields_config Fields configuration JSON
+     * @param string|null $custom_template Custom template string (optional)
+     * @return \WP_Error|bool
      */
-    public static function send_message($bot_token, $chat_ids, $form_data, $form_title, $fields_config = null): \WP_Error|bool {
+    public static function send_message($bot_token, $chat_ids, $form_data, $form_title, $fields_config = null, $custom_template = null): \WP_Error|bool {
         if (!$bot_token || !$chat_ids) {
             return new \WP_Error('telegram_config_error', __( 'Telegram bot token or chat IDs not configured', 'mksddn-forms-handler' ));
         }
@@ -34,7 +42,11 @@ class TelegramHandler {
                 continue;
             }
 
-            $message = self::build_telegram_message($form_data, $form_title, $fields_config);
+            $message = self::build_telegram_message($form_data, $form_title, $fields_config, $custom_template);
+            
+            // Apply filter for advanced customization
+            $message = apply_filters('mksddn_forms_telegram_message', $message, $form_data, $form_title, $fields_config);
+            
             $result = self::send_telegram_request($bot_token, $chat_id, $message);
 
             if (is_wp_error($result)) {
@@ -53,15 +65,29 @@ class TelegramHandler {
     
     /**
      * Escape HTML special characters for Telegram
+     *
+     * @param string $text Text to escape
+     * @return string Escaped text
      */
-    private static function escape_html_for_telegram($text): string {
+    public static function escape_html_for_telegram($text): string {
         return htmlspecialchars($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
     }
 
     /**
      * Build Telegram message
+     *
+     * @param array $form_data Form submission data
+     * @param string $form_title Form title
+     * @param string|null $fields_config Fields configuration JSON
+     * @param string|null $custom_template Custom template string (optional)
+     * @return string Formatted message
      */
-    private static function build_telegram_message($form_data, $form_title, $fields_config = null): string {
+    private static function build_telegram_message($form_data, $form_title, $fields_config = null, $custom_template = null): string {
+        // Use custom template if provided
+        if (!empty($custom_template)) {
+            return TemplateParser::parse($custom_template, $form_data, $form_title, $fields_config);
+        }
+        
         // Build field name to label mapping
         $field_labels_map = self::build_field_labels_map($fields_config);
 
@@ -111,7 +137,7 @@ class TelegramHandler {
      * @param array $value Array to check
      * @return bool True if array contains objects
      */
-    private static function is_array_of_objects(array $value): bool {
+    public static function is_array_of_objects(array $value): bool {
         if (empty($value)) {
             return false;
         }
@@ -133,7 +159,7 @@ class TelegramHandler {
      * @param string|null $parent_field_name Parent field name for nested fields lookup
      * @return string Formatted string
      */
-    private static function format_array_of_objects(array $items, $fields_config = null, $parent_field_name = null): string {
+    public static function format_array_of_objects(array $items, $fields_config = null, $parent_field_name = null): string {
         // Build nested field labels map if parent field config exists
         $nested_labels_map = [];
         if ($fields_config && $parent_field_name) {
