@@ -435,7 +435,32 @@ class MetaBoxes {
             if (!empty($raw_url)) {
                 // Check if URL is absolute (starts with http:// or https://)
                 if (preg_match('#^https?://#i', $raw_url)) {
-                    $redirect_url = esc_url_raw($raw_url);
+                    // Validate absolute URL - only allow same domain for security
+                    $url_host = parse_url($raw_url, PHP_URL_HOST);
+                    $site_host = parse_url(home_url(), PHP_URL_HOST);
+                    
+                    if ($url_host === $site_host) {
+                        // Same domain - safe to use
+                        $redirect_url = esc_url_raw($raw_url);
+                    } else {
+                        // External domain - check whitelist
+                        $allowed_hosts = apply_filters('mksddn_fh_allowed_redirect_hosts', []);
+                        if (in_array($url_host, $allowed_hosts, true)) {
+                            $redirect_url = esc_url_raw($raw_url);
+                        } else {
+                            // External domain not allowed
+                            add_settings_error(
+                                'mksddn_fh',
+                                'redirect_external',
+                                sprintf(
+                                    /* translators: %s: external domain */
+                                    __('External redirect URLs are not allowed (%s). Use relative URLs or add domain to whitelist.', 'mksddn-forms-handler'),
+                                    esc_html($url_host)
+                                )
+                            );
+                            $redirect_url = '';
+                        }
+                    }
                 } else {
                     // Relative path - sanitize and ensure it starts with /
                     $redirect_url = sanitize_text_field($raw_url);
@@ -443,7 +468,12 @@ class MetaBoxes {
                         $redirect_url = '/' . ltrim($redirect_url, '/');
                     }
                 }
-                update_post_meta($post_id, '_redirect_url', $redirect_url);
+                
+                if (!empty($redirect_url)) {
+                    update_post_meta($post_id, '_redirect_url', $redirect_url);
+                } else {
+                    delete_post_meta($post_id, '_redirect_url');
+                }
             } else {
                 delete_post_meta($post_id, '_redirect_url');
             }

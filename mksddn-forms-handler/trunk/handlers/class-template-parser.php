@@ -20,6 +20,7 @@ class TemplateParser {
     
     /**
      * Maximum template size in characters
+     * Can be overridden via filter: mksddn_fh_max_template_size
      */
     private const MAX_TEMPLATE_SIZE = 10000;
     
@@ -33,10 +34,16 @@ class TemplateParser {
      * @return string Parsed template
      */
     public static function parse($template, $form_data, $form_title, $fields_config = null): string {
-        // Validate template size
-        if (strlen($template) > self::MAX_TEMPLATE_SIZE) {
-            error_log('TemplateParser: Template exceeds maximum size (' . self::MAX_TEMPLATE_SIZE . ' characters)');
-            return __('Template is too large', 'mksddn-forms-handler');
+        // Validate template size (allow override via filter)
+        $max_size = apply_filters('mksddn_fh_max_template_size', self::MAX_TEMPLATE_SIZE);
+        if (strlen($template) > $max_size) {
+            error_log(sprintf(
+                'TemplateParser: Template exceeds maximum size (%d chars, max %d)',
+                strlen($template),
+                $max_size
+            ));
+            // Return default template instead of error message
+            return self::get_default_template($fields_config);
         }
         
         // Build field name to label mapping
@@ -112,14 +119,9 @@ class TemplateParser {
      * @return string Formatted value
      */
     private static function format_field_value($value, $fields_config = null, $field_name = null): string {
-        // Check if TelegramHandler methods exist before calling
-        if (is_array($value) && method_exists('MksDdn\FormsHandler\TelegramHandler', 'is_array_of_objects')) {
-            if (TelegramHandler::is_array_of_objects($value)) {
-                // Render array of objects (e.g., products)
-                if (method_exists('MksDdn\FormsHandler\TelegramHandler', 'format_array_of_objects')) {
-                    return TelegramHandler::format_array_of_objects($value, $fields_config, $field_name);
-                }
-            }
+        // Check if value is array of objects (e.g., products)
+        if (is_array($value) && TelegramHandler::is_array_of_objects($value)) {
+            return TelegramHandler::format_array_of_objects($value, $fields_config, $field_name);
         }
         
         if (is_array($value)) {

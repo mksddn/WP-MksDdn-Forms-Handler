@@ -31,6 +31,9 @@ define('MKSDDN_FORMS_HANDLER_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('MKSDDN_FORMS_HANDLER_PLUGIN_FILE', __FILE__);
 define('MKSDDN_FORMS_HANDLER_PLUGIN_BASENAME', plugin_basename(__FILE__));
 
+// Load traits first (before classes that use them)
+require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/includes/traits/trait-telegram-formatter.php';
+
 // Load components
 require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/includes/class-post-types.php';
 require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/includes/class-meta-boxes.php';
@@ -42,9 +45,6 @@ require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/includes/class-security.php';
 require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/includes/class-utilities.php';
 require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/includes/class-google-sheets-admin.php';
 require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/includes/class-assets.php';
-
-// Load traits
-require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/includes/traits/trait-telegram-formatter.php';
 
 // Load handlers
 require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/handlers/class-template-parser.php';

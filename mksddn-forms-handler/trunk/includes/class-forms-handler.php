@@ -17,6 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Main forms handler class
  */
 class FormsHandler {
+    use TelegramFormatterTrait;
     
     /**
      * Cache for form configurations
@@ -1560,7 +1561,7 @@ class FormsHandler {
      */
     private function build_email_body(\WP_Error|array $form_data, $form_title, $fields_config = null): string {
         // Build field name to label mapping
-        $field_labels_map = $this->build_field_labels_map($fields_config);
+        $field_labels_map = self::build_field_labels_map($fields_config);
 
         /* translators: %s: form title */
         $body = sprintf( '<h2>' . __( 'Form Data: %s', 'mksddn-forms-handler' ) . '</h2>', esc_html( $form_title ) );
@@ -1568,7 +1569,7 @@ class FormsHandler {
         $body .= '<tr style="background-color: #f8f8f8;"><th style="padding: 10px; border: 1px solid #e9e9e9; text-align: left;">' . esc_html__( 'Field', 'mksddn-forms-handler' ) . '</th><th style="padding: 10px; border: 1px solid #e9e9e9; text-align: left;">' . esc_html__( 'Value', 'mksddn-forms-handler' ) . '</th></tr>';
 
         foreach ($form_data as $key => $value) {
-            $field_label = $field_labels_map[ $key ] ?? $this->get_system_field_label( $key );
+            $field_label = $field_labels_map[ $key ] ?? self::get_system_field_label( $key );
             $body .= '<tr>';
             $body .= "<td style='padding: 10px; border: 1px solid #e9e9e9;'><strong>" . esc_html($field_label) . '</strong></td>';
             
@@ -1597,49 +1598,6 @@ class FormsHandler {
         return $body . ( '<p><small>' . sprintf( __( 'Sent: %s', 'mksddn-forms-handler' ), current_time( 'd.m.Y H:i:s' ) ) . '</small></p>' );
     }
 
-    /**
-     * Get localized label for system-added field keys (e.g. Page URL).
-     *
-     * @param string $key Field key.
-     * @return string Label for display.
-     */
-    private function get_system_field_label( string $key ): string {
-        if ( $key === 'Page URL' ) {
-            return __( 'Page URL', 'mksddn-forms-handler' );
-        }
-        return $key;
-    }
-
-    /**
-     * Build field name to label mapping from fields configuration
-     * Priority: notification_label → label → name
-     *
-     * @param string|null $fields_config JSON fields configuration
-     * @return array Associative array mapping field names to labels
-     */
-    private function build_field_labels_map($fields_config): array {
-        $labels_map = [];
-        
-        if (!$fields_config) {
-            return $labels_map;
-        }
-        
-        $fields = json_decode((string)$fields_config, true);
-        if (!is_array($fields)) {
-            return $labels_map;
-        }
-        
-        foreach ($fields as $field) {
-            if (isset($field['name'])) {
-                $field_name = $field['name'];
-                // Priority: notification_label → label → name
-                $field_label = $field['notification_label'] ?? $field['label'] ?? $field_name;
-                $labels_map[$field_name] = $field_label;
-            }
-        }
-        
-        return $labels_map;
-    }
     
     /**
      * Check if array contains objects (associative arrays with multiple keys)

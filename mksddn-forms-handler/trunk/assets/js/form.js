@@ -23,14 +23,21 @@
                     // Check if redirect URL is configured and validate it
                     if (i18n.redirect_url && i18n.redirect_url.trim() !== '') {
                         var redirectUrl = i18n.redirect_url.trim();
-                        // Validate URL: only allow http:// or https:// protocols
-                        if (/^https?:\/\//.test(redirectUrl)) {
-                            // Redirect to specified URL
-                            window.location.href = redirectUrl;
-                            return;
-                        } else {
-                            // Log error but don't block success message
-                            console.warn('Invalid redirect URL format:', redirectUrl);
+                        
+                        try {
+                            // Parse URL (relative URLs will be resolved against current origin)
+                            var url = new URL(redirectUrl, window.location.origin);
+                            
+                            // Allow only same origin redirects for security
+                            if (url.origin === window.location.origin) {
+                                window.location.href = url.href;
+                                return;
+                            } else {
+                                console.warn('Redirect to external domain not allowed:', redirectUrl);
+                            }
+                        } catch(e) {
+                            // If URL parsing fails, it might be a malformed URL
+                            console.warn('Invalid redirect URL:', redirectUrl, e);
                         }
                     }
 
