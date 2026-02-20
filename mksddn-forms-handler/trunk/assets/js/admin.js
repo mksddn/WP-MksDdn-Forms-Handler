@@ -93,7 +93,10 @@
         removeField: function(e) {
             e.preventDefault();
             
-            if (confirm('Are you sure you want to remove this field?')) {
+            var i18n = (typeof mksddn_fh_admin !== 'undefined') ? mksddn_fh_admin : {};
+            var confirmText = i18n.confirm_remove_field || 'Are you sure you want to remove this field?';
+            
+            if (confirm(confirmText)) {
                 $(this).closest('.mksddn-field-item').remove();
                 MksDdnFormsHandler.updateFieldCount();
             }
@@ -149,15 +152,19 @@
                     nonce: mksddn_ajax.nonce
                 },
                 success: function(response) {
+                    var i18n = (typeof mksddn_fh_admin !== 'undefined') ? mksddn_fh_admin : {};
+                    
                     if (response.success) {
                         $('#mksddn-preview-container').html(response.data.html);
                         $('#mksddn-preview-modal').show();
                     } else {
-                        alert('Error generating preview: ' + response.data.message);
+                        var errorText = (i18n.error_generating_preview || 'Error generating preview:') + ' ' + (response.data.message || '');
+                        alert(errorText);
                     }
                 },
                 error: function() {
-                    alert('Error generating preview. Please try again.');
+                    var i18n = (typeof mksddn_fh_admin !== 'undefined') ? mksddn_fh_admin : {};
+                    alert(i18n.error_generating_preview_retry || 'Error generating preview. Please try again.');
                 }
             });
         },
@@ -318,6 +325,7 @@
          */
         validateForm: function($form) {
             var isValid = true;
+            var i18n = (typeof mksddn_fh_admin !== 'undefined') ? mksddn_fh_admin : {};
             
             // Clear previous errors
             $form.find('.mksddn-error').remove();
@@ -330,7 +338,8 @@
                 if (!value) {
                     isValid = false;
                     $field.addClass('mksddn-error');
-                    $field.after('<span class="mksddn-error-message">This field is required.</span>');
+                    var errorMsg = i18n.field_required || 'This field is required.';
+                    $field.after('<span class="mksddn-error-message">' + errorMsg + '</span>');
                 }
             });
             
@@ -342,7 +351,8 @@
                 if (value && !MksDdnFormsHandler.isValidEmail(value)) {
                     isValid = false;
                     $field.addClass('mksddn-error');
-                    $field.after('<span class="mksddn-error-message">Please enter a valid email address.</span>');
+                    var errorMsg = i18n.enter_valid_email || 'Please enter a valid email address.';
+                    $field.after('<span class="mksddn-error-message">' + errorMsg + '</span>');
                 }
             });
             

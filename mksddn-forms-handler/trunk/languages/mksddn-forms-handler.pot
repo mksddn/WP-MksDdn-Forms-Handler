@@ -967,3 +967,31 @@ msgstr ""
 #: handlers/class-template-parser.php:192
 msgid "Page URL:"
 msgstr ""
+
+#: includes/class-meta-boxes.php:118
+msgid "By clicking the button, you agree to the"
+msgstr ""
+
+#: includes/class-meta-boxes.php:118
+msgid "privacy policy"
+msgstr ""
+
+#: assets/js/admin.js:96
+msgid "Are you sure you want to remove this field?"
+msgstr ""
+
+#: assets/js/admin.js:156
+msgid "Error generating preview:"
+msgstr ""
+
+#: assets/js/admin.js:160
+msgid "Error generating preview. Please try again."
+msgstr ""
+
+#: assets/js/admin.js:333
+msgid "This field is required."
+msgstr ""
+
+#: assets/js/admin.js:345
+msgid "Please enter a valid email address."
+msgstr ""

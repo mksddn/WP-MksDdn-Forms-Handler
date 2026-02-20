@@ -71,6 +71,11 @@ class Assets {
                     'ajax_url' => admin_url( 'admin-ajax.php' ),
                     'nonce_test_sheets' => wp_create_nonce( 'test_sheets_nonce' ),
                     'export_by_date_text' => __( 'Export by Date', 'mksddn-forms-handler' ),
+                    'confirm_remove_field' => __( 'Are you sure you want to remove this field?', 'mksddn-forms-handler' ),
+                    'error_generating_preview' => __( 'Error generating preview:', 'mksddn-forms-handler' ),
+                    'error_generating_preview_retry' => __( 'Error generating preview. Please try again.', 'mksddn-forms-handler' ),
+                    'field_required' => __( 'This field is required.', 'mksddn-forms-handler' ),
+                    'enter_valid_email' => __( 'Please enter a valid email address.', 'mksddn-forms-handler' ),
                 ]
             );
         }

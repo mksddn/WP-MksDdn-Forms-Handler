@@ -997,6 +997,34 @@ msgstr "Вы можете использовать HTML теги, поддерж
 msgid "Page URL:"
 msgstr "URL страницы:"
 
+#: includes/class-meta-boxes.php:118
+msgid "By clicking the button, you agree to the"
+msgstr "Нажимая кнопку, вы соглашаетесь с"
+
+#: includes/class-meta-boxes.php:118
+msgid "privacy policy"
+msgstr "политикой конфиденциальности"
+
+#: assets/js/admin.js:96
+msgid "Are you sure you want to remove this field?"
+msgstr "Вы уверены, что хотите удалить это поле?"
+
+#: assets/js/admin.js:156
+msgid "Error generating preview:"
+msgstr "Ошибка генерации превью:"
+
+#: assets/js/admin.js:160
+msgid "Error generating preview. Please try again."
+msgstr "Ошибка генерации превью. Пожалуйста, попробуйте снова."
+
+#: assets/js/admin.js:333
+msgid "This field is required."
+msgstr "Это поле обязательно для заполнения."
+
+#: assets/js/admin.js:345
+msgid "Please enter a valid email address."
+msgstr "Пожалуйста, введите корректный email адрес."
+
 #~ msgid ""
 #~ "✅ Google Sheets authentication successful! You can now use Google Sheets "
 #~ "integration in your forms."
