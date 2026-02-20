@@ -20,8 +20,17 @@ class PostTypes {
     
     public function __construct() {
         add_action('init', [$this, 'register_post_types']);
+        add_action('init', [$this, 'remove_unused_supports'], 20);
     }
     
+    /**
+     * Remove unused post type features (excerpt, etc.)
+     */
+    public function remove_unused_supports(): void {
+        remove_post_type_support('mksddn_fh_forms', 'excerpt');
+        remove_post_type_support('mksddn_fh_submits', 'excerpt');
+    }
+
     /**
      * Register custom post types
      */
