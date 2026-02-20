@@ -44,6 +44,12 @@
             $(document).on('click', '.mksddn-tab-nav', function(e) {
                 self.switchTab.call(this, e);
             });
+            
+            // Telegram custom template toggle
+            $(document).on('change', '#use_custom_telegram_template', this.toggleTelegramTemplate);
+            
+            // Initialize telegram template visibility on page load
+            this.initTelegramTemplate();
         },
 
         /**
@@ -87,7 +93,10 @@
         removeField: function(e) {
             e.preventDefault();
             
-            if (confirm('Are you sure you want to remove this field?')) {
+            var i18n = (typeof mksddn_fh_admin !== 'undefined') ? mksddn_fh_admin : {};
+            var confirmText = i18n.confirm_remove_field || 'Are you sure you want to remove this field?';
+            
+            if (confirm(confirmText)) {
                 $(this).closest('.mksddn-field-item').remove();
                 MksDdnFormsHandler.updateFieldCount();
             }
@@ -143,15 +152,19 @@
                     nonce: mksddn_ajax.nonce
                 },
                 success: function(response) {
+                    var i18n = (typeof mksddn_fh_admin !== 'undefined') ? mksddn_fh_admin : {};
+                    
                     if (response.success) {
                         $('#mksddn-preview-container').html(response.data.html);
                         $('#mksddn-preview-modal').show();
                     } else {
-                        alert('Error generating preview: ' + response.data.message);
+                        var errorText = (i18n.error_generating_preview || 'Error generating preview:') + ' ' + (response.data.message || '');
+                        alert(errorText);
                     }
                 },
                 error: function() {
-                    alert('Error generating preview. Please try again.');
+                    var i18n = (typeof mksddn_fh_admin !== 'undefined') ? mksddn_fh_admin : {};
+                    alert(i18n.error_generating_preview_retry || 'Error generating preview. Please try again.');
                 }
             });
         },
@@ -215,41 +228,55 @@
          * Initialize tabs
          */
         initTabs: function() {
-            // Show first tab by default if no active tab is set
             var $tabs = $('.mksddn-form-tabs');
-            if ($tabs.length) {
-                // Hide all tab contents first
-                $tabs.find('.mksddn-form-tab-content').removeClass('active').hide();
-                
-                // Check if there's already an active tab
-                var $activeTab = $tabs.find('.mksddn-tab-nav.active');
-                var $activeContent = null;
-                
-                if ($activeTab.length > 0) {
-                    // Use existing active tab
-                    var activeHref = $activeTab.attr('href');
-                    if (activeHref) {
-                        $activeContent = $(activeHref);
+            if (!$tabs.length) {
+                return;
+            }
+            
+            this.hideAllTabContents($tabs);
+            var $activeContent = this.findActiveTab($tabs) || this.activateFirstTab($tabs);
+            if ($activeContent) {
+                $activeContent.addClass('active').show();
+            }
+        },
+
+        /**
+         * Hide all tab contents
+         */
+        hideAllTabContents: function($tabs) {
+            $tabs.find('.mksddn-form-tab-content').removeClass('active').hide();
+        },
+
+        /**
+         * Find existing active tab and return its content
+         */
+        findActiveTab: function($tabs) {
+            var $activeTab = $tabs.find('.mksddn-tab-nav.active');
+            if ($activeTab.length > 0) {
+                var activeHref = $activeTab.attr('href');
+                if (activeHref) {
+                    var $activeContent = $(activeHref);
+                    if ($activeContent.length) {
+                        return $activeContent;
                     }
-                }
-                
-                // If no active tab or content found, activate first tab
-                if (!$activeContent || !$activeContent.length) {
-                    var $firstTab = $tabs.find('.mksddn-tab-nav').first();
-                    $tabs.find('.mksddn-tab-nav').removeClass('active');
-                    $firstTab.addClass('active');
-                    
-                    var firstTabHref = $firstTab.attr('href');
-                    if (firstTabHref) {
-                        $activeContent = $(firstTabHref);
-                    }
-                }
-                
-                // Show active content
-                if ($activeContent && $activeContent.length) {
-                    $activeContent.addClass('active').show();
                 }
             }
+            return null;
+        },
+
+        /**
+         * Activate first tab and return its content
+         */
+        activateFirstTab: function($tabs) {
+            var $firstTab = $tabs.find('.mksddn-tab-nav').first();
+            $tabs.find('.mksddn-tab-nav').removeClass('active');
+            $firstTab.addClass('active');
+            
+            var firstTabHref = $firstTab.attr('href');
+            if (firstTabHref) {
+                return $(firstTabHref);
+            }
+            return null;
         },
 
         /**
@@ -298,6 +325,7 @@
          */
         validateForm: function($form) {
             var isValid = true;
+            var i18n = (typeof mksddn_fh_admin !== 'undefined') ? mksddn_fh_admin : {};
             
             // Clear previous errors
             $form.find('.mksddn-error').remove();
@@ -310,7 +338,8 @@
                 if (!value) {
                     isValid = false;
                     $field.addClass('mksddn-error');
-                    $field.after('<span class="mksddn-error-message">This field is required.</span>');
+                    var errorMsg = i18n.field_required || 'This field is required.';
+                    $field.after('<span class="mksddn-error-message">' + errorMsg + '</span>');
                 }
             });
             
@@ -322,7 +351,8 @@
                 if (value && !MksDdnFormsHandler.isValidEmail(value)) {
                     isValid = false;
                     $field.addClass('mksddn-error');
-                    $field.after('<span class="mksddn-error-message">Please enter a valid email address.</span>');
+                    var errorMsg = i18n.enter_valid_email || 'Please enter a valid email address.';
+                    $field.after('<span class="mksddn-error-message">' + errorMsg + '</span>');
                 }
             });
             
@@ -389,6 +419,54 @@
                     $(this).remove();
                 });
             }, 3000);
+        },
+
+        /**
+         * Toggle Telegram template field visibility
+         */
+        toggleTelegramTemplate: function() {
+            var $checkbox = $(this);
+            var $templateRow = $('.mksddn-telegram-template-row');
+            
+            if ($checkbox.is(':checked')) {
+                $templateRow.slideDown();
+                
+                    // If template is empty, populate with default template from data attribute
+                    var $templateField = $('#telegram_template');
+                    if (!$templateField.val() || $templateField.val().trim() === '') {
+                        var defaultTemplate = $templateRow.data('default-template');
+                        if (defaultTemplate) {
+                            $templateField.val(defaultTemplate);
+                        }
+                    }
+            } else {
+                $templateRow.slideUp();
+            }
+        },
+
+        /**
+         * Initialize Telegram template visibility on page load
+         */
+        initTelegramTemplate: function() {
+            var $checkbox = $('#use_custom_telegram_template');
+            if ($checkbox.length) {
+                // Set initial visibility state
+                var $templateRow = $('.mksddn-telegram-template-row');
+                if ($checkbox.is(':checked')) {
+                    $templateRow.show();
+                    
+                    // If template is empty, populate with default template from data attribute
+                    var $templateField = $('#telegram_template');
+                    if (!$templateField.val() || $templateField.val().trim() === '') {
+                        var defaultTemplate = $templateRow.data('default-template');
+                        if (defaultTemplate) {
+                            $templateField.val(defaultTemplate);
+                        }
+                    }
+                } else {
+                    $templateRow.hide();
+                }
+            }
         }
     };
 

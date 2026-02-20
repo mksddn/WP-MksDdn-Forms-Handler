@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MksDdn Forms Handler 1.3.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-27 12:00+0000\n"
+"POT-Creation-Date: 2026-02-20 12:52+0300\n"
 "PO-Revision-Date: 2025-01-27 12:00+0000\n"
 "Last-Translator: mksddn\n"
 "Language-Team: Russian\n"
@@ -14,11 +14,663 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: includes/class-security.php:86
+msgid "Creating submissions manually is not allowed"
+msgstr ""
+
+#: includes/class-security.php:102
+msgid ""
+"Editing submissions is not allowed. Submissions can only be created "
+"automatically when forms are submitted."
+msgstr ""
+
+#: includes/class-security.php:105
+msgid ""
+"Creating submissions manually is not allowed. Submissions are created "
+"automatically when forms are submitted."
+msgstr ""
+
+#: includes/class-assets.php:73 includes/class-export-handler.php:341
+#: includes/class-export-handler.php:351
+msgid "Export by Date"
+msgstr "Экспорт по дате"
+
+#: includes/class-forms-handler.php:50 includes/class-forms-handler.php:1149
+#, fuzzy
+msgid "Invalid form fields configuration"
+msgstr "Конфигурация полей"
+
+#: includes/class-forms-handler.php:81 includes/class-forms-handler.php:110
+#: includes/class-forms-handler.php:1202 includes/class-forms-handler.php:1231
+#, fuzzy, php-format
+msgid "Field '%s' is required"
+msgstr "Укажите ID таблицы."
+
+#: includes/class-forms-handler.php:117
+#, php-format
+msgid "Field '%1$s' exceeds max files (%2$d)"
+msgstr ""
+
+#: includes/class-forms-handler.php:124
+#, php-format
+msgid "File upload error for field '%s'"
+msgstr ""
+
+#: includes/class-forms-handler.php:129
+#, php-format
+msgid "File too large for field '%1$s' (max %2$s MB)"
+msgstr ""
+
+#: includes/class-forms-handler.php:135
+#, php-format
+msgid "File type not allowed for field '%s'"
+msgstr ""
+
+#: includes/class-forms-handler.php:252 includes/class-forms-handler.php:543
+msgid "Spam detected"
+msgstr "Обнаружен спам"
+
+#: includes/class-forms-handler.php:260 includes/class-forms-handler.php:551
+msgid "Too many requests. Please wait a few seconds."
+msgstr "Слишком много запросов. Пожалуйста, подождите несколько секунд."
+
+#: includes/class-forms-handler.php:265 includes/class-forms-handler.php:618
+msgid "Invalid form data"
+msgstr "Неверные данные формы"
+
+#: includes/class-forms-handler.php:270
+msgid "Too many form fields submitted"
+msgstr "Отправлено слишком много полей формы"
+
+#: includes/class-forms-handler.php:282
+msgid "Form data is too large"
+msgstr "Данные формы слишком большие"
+
+#: includes/class-forms-handler.php:394
+msgid "Invalid slug"
+msgstr "Неверный слаг"
+
+#: includes/class-forms-handler.php:399 includes/class-forms-handler.php:810
+#: includes/class-shortcodes.php:44
+msgid "Form not found"
+msgstr "Форма не найдена"
+
+#: includes/class-forms-handler.php:532
+msgid "Security check failed. Please refresh the page and try again."
+msgstr ""
+"Проверка безопасности не пройдена. Пожалуйста, обновите страницу и "
+"попробуйте снова."
+
+#: includes/class-forms-handler.php:654 includes/class-forms-handler.php:1131
+#, php-format
+msgid "Unauthorized fields detected: %s"
+msgstr "Обнаружены неавторизованные поля: %s"
+
+#: includes/class-forms-handler.php:776
+msgid "Failed to deliver form submission"
+msgstr "Не удалось доставить отправку формы"
+
+#: includes/class-forms-handler.php:786
+msgid "Form submitted successfully"
+msgstr "Форма успешно отправлена"
+
+#: includes/class-forms-handler.php:834
+msgid "Form is not configured correctly"
+msgstr "Форма настроена неверно"
+
+#: includes/class-forms-handler.php:1071 includes/class-forms-handler.php:1144
+msgid "Form fields configuration is missing"
+msgstr "Конфигурация полей формы отсутствует"
+
+#: includes/class-forms-handler.php:1154
+msgid "No fields configured for this form"
+msgstr ""
+
+#: includes/class-forms-handler.php:1159
+msgid "No form data provided"
+msgstr ""
+
+#: includes/class-forms-handler.php:1192
+#, php-format
+msgid ""
+"Field '%s' must be a single value, not an array. Use 'array_of_objects' type "
+"for arrays."
+msgstr ""
+
+#: includes/class-forms-handler.php:1199
+#, php-format
+msgid "Field '%s' is required for agreement"
+msgstr ""
+
+#: includes/class-forms-handler.php:1210
+#, php-format
+msgid "Field '%s' must be a single email address"
+msgstr ""
+
+#: includes/class-forms-handler.php:1214
+#, php-format
+msgid "Field '%s' must contain a valid email address"
+msgstr ""
+
+#: includes/class-forms-handler.php:1226
+#, php-format
+msgid "Field '%s' contains invalid file URL"
+msgstr ""
+
+#: includes/class-forms-handler.php:1239
+#, php-format
+msgid "Field '%s' must be a single URL"
+msgstr ""
+
+#: includes/class-forms-handler.php:1244
+#, php-format
+msgid "Field '%s' must contain a valid URL"
+msgstr ""
+
+#: includes/class-forms-handler.php:1253
+#, php-format
+msgid "Field '%s' must be a single number"
+msgstr ""
+
+#: includes/class-forms-handler.php:1257
+#, php-format
+msgid "Field '%s' must be a number"
+msgstr ""
+
+#: includes/class-forms-handler.php:1262
+#, php-format
+msgid "Field '%1$s' must be greater than or equal to %2$s"
+msgstr ""
+
+#: includes/class-forms-handler.php:1266
+#, php-format
+msgid "Field '%1$s' must be less than or equal to %2$s"
+msgstr ""
+
+#: includes/class-forms-handler.php:1273
+#, php-format
+msgid "Field '%1$s' must follow step %2$s"
+msgstr ""
+
+#: includes/class-forms-handler.php:1293
+#, php-format
+msgid "Field '%s' must be a single phone number"
+msgstr ""
+
+#: includes/class-forms-handler.php:1297
+#, php-format
+msgid "Field '%s' must be a valid phone number"
+msgstr ""
+
+#: includes/class-forms-handler.php:1307
+#, php-format
+msgid "Field '%s' must be a single date value"
+msgstr ""
+
+#: includes/class-forms-handler.php:1313
+#, php-format
+msgid "Field '%s' must be a valid date (YYYY-MM-DD)"
+msgstr ""
+
+#: includes/class-forms-handler.php:1319
+#, php-format
+msgid "Field '%s' must be a single time value"
+msgstr ""
+
+#: includes/class-forms-handler.php:1325
+#, php-format
+msgid "Field '%s' must be a valid time (HH:MM)"
+msgstr ""
+
+#: includes/class-forms-handler.php:1331
+#, php-format
+msgid "Field '%s' must be a single datetime value"
+msgstr ""
+
+#: includes/class-forms-handler.php:1338
+#, php-format
+msgid "Field '%s' must be a valid datetime (YYYY-MM-DDTHH:MM)"
+msgstr ""
+
+#: includes/class-forms-handler.php:1350 includes/class-forms-handler.php:1355
+#, php-format
+msgid "Field '%s' contains an invalid value"
+msgstr ""
+
+#: includes/class-forms-handler.php:1367 includes/class-forms-handler.php:1372
+#, php-format
+msgid "Field '%s' is too long (maximum 10,000 characters)"
+msgstr ""
+
+#: includes/class-forms-handler.php:1395
+#, php-format
+msgid "Field '%s' is required and must contain at least one item"
+msgstr ""
+
+#: includes/class-forms-handler.php:1415
+#, php-format
+msgid "Field '%1$s' item #%2$d must be an object"
+msgstr ""
+
+#: includes/class-forms-handler.php:1428
+#, php-format
+msgid "Field '%1$s' in '%2$s' item #%3$d is required"
+msgstr ""
+
+#: includes/class-forms-handler.php:1442
+#, php-format
+msgid "Field '%1$s' in '%2$s' item #%3$d must be a valid email"
+msgstr ""
+
+#: includes/class-forms-handler.php:1449
+#, php-format
+msgid "Field '%1$s' in '%2$s' item #%3$d must be a number"
+msgstr ""
+
+#: includes/class-forms-handler.php:1453
+#, php-format
+msgid "Field '%1$s' in '%2$s' item #%3$d must be greater than or equal to %4$s"
+msgstr ""
+
+#: includes/class-forms-handler.php:1456
+#, php-format
+msgid "Field '%1$s' in '%2$s' item #%3$d must be less than or equal to %4$s"
+msgstr ""
+
+#: includes/class-forms-handler.php:1468
+#, php-format
+msgid "Field '%1$s' in '%2$s' item #%3$d must be a valid phone number"
+msgstr ""
+
+#: includes/class-forms-handler.php:1476
+#, php-format
+msgid "Field '%1$s' in '%2$s' item #%3$d must be a valid URL"
+msgstr ""
+
+#: includes/class-forms-handler.php:1519
+msgid "Failed to send email"
+msgstr "Не удалось отправить email"
+
+#: includes/class-forms-handler.php:1530
+#, php-format
+msgid "Form Data: %s"
+msgstr "Данные формы: %s"
+
+#: includes/class-forms-handler.php:1532
+msgid "Field"
+msgstr "Поле"
+
+#: includes/class-forms-handler.php:1532
+msgid "Value"
+msgstr "Значение"
+
+#: includes/class-forms-handler.php:1561
+#, php-format
+msgid "Sent: %s"
+msgstr "Отправлено: %s"
+
+#: includes/class-forms-handler.php:1572
+#: handlers/class-telegram-handler.php:103
+msgid "Page URL"
+msgstr "URL страницы"
 
 #: includes/class-shortcodes.php:34
 msgid "Error: form ID or slug not specified"
 msgstr "Ошибка: не указан ID или slug формы"
+
+#: includes/class-shortcodes.php:56 includes/class-meta-boxes.php:110
+#: includes/template-functions.php:104
+msgid "Thank you! Your message has been sent successfully."
+msgstr "Спасибо! Ваше сообщение успешно отправлено."
+
+#: includes/class-shortcodes.php:95 includes/class-shortcodes.php:121
+#: includes/class-shortcodes.php:135 includes/class-shortcodes.php:157
+#: includes/class-shortcodes.php:192 includes/class-shortcodes.php:215
+#: templates/custom-form-examples.php:134
+#: templates/custom-form-examples.php:142
+#: templates/custom-form-examples.php:163
+#, php-format
+msgid "%s (required)"
+msgstr ""
+
+#: includes/class-shortcodes.php:228 includes/class-shortcodes.php:247
+#: includes/class-meta-boxes.php:97 includes/template-functions.php:103
+msgid "Send"
+msgstr "Отправить"
+
+#: includes/class-shortcodes.php:246 includes/template-functions.php:102
+msgid "Sending..."
+msgstr "Отправка..."
+
+#: includes/class-shortcodes.php:249 includes/template-functions.php:105
+msgid "Error"
+msgstr "Ошибка"
+
+#: includes/class-shortcodes.php:250 includes/template-functions.php:106
+msgid "An error occurred while sending the form"
+msgstr "Произошла ошибка при отправке формы"
+
+#: includes/class-shortcodes.php:251 includes/template-functions.php:107
+msgid "Unauthorized fields:"
+msgstr "Неавторизованные поля:"
+
+#: includes/class-shortcodes.php:252 includes/template-functions.php:108
+msgid "Allowed fields:"
+msgstr "Разрешенные поля:"
+
+#: includes/class-shortcodes.php:253 includes/template-functions.php:109
+msgid "Delivery Status:"
+msgstr "Статус доставки:"
+
+#: includes/class-shortcodes.php:254 includes/template-functions.php:110
+msgid "Email: Sent successfully"
+msgstr "Email: Отправлено успешно"
+
+#: includes/class-shortcodes.php:255 includes/template-functions.php:111
+msgid "Email:"
+msgstr "Email:"
+
+#: includes/class-shortcodes.php:256 includes/template-functions.php:112
+msgid "Telegram: Sent successfully"
+msgstr "Telegram: Отправлено успешно"
+
+#: includes/class-shortcodes.php:257 includes/template-functions.php:113
+msgid "Telegram:"
+msgstr "Telegram:"
+
+#: includes/class-shortcodes.php:258 includes/template-functions.php:114
+msgid "Google Sheets: Data saved"
+msgstr "Google Таблицы: Данные сохранены"
+
+#: includes/class-shortcodes.php:259 includes/template-functions.php:115
+msgid "Google Sheets:"
+msgstr "Google Таблицы:"
+
+#: includes/class-shortcodes.php:260 includes/template-functions.php:116
+msgid "Failed"
+msgstr "Не удалось"
+
+#: includes/class-admin-columns.php:46
+msgid "Recipients"
+msgstr "Получатели"
+
+#: includes/class-admin-columns.php:47
+msgid "Email"
+msgstr "Email"
+
+#: includes/class-admin-columns.php:48 templates/form-settings-meta-box.php:7
+msgid "Telegram"
+msgstr "Telegram"
+
+#: includes/class-admin-columns.php:49 templates/form-settings-meta-box.php:8
+#, fuzzy
+msgid "Google Sheets"
+msgstr "Отправлять в Google Таблицы"
+
+#: includes/class-admin-columns.php:50 templates/form-settings-meta-box.php:9
+msgid "Admin Storage"
+msgstr "Хранилище админки"
+
+#: includes/class-admin-columns.php:51
+msgid "Shortcode"
+msgstr "Шорткод"
+
+#: includes/class-admin-columns.php:52 includes/class-admin-columns.php:88
+#: includes/class-export-handler.php:379
+msgid "Export"
+msgstr "Экспорт"
+
+#: includes/class-admin-columns.php:70 includes/class-admin-columns.php:74
+#: includes/class-admin-columns.php:78 includes/class-admin-columns.php:82
+msgid "✓ Enabled"
+msgstr "✓ Включено"
+
+#: includes/class-admin-columns.php:70 includes/class-admin-columns.php:74
+#: includes/class-admin-columns.php:78 includes/class-admin-columns.php:82
+msgid "✗ Disabled"
+msgstr "✗ Выключено"
+
+#: includes/class-admin-columns.php:90
+msgid "No submissions"
+msgstr "Нет отправок"
+
+#: includes/class-admin-columns.php:179 includes/class-post-types.php:51
+msgid "Form"
+msgstr "Форма"
+
+#: includes/class-admin-columns.php:180
+msgid "Date"
+msgstr "Дата"
+
+#: includes/class-admin-columns.php:181
+msgid "Data"
+msgstr "Данные"
+
+#: includes/class-admin-columns.php:182
+msgid "Delivery Status"
+msgstr "Статус доставки"
+
+#: includes/class-admin-columns.php:201
+msgid "Form deleted"
+msgstr "Форма удалена"
+
+#: includes/class-admin-columns.php:204
+msgid "Unknown form"
+msgstr "Неизвестная форма"
+
+#: includes/class-admin-columns.php:227
+#, php-format
+msgid "%d items"
+msgstr "%d элементов"
+
+#: includes/class-admin-columns.php:247
+msgid "No data"
+msgstr "Нет данных"
+
+#: includes/class-admin-columns.php:263 includes/class-meta-boxes.php:283
+#: includes/class-meta-boxes.php:284 includes/class-meta-boxes.php:286
+#: includes/class-meta-boxes.php:287
+msgid "Unknown"
+msgstr "Неизвестно"
+
+#: includes/class-google-sheets-admin.php:35
+#: includes/class-google-sheets-admin.php:36
+msgid "Google Sheets Settings"
+msgstr "Настройки Google Sheets"
+
+#: includes/class-google-sheets-admin.php:132
+#: includes/class-google-sheets-admin.php:161
+#: includes/class-export-handler.php:63
+msgid "Access denied"
+msgstr "Доступ запрещен"
+
+#: includes/class-google-sheets-admin.php:137
+#: includes/class-google-sheets-admin.php:166
+#: includes/class-export-handler.php:69
+msgid "Security check failed"
+msgstr "Проверка безопасности не пройдена"
+
+#: includes/class-google-sheets-admin.php:171
+msgid "Spreadsheet ID is required."
+msgstr "Укажите ID таблицы."
+
+#: includes/class-google-sheets-admin.php:177
+msgid "✅ Google Sheets connection successful!"
+msgstr "✅ Подключение к Google Таблицам успешно!"
+
+#: includes/class-google-sheets-admin.php:180
+#, php-format
+msgid "❌ Google Sheets connection failed: %s"
+msgstr "❌ Ошибка подключения к Google Таблицам: %s"
+
+#: includes/class-export-handler.php:49 includes/class-export-handler.php:50
+#: includes/class-export-handler.php:319
+msgid "Export Submissions"
+msgstr "Экспорт обращений"
+
+#: includes/class-export-handler.php:79
+msgid "Please select a form to export."
+msgstr "Пожалуйста, выберите форму для экспорта."
+
+#: includes/class-export-handler.php:85
+msgid "Form not found."
+msgstr "Форма не найдена."
+
+#: includes/class-export-handler.php:218
+msgid "Unknown Form"
+msgstr "Неизвестная форма"
+
+#: includes/class-export-handler.php:320
+msgid "Select a form to export all its submissions to CSV:"
+msgstr "Выберите форму для экспорта всех её обращений в CSV:"
+
+#: includes/class-export-handler.php:326
+#, fuzzy
+msgid "Submissions:"
+msgstr "Обращения"
+
+#: includes/class-export-handler.php:327
+msgid "Slug:"
+msgstr "Slug:"
+
+#: includes/class-export-handler.php:334
+msgid "Export All"
+msgstr "Экспортировать все"
+
+#: includes/class-export-handler.php:361
+msgid "Date From"
+msgstr "Дата с"
+
+#: includes/class-export-handler.php:369
+msgid "Date To"
+msgstr "Дата по"
+
+#: includes/class-export-handler.php:378
+msgid "Cancel"
+msgstr "Отмена"
+
+#: includes/class-meta-boxes.php:33
+msgid "Form Settings"
+msgstr "Настройки формы"
+
+#: includes/class-meta-boxes.php:47
+msgid "Submission Data"
+msgstr "Данные отправки"
+
+#: includes/class-meta-boxes.php:56
+msgid "Submission Info"
+msgstr "Информация об отправке"
+
+#: includes/class-meta-boxes.php:142
+msgid "Error: Invalid JSON in Fields Configuration! Check syntax."
+msgstr "Ошибка: неверный JSON в конфигурации полей! Проверьте синтаксис."
+
+#: includes/class-meta-boxes.php:158
+msgid "No data available"
+msgstr "Данные недоступны"
+
+#: includes/class-meta-boxes.php:283 handlers/class-telegram-handler.php:69
+msgid "Form:"
+msgstr "Форма:"
+
+#: includes/class-meta-boxes.php:285
+msgid "Date:"
+msgstr "Дата:"
+
+#: includes/class-meta-boxes.php:286
+msgid "IP Address:"
+msgstr "IP-адрес:"
+
+#: includes/class-meta-boxes.php:287
+msgid "User Agent:"
+msgstr "User Agent:"
+
+#: includes/class-utilities.php:37
+msgid "New message from website"
+msgstr "Новое сообщение с сайта"
+
+#: includes/class-post-types.php:50 includes/class-post-types.php:52
+msgid "Forms"
+msgstr "Формы"
+
+#: includes/class-post-types.php:53
+msgid "Add Form"
+msgstr "Добавить форму"
+
+#: includes/class-post-types.php:54
+msgid "Add New Form"
+msgstr "Добавить новую форму"
+
+#: includes/class-post-types.php:55
+msgid "Edit Form"
+msgstr "Редактировать форму"
+
+#: includes/class-post-types.php:56
+msgid "New Form"
+msgstr "Новая форма"
+
+#: includes/class-post-types.php:57
+msgid "View Form"
+msgstr "Просмотр формы"
+
+#: includes/class-post-types.php:58
+msgid "Search Forms"
+msgstr "Поиск форм"
+
+#: includes/class-post-types.php:59
+msgid "No forms found"
+msgstr "Формы не найдены"
+
+#: includes/class-post-types.php:60
+msgid "No forms found in trash"
+msgstr "В корзине форм не найдено"
+
+#: includes/class-post-types.php:100
+msgid "Form Submissions"
+msgstr "Обращения"
+
+#: includes/class-post-types.php:101
+msgid "Submission"
+msgstr "Обращение"
+
+#: includes/class-post-types.php:102
+msgid "Submissions"
+msgstr "Обращения"
+
+#: includes/class-post-types.php:103
+msgid "Add Submission"
+msgstr "Добавить обращение"
+
+#: includes/class-post-types.php:104
+msgid "Add New Submission"
+msgstr "Добавить новое обращение"
+
+#: includes/class-post-types.php:105
+msgid "Edit Submission"
+msgstr "Редактировать обращение"
+
+#: includes/class-post-types.php:106
+msgid "New Submission"
+msgstr "Новое обращение"
+
+#: includes/class-post-types.php:107
+msgid "View Submission"
+msgstr "Просмотр обращения"
+
+#: includes/class-post-types.php:108
+msgid "Search Submissions"
+msgstr "Поиск обращений"
+
+#: includes/class-post-types.php:109
+msgid "No submissions found"
+msgstr "Обращения не найдены"
+
+#: includes/class-post-types.php:110
+msgid "No submissions found in trash"
+msgstr "В корзине обращений не найдено"
 
 #: templates/form-settings-meta-box.php:5
 msgid "Form Fields"
@@ -36,740 +688,575 @@ msgstr "Отображение"
 msgid "Advanced"
 msgstr "Расширенные"
 
-#: includes/class-shortcodes.php:44
-msgid "Form not found"
-msgstr "Форма не найдена"
-
-#: includes/class-shortcodes.php:182
-msgid "Send"
-msgstr "Отправить"
-
-#: includes/class-shortcodes.php:195
-msgid "Sending..."
-msgstr "Отправка..."
-
-#: includes/class-meta-boxes.php:28
-msgid "Form Settings"
-msgstr "Настройки формы"
-
-#: includes/class-meta-boxes.php:42
-msgid "Submission Data"
-msgstr "Данные отправки"
-
-#: includes/class-meta-boxes.php:51
-msgid "Submission Info"
-msgstr "Информация об отправке"
-
-#: includes/class-meta-boxes.php:113
-msgid "Error: Invalid JSON in Fields Configuration! Check syntax."
-msgstr "Ошибка: неверный JSON в конфигурации полей! Проверьте синтаксис."
-
-#: includes/class-meta-boxes.php:129
-msgid "No data available"
-msgstr "Данные недоступны"
-
-#: includes/class-meta-boxes.php:255
-msgid "Form:"
-msgstr "Форма:"
-
-#: includes/class-meta-boxes.php:255
-msgid "Unknown"
-msgstr "Неизвестно"
-
-#: includes/class-meta-boxes.php:256
-msgid "Date:"
-msgstr "Дата:"
-
-#: includes/class-meta-boxes.php:259
-msgid "Page URL:"
-msgstr "URL страницы:"
-
-#: includes/class-forms-handler.php (email/telegram notifications)
-msgid "Form Data: %s"
-msgstr "Данные формы: %s"
-
-msgid "Field"
-msgstr "Поле"
-
-msgid "Value"
-msgstr "Значение"
-
-msgid "Sent: %s"
-msgstr "Отправлено: %s"
-
-msgid "Page URL"
-msgstr "URL страницы"
-
-msgid "New Form Submission"
-msgstr "Новая отправка формы"
-
-msgid "Time:"
-msgstr "Время:"
-
-msgid "Form Data:"
-msgstr "Данные формы:"
-
-msgid "New message from website"
-msgstr "Новое сообщение с сайта"
-
-#: includes/class-meta-boxes.php:261
-msgid "IP Address:"
-msgstr "IP-адрес:"
-
-#: includes/class-meta-boxes.php:262
-msgid "User Agent:"
-msgstr "User Agent:"
-
-#: includes/class-admin-columns.php:41
-msgid "Recipients"
-msgstr "Получатели"
-
-#: includes/class-admin-columns.php:42
-msgid "Telegram"
-msgstr "Telegram"
-
-#: includes/class-admin-columns.php:43 includes/class-google-sheets-admin.php:36
-msgid "Google Sheets Settings"
-msgstr "Настройки Google Sheets"
-
-#: includes/class-admin-columns.php:44
-msgid "Admin Storage"
-msgstr "Хранилище админки"
-
-#: includes/class-admin-columns.php:45
-msgid "Shortcode"
-msgstr "Шорткод"
-
-#: includes/class-admin-columns.php:46
-msgid "Export"
-msgstr "Экспорт"
-
-#: includes/class-admin-columns.php:64
-msgid "✓ Enabled"
-msgstr "✓ Включено"
-
-#: includes/class-admin-columns.php:64
-msgid "✗ Disabled"
-msgstr "✗ Выключено"
-
-#: includes/class-admin-columns.php:80
-msgid "No submissions"
-msgstr "Нет отправок"
-
-#: includes/class-admin-columns.php:87
-msgid "Copy to clipboard"
-msgstr "Копировать в буфер обмена"
-
-#: includes/class-admin-columns.php:169
-msgid "Form"
-msgstr "Форма"
-
-#: includes/class-admin-columns.php:170
-msgid "Date"
-msgstr "Дата"
-
-#: includes/class-admin-columns.php:171
-msgid "Data"
-msgstr "Данные"
-
-#: includes/class-admin-columns.php:172
-msgid "Delivery Status"
-msgstr "Статус доставки"
-
-#: includes/class-admin-columns.php:191
-msgid "Form deleted"
-msgstr "Форма удалена"
-
-#: includes/class-admin-columns.php:194
-msgid "Unknown form"
-msgstr "Неизвестная форма"
-
-#: includes/class-admin-columns.php:217
-#, php-format
-msgid "%d items"
-msgstr "%d элементов"
-
-#: includes/class-admin-columns.php:237
-msgid "No data"
-msgstr "Нет данных"
-
-#: includes/class-forms-handler.php:243
-msgid "Spam detected"
-msgstr "Обнаружен спам"
-
-#: includes/class-forms-handler.php:251
-msgid "Too many requests. Please wait a few seconds."
-msgstr "Слишком много запросов. Пожалуйста, подождите несколько секунд."
-
-#: includes/class-forms-handler.php:256
-msgid "Invalid form data"
-msgstr "Неверные данные формы"
-
-#: includes/class-forms-handler.php:261
-msgid "Too many form fields submitted"
-msgstr "Отправлено слишком много полей формы"
-
-#: includes/class-forms-handler.php:273
-msgid "Form data is too large"
-msgstr "Данные формы слишком большие"
-
-#: includes/class-forms-handler.php:523
-msgid "Security check failed. Please refresh the page and try again."
-msgstr "Проверка безопасности не пройдена. Пожалуйста, обновите страницу и попробуйте снова."
-
-#: includes/class-forms-handler.php:645
-#, php-format
-msgid "Unauthorized fields detected: %s"
-msgstr "Обнаружены неавторизованные поля: %s"
-
-#: includes/class-forms-handler.php:755
-msgid "Failed to deliver form submission"
-msgstr "Не удалось доставить отправку формы"
-
-#: includes/class-forms-handler.php:765
-msgid "Form submitted successfully"
-msgstr "Форма успешно отправлена"
-
-#: includes/class-forms-handler.php:811
-msgid "Form is not configured correctly"
-msgstr "Форма настроена неверно"
-
-#: templates/form-settings-meta-box.php:4
-msgid "Recipients (comma separated)"
-msgstr "Получатели (через запятую)"
-
-#: templates/form-settings-meta-box.php:7
-msgid "Email addresses separated by commas"
-msgstr "Email-адреса, разделенные запятыми"
-
-#: templates/form-settings-meta-box.php:11
-msgid "BCC Recipient"
-msgstr "Получатель BCC"
-
-#: templates/form-settings-meta-box.php:14
-msgid "Specified for debugging"
-msgstr "Указывается для отладки"
-
-#: templates/form-settings-meta-box.php:17
-msgid "Email Subject"
-msgstr "Тема письма"
-
-#: templates/form-settings-meta-box.php:23
+#: templates/form-settings-meta-box.php:18
 msgid "Fields Configuration"
 msgstr "Конфигурация полей"
 
-#: templates/form-settings-meta-box.php:26
-msgid "JSON configuration of form fields. Example: [{\"name\": \"name\", \"label\": \"Name\", \"type\": \"text\", \"required\": true}]"
-msgstr "JSON-конфигурация полей формы. Пример: [{\"name\": \"name\", \"label\": \"Имя\", \"type\": \"text\", \"required\": true}]"
+#: templates/form-settings-meta-box.php:22
+msgid ""
+"JSON configuration of form fields. Example: [{\"name\": \"name\", \"label\": "
+"\"Name\", \"type\": \"text\", \"required\": true}]"
+msgstr ""
+"JSON-конфигурация полей формы. Пример: [{\"name\": \"name\", \"label\": "
+"\"Имя\", \"type\": \"text\", \"required\": true}]"
 
-#. translators: Note about regex patterns in JSON
-#: templates/form-settings-meta-box.php:27
+#: templates/form-settings-meta-box.php:23
 msgid "Pattern note:"
 msgstr "О паттернах:"
 
-#: templates/form-settings-meta-box.php:27
-msgid "For regex patterns, use double backslashes in JSON (e.g., \"pattern\": \"^\\\\+?\\\\d{7,15}$\")"
-msgstr "Для regex-паттернов используйте двойные обратные слеши в JSON (например, \"pattern\": \"^\\\\+?\\\\d{7,15}$\")"
+#: templates/form-settings-meta-box.php:23
+msgid ""
+"For regex patterns, use double backslashes in JSON (e.g., \"pattern\": \"^\\"
+"\\+?\\\\d{7,15}$\")"
+msgstr ""
+"Для regex-паттернов используйте двойные обратные слеши в JSON (например, "
+"\"pattern\": \"^\\\\+?\\\\d{7,15}$\")"
 
-#: templates/form-settings-meta-box.php:32
-msgid "Telegram Notifications"
-msgstr "Уведомления Telegram"
+#: templates/form-settings-meta-box.php:37
+msgid "Send to Email"
+msgstr "Отправлять на Email"
 
-#: templates/form-settings-meta-box.php:39
+#: templates/form-settings-meta-box.php:41
+msgid "Enable email notifications for this form"
+msgstr "Включить уведомления на email для этой формы"
+
+#: templates/form-settings-meta-box.php:45
+msgid "Recipients (comma separated)"
+msgstr "Получатели (через запятую)"
+
+#: templates/form-settings-meta-box.php:48
+msgid "Email addresses separated by commas"
+msgstr "Email-адреса, разделенные запятыми"
+
+#: templates/form-settings-meta-box.php:52
+msgid "BCC Recipient"
+msgstr "Получатель BCC"
+
+#: templates/form-settings-meta-box.php:55
+msgid "Specified for debugging"
+msgstr "Указывается для отладки"
+
+#: templates/form-settings-meta-box.php:59
+msgid "Email Subject"
+msgstr "Тема письма"
+
+#: templates/form-settings-meta-box.php:74
 msgid "Send to Telegram"
 msgstr "Отправлять в Telegram"
 
-#: templates/form-settings-meta-box.php:43
+#: templates/form-settings-meta-box.php:78
 msgid "Enable Telegram notifications for this form"
 msgstr "Включить уведомления Telegram для этой формы"
 
-#: templates/form-settings-meta-box.php:47
+#: templates/form-settings-meta-box.php:82
 msgid "Telegram Bot Token"
 msgstr "Токен бота Telegram"
 
-#: templates/form-settings-meta-box.php:50
+#: templates/form-settings-meta-box.php:85
 msgid "Your Telegram bot token (e.g., 123456789:ABCdefGHIjklMNOpqrsTUVwxyz)"
-msgstr "Токен вашего бота Telegram (например, 123456789:ABCdefGHIjklMNOpqrsTUVwxyz)"
+msgstr ""
+"Токен вашего бота Telegram (например, 123456789:ABCdefGHIjklMNOpqrsTUVwxyz)"
 
-#: templates/form-settings-meta-box.php:54
+#: templates/form-settings-meta-box.php:89
 msgid "Telegram Chat IDs"
 msgstr "ID чатов Telegram"
 
-#: templates/form-settings-meta-box.php:57
+#: templates/form-settings-meta-box.php:92
 msgid "Chat IDs separated by commas (e.g., -1001234567890, -1009876543210)"
-msgstr "ID чатов, разделенные запятыми (например, -1001234567890, -1009876543210)"
+msgstr ""
+"ID чатов, разделенные запятыми (например, -1001234567890, -1009876543210)"
 
-#: templates/form-settings-meta-box.php:63
-msgid "Google Sheets Integration"
-msgstr "Интеграция с Google Таблицами"
-
-#: templates/form-settings-meta-box.php:70
+#: templates/form-settings-meta-box.php:105
 msgid "Send to Google Sheets"
 msgstr "Отправлять в Google Таблицы"
 
-#: templates/form-settings-meta-box.php:74
+#: templates/form-settings-meta-box.php:109
 msgid "Enable Google Sheets integration for this form"
 msgstr "Включить интеграцию с Google Таблицами для этой формы"
 
-#: templates/form-settings-meta-box.php:78
+#: templates/form-settings-meta-box.php:113
 msgid "Spreadsheet ID"
 msgstr "ID таблицы"
 
-#: templates/form-settings-meta-box.php:81
-msgid "Google Sheets spreadsheet ID (from URL: docs.google.com/spreadsheets/d/SPREADSHEET_ID)"
-msgstr "ID таблицы Google Sheets (из URL: docs.google.com/spreadsheets/d/SPREADSHEET_ID)"
+#: templates/form-settings-meta-box.php:116
+msgid ""
+"Google Sheets spreadsheet ID (from URL: docs.google.com/spreadsheets/d/"
+"SPREADSHEET_ID)"
+msgstr ""
+"ID таблицы Google Sheets (из URL: docs.google.com/spreadsheets/d/"
+"SPREADSHEET_ID)"
 
-#: templates/form-settings-meta-box.php:85
+#: templates/form-settings-meta-box.php:120
 msgid "Sheet Name"
 msgstr "Название листа"
 
-#: templates/form-settings-meta-box.php:88
+#: templates/form-settings-meta-box.php:123
 msgid "Sheet name (optional, defaults to first sheet)"
 msgstr "Название листа (необязательно, по умолчанию первый лист)"
 
-#: templates/form-settings-meta-box.php:94
-msgid "Admin Panel Storage"
-msgstr "Хранилище админ-панели"
-
-#: templates/form-settings-meta-box.php:101
+#: templates/form-settings-meta-box.php:136
 msgid "Save submissions to admin panel"
 msgstr "Сохранять отправки в админ-панели"
 
-#: templates/form-settings-meta-box.php:105
+#: templates/form-settings-meta-box.php:140
 msgid "Enable saving form submissions to admin panel for viewing and export"
-msgstr "Включить сохранение отправок формы в админ-панели для просмотра и экспорта"
+msgstr ""
+"Включить сохранение отправок формы в админ-панели для просмотра и экспорта"
 
-#: templates/form-settings-meta-box.php:111
-msgid "Shortcode Display Settings"
-msgstr "Отображение формы из шорткода"
-
-#: templates/form-settings-meta-box.php:114
+#: templates/form-settings-meta-box.php:150
 msgid "Submit Button Text"
 msgstr "Текст кнопки отправки"
 
-#: templates/form-settings-meta-box.php:117
+#: templates/form-settings-meta-box.php:153
 msgid "Custom text for the submit button. Leave empty to use default \"Send\""
-msgstr "Пользовательский текст для кнопки отправки. Оставьте пустым для использования значения по умолчанию \"Отправить\""
+msgstr ""
+"Пользовательский текст для кнопки отправки. Оставьте пустым для "
+"использования значения по умолчанию \"Отправить\""
 
-#: templates/form-settings-meta-box.php:121
+#: templates/form-settings-meta-box.php:157
 msgid "Custom HTML/Text After Button"
 msgstr "Пользовательский HTML/текст после кнопки"
 
-#: templates/form-settings-meta-box.php:124
-msgid "Custom HTML or text to display after the submit button (e.g., privacy policy notice)"
-msgstr "Пользовательский HTML или текст для отображения после кнопки отправки (например, уведомление о политике конфиденциальности)"
+#: templates/form-settings-meta-box.php:160
+msgid ""
+"Custom HTML or text to display after the submit button (e.g., privacy policy "
+"notice)"
+msgstr ""
+"Пользовательский HTML или текст для отображения после кнопки отправки "
+"(например, уведомление о политике конфиденциальности)"
 
-#: templates/form-settings-meta-box.php:118
-msgid "Accept any fields from frontend"
-msgstr "Принимать любые поля с фронтенда"
-
-#: templates/form-settings-meta-box.php:123
-msgid "Warning:"
-msgstr "Предупреждение:"
-
-#: templates/form-settings-meta-box.php:124
-msgid "When enabled, the form will accept ANY field names from frontend submissions without validation against Fields Configuration. Use this for custom forms where you control field names in templates. All fields will still be sanitized but type validation will be skipped."
-msgstr "При включении форма будет принимать ЛЮБЫЕ имена полей из отправок с фронтенда без проверки по конфигурации полей. Используйте это для пользовательских форм, где вы контролируете имена полей в шаблонах. Все поля все равно будут санитизированы, но проверка типов будет пропущена."
-
-#: includes/class-post-types.php:36
-msgid "Forms"
-msgstr "Формы"
-
-#: includes/class-post-types.php:39
-msgid "Add Form"
-msgstr "Добавить форму"
-
-#: includes/class-post-types.php:40
-msgid "Add New Form"
-msgstr "Добавить новую форму"
-
-#: includes/class-post-types.php:41
-msgid "Edit Form"
-msgstr "Редактировать форму"
-
-#: includes/class-post-types.php:42
-msgid "New Form"
-msgstr "Новая форма"
-
-#: includes/class-post-types.php:43
-msgid "View Form"
-msgstr "Просмотр формы"
-
-#: includes/class-post-types.php:44
-msgid "Search Forms"
-msgstr "Поиск форм"
-
-#: includes/class-post-types.php:45
-msgid "No forms found"
-msgstr "Формы не найдены"
-
-#: includes/class-post-types.php:46
-msgid "No forms found in trash"
-msgstr "В корзине форм не найдено"
-
-#: includes/class-post-types.php:86
-msgid "Form Submissions"
-msgstr "Обращения"
-
-#: includes/class-post-types.php:87
-msgid "Submission"
-msgstr "Обращение"
-
-#: includes/class-post-types.php:88
-msgid "Submissions"
-msgstr "Обращения"
-
-#: includes/class-post-types.php:89
-msgid "Add Submission"
-msgstr "Добавить обращение"
-
-#: includes/class-post-types.php:90
-msgid "Add New Submission"
-msgstr "Добавить новое обращение"
-
-#: includes/class-post-types.php:91
-msgid "Edit Submission"
-msgstr "Редактировать обращение"
-
-#: includes/class-post-types.php:92
-msgid "New Submission"
-msgstr "Новое обращение"
-
-#: includes/class-post-types.php:93
-msgid "View Submission"
-msgstr "Просмотр обращения"
-
-#: includes/class-post-types.php:94
-msgid "Search Submissions"
-msgstr "Поиск обращений"
-
-#: includes/class-post-types.php:95
-msgid "No submissions found"
-msgstr "Обращения не найдены"
-
-#: includes/class-post-types.php:96
-msgid "No submissions found in trash"
-msgstr "В корзине обращений не найдено"
-
-#: includes/class-shortcodes.php:195
-msgid "Thank you! Your message has been sent successfully."
-msgstr "Спасибо! Ваше сообщение успешно отправлено."
-
-#: templates/form-settings-meta-box.php:117
+#: templates/form-settings-meta-box.php:164
 msgid "Success Message Text"
 msgstr "Текст сообщения об успехе"
 
-#: templates/form-settings-meta-box.php:120
-msgid "Custom text to display after successful form submission. Leave empty to use default message."
-msgstr "Пользовательский текст для отображения после успешной отправки формы. Оставьте пустым для использования сообщения по умолчанию."
+#: templates/form-settings-meta-box.php:167
+msgid ""
+"Custom text to display after successful form submission. Leave empty to use "
+"default message."
+msgstr ""
+"Пользовательский текст для отображения после успешной отправки формы. "
+"Оставьте пустым для использования сообщения по умолчанию."
 
-#: templates/form-settings-meta-box.php:137
+#: templates/form-settings-meta-box.php:171
 msgid "Custom CSS Classes"
 msgstr "Пользовательские CSS классы"
 
-#: templates/form-settings-meta-box.php:140
-msgid "Additional CSS classes to add to the form element. Separate multiple classes with spaces."
-msgstr "Дополнительные CSS классы для добавления к элементу формы. Разделяйте несколько классов пробелами."
+#: templates/form-settings-meta-box.php:174
+msgid ""
+"Additional CSS classes to add to the form element. Separate multiple classes "
+"with spaces."
+msgstr ""
+"Дополнительные CSS классы для добавления к элементу формы. Разделяйте "
+"несколько классов пробелами."
 
-#: includes/class-export-handler.php:44
-msgid "Export Submissions"
-msgstr "Экспорт обращений"
+#: templates/form-settings-meta-box.php:177
+msgid "Redirect URL After Submission"
+msgstr "URL для редиректа после отправки"
 
-#: includes/class-export-handler.php:58
-msgid "Access denied"
-msgstr "Доступ запрещен"
+#: templates/form-settings-meta-box.php:181
+msgid ""
+"URL or relative path to redirect to after successful form submission (e.g., "
+"https://example.com/page or /thank-you). Leave empty to show success message "
+"without redirect."
+msgstr ""
+"URL или относительный путь для перенаправления после успешной отправки формы "
+"(например, https://example.com/page или /thank-you). Оставьте пустым, чтобы "
+"показать сообщение об успехе без редиректа."
 
-#: includes/class-export-handler.php:64
-msgid "Security check failed"
-msgstr "Проверка безопасности не пройдена"
+#: templates/form-settings-meta-box.php:187
+msgid "Accept any fields from frontend"
+msgstr "Принимать любые поля с фронтенда"
 
-#: includes/class-export-handler.php:74
-msgid "Please select a form to export."
-msgstr "Пожалуйста, выберите форму для экспорта."
+#: templates/form-settings-meta-box.php:192
+msgid "Warning:"
+msgstr "Предупреждение:"
 
-#: includes/class-export-handler.php:80
-msgid "Form not found."
-msgstr "Форма не найдена."
+#: templates/form-settings-meta-box.php:193
+msgid ""
+"When enabled, the form will accept ANY field names from frontend submissions "
+"without validation against Fields Configuration. Use this for custom forms "
+"where you control field names in templates. All fields will still be "
+"sanitized but type validation will be skipped."
+msgstr ""
+"При включении форма будет принимать ЛЮБЫЕ имена полей из отправок с "
+"фронтенда без проверки по конфигурации полей. Используйте это для "
+"пользовательских форм, где вы контролируете имена полей в шаблонах. Все поля "
+"все равно будут санитизированы, но проверка типов будет пропущена."
 
-#: includes/class-export-handler.php:211
-msgid "Unknown Form"
-msgstr "Неизвестная форма"
+#: handlers/class-telegram-handler.php:24
+msgid "Telegram bot token or chat IDs not configured"
+msgstr ""
 
-#: includes/class-export-handler.php:312
-msgid "Select a form to export all its submissions to CSV:"
-msgstr "Выберите форму для экспорта всех её обращений в CSV:"
+#: handlers/class-telegram-handler.php:48
+msgid "Failed to send to any Telegram chat:"
+msgstr ""
 
-#: includes/class-export-handler.php:318
-msgid "Slug:"
-msgstr "Slug:"
+#: handlers/class-telegram-handler.php:68
+msgid "New Form Submission"
+msgstr "Новая отправка формы"
 
-#: includes/class-export-handler.php:326
-msgid "Export All"
-msgstr "Экспортировать все"
+#: handlers/class-telegram-handler.php:70
+msgid "Time:"
+msgstr "Время:"
 
-#: includes/class-export-handler.php:333
-msgid "Export by Date"
-msgstr "Экспорт по дате"
+#: handlers/class-telegram-handler.php:71
+msgid "Form Data:"
+msgstr "Данные формы:"
 
-#: includes/class-export-handler.php:353
-msgid "Date From"
-msgstr "Дата с"
+#: handlers/class-telegram-handler.php:227
+msgid "Failed to send Telegram request:"
+msgstr "Не удалось отправить запрос в Telegram:"
 
-#: includes/class-export-handler.php:361
-msgid "Date To"
-msgstr "Дата по"
+#: handlers/class-google-sheets-handler.php:26
+msgid "Google Sheets spreadsheet ID not configured"
+msgstr ""
 
-#: includes/class-export-handler.php:370
-msgid "Cancel"
-msgstr "Отмена"
+#: handlers/class-google-sheets-handler.php:72
+#, fuzzy
+msgid "Failed to send data to Google Sheets:"
+msgstr "Отправлять в Google Таблицы"
 
-#: includes/class-google-sheets-admin.php:171
-msgid "Spreadsheet ID is required."
-msgstr "Укажите ID таблицы."
-
-#: includes/class-google-sheets-admin.php:177
-msgid "✅ Google Sheets connection successful!"
-msgstr "✅ Подключение к Google Таблицам успешно!"
-
-#: includes/class-google-sheets-admin.php:179
-#, php-format
-msgid "❌ Google Sheets connection failed: %s"
-msgstr "❌ Ошибка подключения к Google Таблицам: %s"
-
-#: includes/class-google-sheets-admin.php:202
-msgid "✅ Google Sheets authentication successful! You can now use Google Sheets integration in your forms."
-msgstr "✅ Аутентификация Google Таблиц успешна! Теперь вы можете использовать интеграцию с Google Таблицами в своих формах."
-
-#: includes/class-google-sheets-admin.php:207
-msgid "❌ Authentication failed. Please try again."
-msgstr "❌ Ошибка аутентификации. Пожалуйста, попробуйте снова."
-
-#: includes/class-google-sheets-admin.php:213
-msgid "Settings saved successfully!"
-msgstr "Настройки сохранены успешно!"
-
-#: includes/class-google-sheets-admin.php:219
-msgid "✅ Google Sheets authentication has been revoked. You can now re-authenticate with different credentials."
-msgstr "✅ Аутентификация Google Таблиц отозвана. Теперь вы можете пройти аутентификацию с другими учетными данными."
-
-#: includes/class-google-sheets-admin.php:226
-msgid "🗑️ All Google Sheets settings have been cleared. You can start fresh setup."
-msgstr "🗑️ Все настройки Google Таблиц очищены. Вы можете начать настройку заново."
-
-#: includes/class-google-sheets-admin.php:231
-msgid "Step 1: Google Cloud Console Setup"
-msgstr "Шаг 1: Настройка Google Cloud Console"
-
-#: includes/class-google-sheets-admin.php:233
-msgid "Go to"
-msgstr "Перейдите на"
-
-#: includes/class-google-sheets-admin.php:234
-msgid "Google Cloud Console"
-msgstr "Google Cloud Console"
-
-#: includes/class-google-sheets-admin.php:235
-msgid "Create a new project or select existing one"
-msgstr "Создайте новый проект или выберите существующий"
-
-#: includes/class-google-sheets-admin.php:236
-msgid "Enable Google Sheets API:"
+#: handlers/class-google-sheets-handler.php:80
+#, fuzzy
+msgid "Google Sheets API error:"
 msgstr "Включите Google Sheets API:"
 
-#: includes/class-google-sheets-admin.php:237
-msgid "Go to \"APIs &amp; Services\" → \"Library\""
-msgstr "Перейдите в \"APIs &amp; Services\" → \"Library\""
+#: handlers/class-google-sheets-handler.php:95
+#: handlers/class-google-sheets-handler.php:139
+#, fuzzy
+msgid "Google Sheets authentication not configured"
+msgstr "Интеграция с Google Таблицами"
 
-#: includes/class-google-sheets-admin.php:238
-msgid "Search for \"Google Sheets API\""
-msgstr "Найдите \"Google Sheets API\""
+#: handlers/class-google-sheets-handler.php:112
+#: handlers/class-google-sheets-handler.php:120
+msgid "Failed to get access token:"
+msgstr ""
 
-#: includes/class-google-sheets-admin.php:239
-msgid "Click \"Enable\""
-msgstr "Нажмите \"Enable\""
+#: handlers/class-google-sheets-handler.php:131
+#, fuzzy
+msgid "Spreadsheet ID is required"
+msgstr "Укажите ID таблицы."
 
-#: includes/class-google-sheets-admin.php:241
-msgid "Create OAuth 2.0 credentials:"
-msgstr "Создайте учетные данные OAuth 2.0:"
+#: templates/form-settings-meta-box.php:99
+msgid "Use Custom Template"
+msgstr "Использовать кастомный шаблон"
 
-#: includes/class-google-sheets-admin.php:242
-msgid "Go to \"APIs &amp; Services\" → \"Credentials\""
-msgstr "Перейдите в \"APIs &amp; Services\" → \"Credentials\""
+#: templates/form-settings-meta-box.php:103
+msgid "Enable custom template for Telegram notifications"
+msgstr "Включить кастомный шаблон для уведомлений в Telegram"
 
-#: includes/class-google-sheets-admin.php:243
-msgid "Click \"Create Credentials\" → \"OAuth 2.0 Client IDs\""
-msgstr "Нажмите \"Create Credentials\" → \"OAuth 2.0 Client IDs\""
+#: templates/form-settings-meta-box.php:107
+msgid "Telegram Template"
+msgstr "Шаблон Telegram"
 
-#: includes/class-google-sheets-admin.php:244
-msgid "Choose \"Web application\""
-msgstr "Выберите \"Web application\""
+#: templates/form-settings-meta-box.php:111
+msgid "Custom template for Telegram notifications. Use placeholders:"
+msgstr "Кастомный шаблон для уведомлений в Telegram. Используйте плейсхолдеры:"
 
-#: includes/class-google-sheets-admin.php:245
-msgid "Add authorized redirect URI:"
-msgstr "Добавьте авторизованный URI перенаправления:"
+#: templates/form-settings-meta-box.php:112
+msgid "System placeholders:"
+msgstr "Системные плейсхолдеры:"
 
-#: includes/class-google-sheets-admin.php:246
-msgid "Important:"
-msgstr "Важно:"
+#: templates/form-settings-meta-box.php:113
+msgid "Form title"
+msgstr "Название формы"
 
-#: includes/class-google-sheets-admin.php:246
-msgid "Make sure this exact URL is added to your Google Cloud Console OAuth credentials"
-msgstr "Убедитесь, что этот точный URL добавлен в учетные данные OAuth вашей Google Cloud Console"
+#: templates/form-settings-meta-box.php:114
+msgid "Date (d.m.Y)"
+msgstr "Дата (дд.мм.гггг)"
 
-#: includes/class-google-sheets-admin.php:247
-msgid "Save Client ID and Client Secret"
-msgstr "Сохраните Client ID и Client Secret"
+#: templates/form-settings-meta-box.php:115
+msgid "Time (H:i:s)"
+msgstr "Время (ЧЧ:мм:сс)"
 
-#: includes/class-google-sheets-admin.php:252
-msgid "Step 2: Enter Credentials"
-msgstr "Шаг 2: Введите учетные данные"
+#: templates/form-settings-meta-box.php:116
+msgid "Date and time (d.m.Y H:i:s)"
+msgstr "Дата и время (дд.мм.гггг ЧЧ:мм:сс)"
 
-#: includes/class-google-sheets-admin.php:259
-msgid "Client ID"
-msgstr "Client ID"
+#: templates/form-settings-meta-box.php:118
+msgid "Field placeholders:"
+msgstr "Плейсхолдеры полей:"
 
-#: includes/class-google-sheets-admin.php:263
-msgid "OAuth 2.0 Client ID from Google Cloud Console"
-msgstr "OAuth 2.0 Client ID из Google Cloud Console"
+#: templates/form-settings-meta-box.php:119
+msgid "Field value (replace field_name with actual field name)"
+msgstr "Значение поля (замените field_name на реальное имя поля)"
 
-#: includes/class-google-sheets-admin.php:267
-msgid "Client Secret"
-msgstr "Client Secret"
+#: templates/form-settings-meta-box.php:120
+msgid "Field label (replace field_name with actual field name)"
+msgstr "Лейбл поля (замените field_name на реальное имя поля)"
 
-#: includes/class-google-sheets-admin.php:271
-msgid "OAuth 2.0 Client Secret from Google Cloud Console"
-msgstr "OAuth 2.0 Client Secret из Google Cloud Console"
-
-#: includes/class-google-sheets-admin.php:277
-msgid "Save Credentials"
-msgstr "Сохранить учетные данные"
-
-#: includes/class-google-sheets-admin.php:282
-msgid "Step 3: Authorize Access"
-msgstr "Шаг 3: Авторизуйте доступ"
-
-#: includes/class-google-sheets-admin.php:285
-msgid "✅ Authenticated! Google Sheets integration is ready to use."
-msgstr "✅ Аутентифицирован! Интеграция с Google Таблицами готова к использованию."
-
-#: includes/class-google-sheets-admin.php:286
-msgid "Refresh Token:"
-msgstr "Refresh Token:"
-
-#: includes/class-google-sheets-admin.php:290
-msgid "🔐 Authentication Management"
-msgstr "🔐 Управление аутентификацией"
-
-#: includes/class-google-sheets-admin.php:291
-msgid "If you need to switch to a different Google account or re-authenticate:"
-msgstr "Если вам нужно переключиться на другой аккаунт Google или пройти аутентификацию заново:"
-
-#: includes/class-google-sheets-admin.php:293
-msgid "Are you sure you want to revoke Google Sheets authentication? This will disconnect the current integration."
-msgstr "Вы уверены, что хотите отозвать аутентификацию Google Таблиц? Это отключит текущую интеграцию."
-
-#: includes/class-google-sheets-admin.php:295
-msgid "🚫 Revoke Authentication"
-msgstr "🚫 Отозвать аутентификацию"
-
-#: includes/class-google-sheets-admin.php:299
+#: templates/form-settings-meta-box.php:121
 msgid "Note:"
 msgstr "Примечание:"
 
-#: includes/class-google-sheets-admin.php:299
-msgid "This will remove the current authentication. You'll need to re-authenticate to use Google Sheets integration again."
-msgstr "Это удалит текущую аутентификацию. Вам нужно будет пройти аутентификацию снова, чтобы использовать интеграцию с Google Таблицами."
+#: templates/form-settings-meta-box.php:121
+msgid "You can use HTML tags supported by Telegram (b, i, u, s, code, pre, a)."
+msgstr "Вы можете использовать HTML теги, поддерживаемые Telegram (b, i, u, s, code, pre, a)."
 
-#: includes/class-google-sheets-admin.php:303
-msgid "Click the button below to authorize access to Google Sheets:"
-msgstr "Нажмите кнопку ниже, чтобы авторизовать доступ к Google Таблицам:"
+#: handlers/class-template-parser.php:192
+msgid "Page URL:"
+msgstr "URL страницы:"
 
-#: includes/class-google-sheets-admin.php:304
-msgid "🔐 Authorize Google Sheets Access"
-msgstr "🔐 Авторизовать доступ к Google Таблицам"
+#: includes/class-meta-boxes.php:118
+msgid "By clicking the button, you agree to the"
+msgstr "Нажимая кнопку, вы соглашаетесь с"
 
-#: includes/class-google-sheets-admin.php:308
-msgid "⚠️ Please save your Client ID and Client Secret first."
-msgstr "⚠️ Сначала сохраните свой Client ID и Client Secret."
+#: includes/class-meta-boxes.php:118
+msgid "privacy policy"
+msgstr "политикой конфиденциальности"
 
-#: includes/class-google-sheets-admin.php:313
-msgid "Step 4: Test Connection"
-msgstr "Шаг 4: Тестирование подключения"
+#: assets/js/admin.js:96
+msgid "Are you sure you want to remove this field?"
+msgstr "Вы уверены, что хотите удалить это поле?"
 
-#: includes/class-google-sheets-admin.php:314
-msgid "Test your Google Sheets connection:"
-msgstr "Протестируйте подключение Google Таблиц:"
+#: assets/js/admin.js:156
+msgid "Error generating preview:"
+msgstr "Ошибка генерации превью:"
 
-#: includes/class-google-sheets-admin.php:321
-msgid "Enter a spreadsheet ID to test the connection"
-msgstr "Введите ID таблицы для тестирования подключения"
+#: assets/js/admin.js:160
+msgid "Error generating preview. Please try again."
+msgstr "Ошибка генерации превью. Пожалуйста, попробуйте снова."
 
-#: includes/class-google-sheets-admin.php:325
-msgid "Test Google Sheets Connection"
-msgstr "Протестировать подключение Google Таблиц"
+#: assets/js/admin.js:333
+msgid "This field is required."
+msgstr "Это поле обязательно для заполнения."
 
-#: includes/class-google-sheets-admin.php:331
-msgid "Usage"
-msgstr "Использование"
+#: assets/js/admin.js:345
+msgid "Please enter a valid email address."
+msgstr "Пожалуйста, введите корректный email адрес."
 
-#: includes/class-google-sheets-admin.php:332
-msgid "Once configured, you can enable Google Sheets integration in your forms:"
-msgstr "После настройки вы можете включить интеграцию с Google Таблицами в своих формах:"
+#~ msgid ""
+#~ "✅ Google Sheets authentication successful! You can now use Google Sheets "
+#~ "integration in your forms."
+#~ msgstr ""
+#~ "✅ Аутентификация Google Таблиц успешна! Теперь вы можете использовать "
+#~ "интеграцию с Google Таблицами в своих формах."
 
-#: includes/class-google-sheets-admin.php:334
-msgid "Add New"
-msgstr "Добавить"
+#~ msgid "❌ Authentication failed. Please try again."
+#~ msgstr "❌ Ошибка аутентификации. Пожалуйста, попробуйте снова."
 
-#: includes/class-google-sheets-admin.php:334
-msgid "or edit existing form"
-msgstr "или отредактируйте существующую форму"
+#~ msgid "Settings saved successfully!"
+#~ msgstr "Настройки сохранены успешно!"
 
-#: includes/class-google-sheets-admin.php:335
-msgid "In the"
-msgstr "В"
+#~ msgid ""
+#~ "✅ Google Sheets authentication has been revoked. You can now re-"
+#~ "authenticate with different credentials."
+#~ msgstr ""
+#~ "✅ Аутентификация Google Таблиц отозвана. Теперь вы можете пройти "
+#~ "аутентификацию с другими учетными данными."
 
-#: includes/class-google-sheets-admin.php:335
-msgid "section:"
-msgstr "раздел:"
+#~ msgid ""
+#~ "🗑️ All Google Sheets settings have been cleared. You can start fresh setup."
+#~ msgstr ""
+#~ "🗑️ Все настройки Google Таблиц очищены. Вы можете начать настройку заново."
 
-#: includes/class-google-sheets-admin.php:337
-msgid "Check \"Send to Google Sheets\""
-msgstr "Установите флажок \"Отправлять в Google Таблицы\""
+#~ msgid "Step 1: Google Cloud Console Setup"
+#~ msgstr "Шаг 1: Настройка Google Cloud Console"
 
-#: includes/class-google-sheets-admin.php:338
-msgid "Enter your Spreadsheet ID (from URL: docs.google.com/spreadsheets/d/SPREADSHEET_ID)"
-msgstr "Введите ID вашей таблицы (из URL: docs.google.com/spreadsheets/d/SPREADSHEET_ID)"
+#~ msgid "Go to"
+#~ msgstr "Перейдите на"
 
-#: includes/class-google-sheets-admin.php:339
-msgid "Optionally specify Sheet Name"
-msgstr "При необходимости укажите название листа"
+#~ msgid "Google Cloud Console"
+#~ msgstr "Google Cloud Console"
 
-#: includes/class-google-sheets-admin.php:341
-msgid "Save the form"
-msgstr "Сохраните форму"
+#~ msgid "Create a new project or select existing one"
+#~ msgstr "Создайте новый проект или выберите существующий"
 
-#: includes/class-google-sheets-admin.php:346
-msgid "⚠️ Clear All Settings"
-msgstr "⚠️ Очистить все настройки"
+#~ msgid "Enable Google Sheets API:"
+#~ msgstr "Включите Google Sheets API:"
 
-#: includes/class-google-sheets-admin.php:347
-msgid "If you want to completely remove all Google Sheets settings and start over:"
-msgstr "Если вы хотите полностью удалить все настройки Google Таблиц и начать заново:"
+#~ msgid "Go to \"APIs &amp; Services\" → \"Library\""
+#~ msgstr "Перейдите в \"APIs &amp; Services\" → \"Library\""
 
-#: includes/class-google-sheets-admin.php:351
-msgid "⚠️ WARNING: This will permanently delete ALL Google Sheets settings including Client ID, Client Secret, and Refresh Token. This action cannot be undone. Are you absolutely sure?"
-msgstr "⚠️ ПРЕДУПРЕЖДЕНИЕ: Это навсегда удалит ВСЕ настройки Google Таблиц, включая Client ID, Client Secret и Refresh Token. Это действие невозможно отменить. Вы абсолютно уверены?"
+#~ msgid "Search for \"Google Sheets API\""
+#~ msgstr "Найдите \"Google Sheets API\""
 
-#: includes/class-google-sheets-admin.php:353
-msgid "🗑️ Clear All Google Sheets Settings"
-msgstr "🗑️ Очистить все настройки Google Таблиц"
+#~ msgid "Click \"Enable\""
+#~ msgstr "Нажмите \"Enable\""
 
-#: includes/class-google-sheets-admin.php:357
-msgid "Use this when:"
-msgstr "Используйте это, когда:"
+#~ msgid "Create OAuth 2.0 credentials:"
+#~ msgstr "Создайте учетные данные OAuth 2.0:"
 
-#: includes/class-google-sheets-admin.php:357
-msgid "You want to switch to different Google account, fix OAuth issues, or start fresh setup."
-msgstr "Вы хотите переключиться на другой аккаунт Google, исправить проблемы с OAuth или начать настройку заново."
+#~ msgid "Go to \"APIs &amp; Services\" → \"Credentials\""
+#~ msgstr "Перейдите в \"APIs &amp; Services\" → \"Credentials\""
 
+#~ msgid "Click \"Create Credentials\" → \"OAuth 2.0 Client IDs\""
+#~ msgstr "Нажмите \"Create Credentials\" → \"OAuth 2.0 Client IDs\""
 
+#~ msgid "Choose \"Web application\""
+#~ msgstr "Выберите \"Web application\""
+
+#~ msgid "Add authorized redirect URI:"
+#~ msgstr "Добавьте авторизованный URI перенаправления:"
+
+#~ msgid "Important:"
+#~ msgstr "Важно:"
+
+#~ msgid ""
+#~ "Make sure this exact URL is added to your Google Cloud Console OAuth "
+#~ "credentials"
+#~ msgstr ""
+#~ "Убедитесь, что этот точный URL добавлен в учетные данные OAuth вашей "
+#~ "Google Cloud Console"
+
+#~ msgid "Save Client ID and Client Secret"
+#~ msgstr "Сохраните Client ID и Client Secret"
+
+#~ msgid "Step 2: Enter Credentials"
+#~ msgstr "Шаг 2: Введите учетные данные"
+
+#~ msgid "Client ID"
+#~ msgstr "Client ID"
+
+#~ msgid "OAuth 2.0 Client ID from Google Cloud Console"
+#~ msgstr "OAuth 2.0 Client ID из Google Cloud Console"
+
+#~ msgid "Client Secret"
+#~ msgstr "Client Secret"
+
+#~ msgid "OAuth 2.0 Client Secret from Google Cloud Console"
+#~ msgstr "OAuth 2.0 Client Secret из Google Cloud Console"
+
+#~ msgid "Save Credentials"
+#~ msgstr "Сохранить учетные данные"
+
+#~ msgid "Step 3: Authorize Access"
+#~ msgstr "Шаг 3: Авторизуйте доступ"
+
+#~ msgid "✅ Authenticated! Google Sheets integration is ready to use."
+#~ msgstr ""
+#~ "✅ Аутентифицирован! Интеграция с Google Таблицами готова к использованию."
+
+#~ msgid "Refresh Token:"
+#~ msgstr "Refresh Token:"
+
+#~ msgid "🔐 Authentication Management"
+#~ msgstr "🔐 Управление аутентификацией"
+
+#~ msgid ""
+#~ "If you need to switch to a different Google account or re-authenticate:"
+#~ msgstr ""
+#~ "Если вам нужно переключиться на другой аккаунт Google или пройти "
+#~ "аутентификацию заново:"
+
+#~ msgid ""
+#~ "Are you sure you want to revoke Google Sheets authentication? This will "
+#~ "disconnect the current integration."
+#~ msgstr ""
+#~ "Вы уверены, что хотите отозвать аутентификацию Google Таблиц? Это "
+#~ "отключит текущую интеграцию."
+
+#~ msgid "🚫 Revoke Authentication"
+#~ msgstr "🚫 Отозвать аутентификацию"
+
+#~ msgid ""
+#~ "This will remove the current authentication. You'll need to re-"
+#~ "authenticate to use Google Sheets integration again."
+#~ msgstr ""
+#~ "Это удалит текущую аутентификацию. Вам нужно будет пройти аутентификацию "
+#~ "снова, чтобы использовать интеграцию с Google Таблицами."
+
+#~ msgid "Click the button below to authorize access to Google Sheets:"
+#~ msgstr "Нажмите кнопку ниже, чтобы авторизовать доступ к Google Таблицам:"
+
+#~ msgid "🔐 Authorize Google Sheets Access"
+#~ msgstr "🔐 Авторизовать доступ к Google Таблицам"
+
+#~ msgid "⚠️ Please save your Client ID and Client Secret first."
+#~ msgstr "⚠️ Сначала сохраните свой Client ID и Client Secret."
+
+#~ msgid "Step 4: Test Connection"
+#~ msgstr "Шаг 4: Тестирование подключения"
+
+#~ msgid "Test your Google Sheets connection:"
+#~ msgstr "Протестируйте подключение Google Таблиц:"
+
+#~ msgid "Enter a spreadsheet ID to test the connection"
+#~ msgstr "Введите ID таблицы для тестирования подключения"
+
+#~ msgid "Test Google Sheets Connection"
+#~ msgstr "Протестировать подключение Google Таблиц"
+
+#~ msgid "Usage"
+#~ msgstr "Использование"
+
+#~ msgid ""
+#~ "Once configured, you can enable Google Sheets integration in your forms:"
+#~ msgstr ""
+#~ "После настройки вы можете включить интеграцию с Google Таблицами в своих "
+#~ "формах:"
+
+#~ msgid "Add New"
+#~ msgstr "Добавить"
+
+#~ msgid "or edit existing form"
+#~ msgstr "или отредактируйте существующую форму"
+
+#~ msgid "In the"
+#~ msgstr "В"
+
+#~ msgid "Google Sheets Integration"
+#~ msgstr "Интеграция с Google Таблицами"
+
+#~ msgid "section:"
+#~ msgstr "раздел:"
+
+#~ msgid "Check \"Send to Google Sheets\""
+#~ msgstr "Установите флажок \"Отправлять в Google Таблицы\""
+
+#~ msgid ""
+#~ "Enter your Spreadsheet ID (from URL: docs.google.com/spreadsheets/d/"
+#~ "SPREADSHEET_ID)"
+#~ msgstr ""
+#~ "Введите ID вашей таблицы (из URL: docs.google.com/spreadsheets/d/"
+#~ "SPREADSHEET_ID)"
+
+#~ msgid "Optionally specify Sheet Name"
+#~ msgstr "При необходимости укажите название листа"
+
+#~ msgid "Save the form"
+#~ msgstr "Сохраните форму"
+
+#~ msgid "⚠️ Clear All Settings"
+#~ msgstr "⚠️ Очистить все настройки"
+
+#~ msgid ""
+#~ "If you want to completely remove all Google Sheets settings and start "
+#~ "over:"
+#~ msgstr ""
+#~ "Если вы хотите полностью удалить все настройки Google Таблиц и начать "
+#~ "заново:"
+
+#~ msgid ""
+#~ "⚠️ WARNING: This will permanently delete ALL Google Sheets settings "
+#~ "including Client ID, Client Secret, and Refresh Token. This action cannot "
+#~ "be undone. Are you absolutely sure?"
+#~ msgstr ""
+#~ "⚠️ ПРЕДУПРЕЖДЕНИЕ: Это навсегда удалит ВСЕ настройки Google Таблиц, "
+#~ "включая Client ID, Client Secret и Refresh Token. Это действие невозможно "
+#~ "отменить. Вы абсолютно уверены?"
+
+#~ msgid "🗑️ Clear All Google Sheets Settings"
+#~ msgstr "🗑️ Очистить все настройки Google Таблиц"
+
+#~ msgid "Use this when:"
+#~ msgstr "Используйте это, когда:"
+
+#~ msgid ""
+#~ "You want to switch to different Google account, fix OAuth issues, or "
+#~ "start fresh setup."
+#~ msgstr ""
+#~ "Вы хотите переключиться на другой аккаунт Google, исправить проблемы с "
+#~ "OAuth или начать настройку заново."
+
+#~ msgid "Copy to clipboard"
+#~ msgstr "Копировать в буфер обмена"
+
+#~ msgid "Telegram Notifications"
+#~ msgstr "Уведомления Telegram"
+
+#~ msgid "Admin Panel Storage"
+#~ msgstr "Хранилище админ-панели"
+
+#~ msgid "Shortcode Display Settings"
+#~ msgstr "Отображение формы из шорткода"

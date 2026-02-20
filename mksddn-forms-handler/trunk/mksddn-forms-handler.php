@@ -3,7 +3,7 @@
  * Plugin Name: MksDdn Forms Handler
  * Plugin URI: https://github.com/mksddn/WP-MksDdn-Forms-Handler
  * Description: Advanced form processing system with REST API support, Telegram notifications, and Google Sheets integration. Create and manage forms with multiple delivery methods including email, Telegram, Google Sheets, and admin storage.
- * Version: 2.3.0
+ * Version: 2.4.0
  * Requires at least: 5.0
  * Requires PHP: 8.0
  * Author: mksddn
@@ -14,7 +14,7 @@
  * Domain Path: /languages
  * 
  * @package MksDdnFormsHandler
- * @version 2.2.0
+ * @version 2.4.0
  * @author mksddn
  * @license GPL v2 or later
 */
@@ -25,11 +25,14 @@ if (!defined('ABSPATH')) {
     }
 
 // Define plugin constants
-define('MKSDDN_FORMS_HANDLER_VERSION', '2.3.0');
+define('MKSDDN_FORMS_HANDLER_VERSION', '2.4.0');
 define('MKSDDN_FORMS_HANDLER_PLUGIN_DIR', __DIR__);
 define('MKSDDN_FORMS_HANDLER_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('MKSDDN_FORMS_HANDLER_PLUGIN_FILE', __FILE__);
 define('MKSDDN_FORMS_HANDLER_PLUGIN_BASENAME', plugin_basename(__FILE__));
+
+// Load traits first (before classes that use them)
+require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/includes/traits/trait-telegram-formatter.php';
 
 // Load components
 require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/includes/class-post-types.php';
@@ -44,6 +47,7 @@ require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/includes/class-google-sheets-ad
 require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/includes/class-assets.php';
 
 // Load handlers
+require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/handlers/class-template-parser.php';
 require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/handlers/class-telegram-handler.php';
 require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/handlers/class-google-sheets-handler.php';
 
@@ -52,6 +56,9 @@ require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/includes/template-functions.php
 
 // Initialize plugin
 add_action('plugins_loaded', function() {
+    // Run migration for email notification settings (one-time migration)
+    MksDdn\FormsHandler\Utilities::migrate_email_notification_settings();
+
     new MksDdn\FormsHandler\PostTypes();
     new MksDdn\FormsHandler\MetaBoxes();
     new MksDdn\FormsHandler\FormsHandler();

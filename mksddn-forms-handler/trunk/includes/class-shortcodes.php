@@ -49,6 +49,7 @@ class Shortcodes {
         $submit_button_text = get_post_meta($form->ID, '_submit_button_text', true);
         $custom_html_after_button = get_post_meta($form->ID, '_custom_html_after_button', true);
         $success_message_text = get_post_meta($form->ID, '_success_message_text', true);
+        $redirect_url = get_post_meta($form->ID, '_redirect_url', true);
         $form_custom_classes = get_post_meta($form->ID, '_form_custom_classes', true);
 
         // Set default success message if empty
@@ -244,8 +245,21 @@ class Shortcodes {
             'mksddn_fh_form',
             [
                 'sending_text' => __( 'Sending...', 'mksddn-forms-handler' ),
-                'send_text'    => __( 'Send', 'mksddn-forms-handler' ),
+                'send_text' => __( 'Send', 'mksddn-forms-handler' ),
                 'success_message' => $success_message_text,
+                'redirect_url' => $redirect_url ? (preg_match('#^https?://#i', $redirect_url) ? esc_url($redirect_url) : esc_attr($redirect_url)) : '',
+                'error_default' => __( 'Error', 'mksddn-forms-handler' ),
+                'error_sending' => __( 'An error occurred while sending the form', 'mksddn-forms-handler' ),
+                'unauthorized_fields_label' => __( 'Unauthorized fields:', 'mksddn-forms-handler' ),
+                'allowed_fields_label' => __( 'Allowed fields:', 'mksddn-forms-handler' ),
+                'delivery_status_label' => __( 'Delivery Status:', 'mksddn-forms-handler' ),
+                'email_sent_successfully' => __( 'Email: Sent successfully', 'mksddn-forms-handler' ),
+                'email_label' => __( 'Email:', 'mksddn-forms-handler' ),
+                'telegram_sent_successfully' => __( 'Telegram: Sent successfully', 'mksddn-forms-handler' ),
+                'telegram_label' => __( 'Telegram:', 'mksddn-forms-handler' ),
+                'google_sheets_data_saved' => __( 'Google Sheets: Data saved', 'mksddn-forms-handler' ),
+                'google_sheets_label' => __( 'Google Sheets:', 'mksddn-forms-handler' ),
+                'failed' => __( 'Failed', 'mksddn-forms-handler' ),
             ]
         );
         ?>

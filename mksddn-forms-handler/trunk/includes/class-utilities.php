@@ -35,6 +35,7 @@ class Utilities {
                 // Set meta fields
                 update_post_meta($form_id, '_recipients', get_option('admin_email'));
                 update_post_meta($form_id, '_subject', __( 'New message from website', 'mksddn-forms-handler' ));
+                update_post_meta($form_id, '_send_to_email', '1');
 
                 // Default fields configuration
                 $default_fields = json_encode([
@@ -388,5 +389,43 @@ class Utilities {
         }
 
         return false;
+    }
+
+    /**
+     * Migrate existing forms to enable email notifications by default
+     * Sets _send_to_email = '1' for forms that have _recipients and _subject but no _send_to_email
+     *
+     * @return int Number of forms migrated
+     */
+    public static function migrate_email_notification_settings(): int {
+        $migration_key = 'mksddn_fh_email_notification_migrated';
+        
+        // Check if migration already completed
+        if (get_option($migration_key) === 'yes') {
+            return 0;
+        }
+
+        $forms = self::get_all_forms();
+        $migrated_count = 0;
+
+        foreach ($forms as $form) {
+            // Check if _send_to_email meta exists (to avoid overwriting explicitly disabled forms)
+            $send_to_email_exists = metadata_exists('post', $form->ID, '_send_to_email');
+            $send_to_email = get_post_meta($form->ID, '_send_to_email', true);
+            $recipients = get_post_meta($form->ID, '_recipients', true);
+            $subject = get_post_meta($form->ID, '_subject', true);
+
+            // Only migrate if _send_to_email meta doesn't exist (old forms)
+            // Don't overwrite if it exists (even if empty or '0') - user may have explicitly disabled it
+            if (!$send_to_email_exists && !empty($recipients) && !empty($subject)) {
+                update_post_meta($form->ID, '_send_to_email', '1');
+                $migrated_count++;
+            }
+        }
+
+        // Mark migration as completed
+        update_option($migration_key, 'yes');
+
+        return $migrated_count;
     }
 } 

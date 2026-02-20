@@ -11,15 +11,25 @@ namespace MksDdn\FormsHandler;
 if (!defined('ABSPATH')) {
     exit;
 }
+
 /**
  * Handles Telegram notifications
  */
 class TelegramHandler {
+    use TelegramFormatterTrait;
     
     /**
      * Send message to Telegram
+     *
+     * @param string $bot_token Telegram bot token
+     * @param string $chat_ids Comma-separated chat IDs
+     * @param array $form_data Form submission data
+     * @param string $form_title Form title
+     * @param string|null $fields_config Fields configuration JSON
+     * @param string|null $custom_template Custom template string (optional)
+     * @return \WP_Error|bool
      */
-    public static function send_message($bot_token, $chat_ids, $form_data, $form_title, $fields_config = null): \WP_Error|bool {
+    public static function send_message($bot_token, $chat_ids, $form_data, $form_title, $fields_config = null, $custom_template = null): \WP_Error|bool {
         if (!$bot_token || !$chat_ids) {
             return new \WP_Error('telegram_config_error', __( 'Telegram bot token or chat IDs not configured', 'mksddn-forms-handler' ));
         }
@@ -34,7 +44,11 @@ class TelegramHandler {
                 continue;
             }
 
-            $message = self::build_telegram_message($form_data, $form_title, $fields_config);
+            $message = self::build_telegram_message($form_data, $form_title, $fields_config, $custom_template);
+            
+            // Apply filter for advanced customization
+            $message = apply_filters('mksddn_forms_telegram_message', $message, $form_data, $form_title, $fields_config);
+            
             $result = self::send_telegram_request($bot_token, $chat_id, $message);
 
             if (is_wp_error($result)) {
@@ -52,16 +66,20 @@ class TelegramHandler {
     }
     
     /**
-     * Escape HTML special characters for Telegram
-     */
-    private static function escape_html_for_telegram($text): string {
-        return htmlspecialchars($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-    }
-
-    /**
      * Build Telegram message
+     *
+     * @param array $form_data Form submission data
+     * @param string $form_title Form title
+     * @param string|null $fields_config Fields configuration JSON
+     * @param string|null $custom_template Custom template string (optional)
+     * @return string Formatted message
      */
-    private static function build_telegram_message($form_data, $form_title, $fields_config = null): string {
+    private static function build_telegram_message($form_data, $form_title, $fields_config = null, $custom_template = null): string {
+        // Use custom template if provided
+        if (!empty($custom_template)) {
+            return TemplateParser::parse($custom_template, $form_data, $form_title, $fields_config);
+        }
+        
         // Build field name to label mapping
         $field_labels_map = self::build_field_labels_map($fields_config);
 
@@ -93,25 +111,12 @@ class TelegramHandler {
     }
 
     /**
-     * Get localized label for system-added field keys (e.g. Page URL).
-     *
-     * @param string $key Field key.
-     * @return string Label for display.
-     */
-    private static function get_system_field_label( string $key ): string {
-        if ( $key === 'Page URL' ) {
-            return __( 'Page URL', 'mksddn-forms-handler' );
-        }
-        return $key;
-    }
-
-    /**
      * Check if array contains objects (associative arrays with multiple keys)
      *
      * @param array $value Array to check
      * @return bool True if array contains objects
      */
-    private static function is_array_of_objects(array $value): bool {
+    public static function is_array_of_objects(array $value): bool {
         if (empty($value)) {
             return false;
         }
@@ -133,12 +138,19 @@ class TelegramHandler {
      * @param string|null $parent_field_name Parent field name for nested fields lookup
      * @return string Formatted string
      */
-    private static function format_array_of_objects(array $items, $fields_config = null, $parent_field_name = null): string {
+    public static function format_array_of_objects(array $items, $fields_config = null, $parent_field_name = null): string {
         // Build nested field labels map if parent field config exists
         $nested_labels_map = [];
         if ($fields_config && $parent_field_name) {
             $fields = json_decode((string)$fields_config, true);
-            if (is_array($fields)) {
+            
+            // Check for JSON decode errors
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                if (defined('WP_DEBUG') && WP_DEBUG) {
+                    // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+                    error_log('TelegramHandler::format_array_of_objects: Invalid JSON - ' . json_last_error_msg());
+                }
+            } elseif (is_array($fields)) {
                 foreach ($fields as $field) {
                     if (($field['name'] ?? '') === $parent_field_name && isset($field['fields']) && is_array($field['fields'])) {
                         foreach ($field['fields'] as $nested_field) {
@@ -178,37 +190,6 @@ class TelegramHandler {
     }
     
     /**
-     * Build field name to label mapping from fields configuration
-     * Priority: notification_label → label → name
-     *
-     * @param string|null $fields_config JSON fields configuration
-     * @return array Associative array mapping field names to labels
-     */
-    private static function build_field_labels_map($fields_config): array {
-        $labels_map = [];
-        
-        if (!$fields_config) {
-            return $labels_map;
-        }
-        
-        $fields = json_decode((string)$fields_config, true);
-        if (!is_array($fields)) {
-            return $labels_map;
-        }
-        
-        foreach ($fields as $field) {
-            if (isset($field['name'])) {
-                $field_name = $field['name'];
-                // Priority: notification_label → label → name
-                $field_label = $field['notification_label'] ?? $field['label'] ?? $field_name;
-                $labels_map[$field_name] = $field_label;
-            }
-        }
-        
-        return $labels_map;
-    }
-    
-    /**
      * Send request to Telegram API
      */
     private static function send_telegram_request($bot_token, $chat_id, $message): \WP_Error|bool {
@@ -224,7 +205,7 @@ class TelegramHandler {
         ]);
 
         if (is_wp_error($response)) {
-            return new \WP_Error('telegram_request_error', 'Failed to send Telegram request: ' . $response->get_error_message());
+            return new \WP_Error('telegram_request_error', __( 'Failed to send Telegram request:', 'mksddn-forms-handler' ) . ' ' . $response->get_error_message());
         }
 
         $body = wp_remote_retrieve_body($response);

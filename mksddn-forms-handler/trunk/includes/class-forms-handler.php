@@ -17,6 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Main forms handler class
  */
 class FormsHandler {
+    use TelegramFormatterTrait;
     
     /**
      * Cache for form configurations
@@ -29,6 +30,24 @@ class FormsHandler {
      * @var int
      */
     private const CACHE_TTL = 3600; // 1 hour
+    
+    /**
+     * Maximum number of form fields allowed
+     * @var int
+     */
+    private const MAX_FORM_FIELDS = 50;
+    
+    /**
+     * Maximum total data size in bytes (100KB)
+     * @var int
+     */
+    private const MAX_DATA_SIZE = 100000;
+    
+    /**
+     * Rate limit window in seconds
+     * @var int
+     */
+    private const RATE_LIMIT_SECONDS = 10;
     
     public function __construct() {
         add_action('rest_api_init', [$this, 'register_rest_routes']);
@@ -252,11 +271,11 @@ class FormsHandler {
             return new \WP_Error('spam_detected', __( 'Spam detected', 'mksddn-forms-handler' ), ['status' => 400]);
         }
 
-        // Simple rate limiting: 1 request per 10 seconds per IP per form
+        // Simple rate limiting: 1 request per RATE_LIMIT_SECONDS per IP per form
         $ip = sanitize_text_field( wp_unslash($_SERVER['REMOTE_ADDR'] ?? 'unknown') );
         $rl_key = 'mksddn_fh_rate_' . md5($slug . '|' . $ip);
         $last_ts = get_transient($rl_key);
-        if ($last_ts && (time() - (int)$last_ts) < 10) {
+        if ($last_ts && (time() - (int)$last_ts) < self::RATE_LIMIT_SECONDS) {
             return new \WP_Error('rate_limited', __( 'Too many requests. Please wait a few seconds.', 'mksddn-forms-handler' ), ['status' => 429]);
         }
         set_transient($rl_key, time(), 15);
@@ -266,7 +285,7 @@ class FormsHandler {
         }
 
         // Check data size (protection against too large requests)
-        if (count($form_data) > 50) {
+        if (count($form_data) > self::MAX_FORM_FIELDS) {
             return new \WP_Error('too_many_fields', __( 'Too many form fields submitted', 'mksddn-forms-handler' ), ['status' => 400]);
         }
 
@@ -278,7 +297,7 @@ class FormsHandler {
             $total_size += $size_key + $size_val;
         }
 
-        if ($total_size > 100000) { // Maximum 100KB total data
+        if ($total_size > self::MAX_DATA_SIZE) {
             return new \WP_Error('data_too_large', __( 'Form data is too large', 'mksddn-forms-handler' ), ['status' => 400]);
         }
 
@@ -391,12 +410,12 @@ class FormsHandler {
         $slug = $request->get_param('slug');
         $slug = is_string($slug) ? sanitize_title($slug) : '';
         if ($slug === '') {
-            return new \WP_REST_Response(['message' => 'Invalid slug'], 400);
+            return new \WP_REST_Response(['message' => __( 'Invalid slug', 'mksddn-forms-handler' )], 400);
         }
 
         $post = get_page_by_path($slug, OBJECT, 'mksddn_fh_forms');
         if (!$post) {
-            return new \WP_REST_Response(['message' => 'Form not found'], 404);
+            return new \WP_REST_Response(['message' => __( 'Form not found', 'mksddn-forms-handler' )], 404);
         }
 
         // Read and sanitize fields configuration preserving arbitrary attributes
@@ -543,11 +562,11 @@ class FormsHandler {
             wp_die( esc_html__( 'Spam detected', 'mksddn-forms-handler' ) );
         }
 
-        // Simple rate limiting per IP+form: 1 request per 10 seconds
+        // Simple rate limiting per IP+form: 1 request per RATE_LIMIT_SECONDS
         $ip = sanitize_text_field( wp_unslash($_SERVER['REMOTE_ADDR'] ?? 'unknown') );
         $rl_key = 'mksddn_fh_rate_' . md5($form_id . '|' . $ip);
         $last_ts = get_transient($rl_key);
-        if ($last_ts && (time() - (int)$last_ts) < 10) {
+        if ($last_ts && (time() - (int)$last_ts) < self::RATE_LIMIT_SECONDS) {
             wp_die( esc_html__( 'Too many requests. Please wait a few seconds.', 'mksddn-forms-handler' ) );
         }
         set_transient($rl_key, time(), 15);
@@ -684,6 +703,7 @@ class FormsHandler {
             'email'         => [
                 'success' => false,
                 'error'   => null,
+                'enabled' => false,
             ],
             'telegram'      => [
                 'success' => false,
@@ -702,30 +722,41 @@ class FormsHandler {
             ],
         ];
 
-        // Prepare and send email
-        $email_result = $this->prepare_and_send_email(
-            $form_config['recipients'], 
-            $form_config['bcc_recipient'], 
-            $form_config['subject'], 
-            $filtered_form_data, 
-            $form_config['form_title'],
-            $email_attachments,
-            $form_config['fields_config']
-        );
-        $delivery_results['email']['success'] = !is_wp_error($email_result);
-        if (is_wp_error($email_result)) {
-            $delivery_results['email']['error'] = $email_result->get_error_message();
+        // Send email if enabled
+        if ($form_config['send_to_email'] && $form_config['recipients'] && $form_config['subject']) {
+            $delivery_results['email']['enabled'] = true;
+            $email_result = $this->prepare_and_send_email(
+                $form_config['recipients'], 
+                $form_config['bcc_recipient'], 
+                $form_config['subject'], 
+                $filtered_form_data, 
+                $form_config['form_title'],
+                $email_attachments,
+                $form_config['fields_config']
+            );
+            $delivery_results['email']['success'] = !is_wp_error($email_result);
+            if (is_wp_error($email_result)) {
+                $delivery_results['email']['error'] = $email_result->get_error_message();
+            }
         }
 
         // Send to Telegram
         if ($form_config['send_to_telegram'] && $form_config['telegram_bot_token'] && $form_config['telegram_chat_ids']) {
             $delivery_results['telegram']['enabled'] = true;
+            
+            // Get custom template if enabled
+            $custom_template = null;
+            if ($form_config['use_custom_telegram_template'] && !empty($form_config['telegram_template'])) {
+                $custom_template = $form_config['telegram_template'];
+            }
+            
             $telegram_result = \MksDdn\FormsHandler\TelegramHandler::send_message(
                 $form_config['telegram_bot_token'], 
                 $form_config['telegram_chat_ids'], 
                 $filtered_form_data, 
                 $form_config['form_title'],
-                $form_config['fields_config']
+                $form_config['fields_config'],
+                $custom_template
             );
             $delivery_results['telegram']['success'] = !is_wp_error($telegram_result);
             if (is_wp_error($telegram_result)) {
@@ -761,7 +792,7 @@ class FormsHandler {
         $this->log_form_submission($form_config['form_id'], true);
 
         // Check if at least one delivery method succeeded
-        $any_success = $delivery_results['email']['success'] ||
+        $any_success = ($delivery_results['email']['enabled'] && $delivery_results['email']['success']) ||
                       ($delivery_results['telegram']['enabled'] && $delivery_results['telegram']['success']) ||
                       ($delivery_results['google_sheets']['enabled'] && $delivery_results['google_sheets']['success']) ||
                       ($delivery_results['admin_storage']['enabled'] && $delivery_results['admin_storage']['success']);
@@ -803,28 +834,62 @@ class FormsHandler {
         }
 
         if (!$form || $form->post_type !== 'mksddn_fh_forms') {
-            return new \WP_Error('form_not_found', 'Form not found', ['status' => 404]);
+            return new \WP_Error('form_not_found', __( 'Form not found', 'mksddn-forms-handler' ), ['status' => 404]);
         }
 
         // Get all form settings in one query to reduce database calls
+        // Use get_post_meta() without second parameter to fetch all meta at once
+        $all_meta = get_post_meta($form->ID);
+        
+        // Helper function to get meta value safely
+        $get_meta = function($key) use ($all_meta) {
+            return isset($all_meta[$key][0]) ? $all_meta[$key][0] : '';
+        };
+        
+        // Check if _send_to_email meta exists (to distinguish between old forms and explicitly disabled)
+        $send_to_email_exists = isset($all_meta['_send_to_email']);
+        $send_to_email_raw = $get_meta('_send_to_email');
+        $recipients = $get_meta('_recipients');
+        $subject = $get_meta('_subject');
+
+        // Determine email sending status:
+        // - If meta doesn't exist (old form): enable for backward compatibility if recipients/subject exist
+        // - If meta exists and equals '0': explicitly disabled, don't send
+        // - If meta exists and equals '1': explicitly enabled, send
+        // - If meta exists but empty: enable for backward compatibility if recipients/subject exist
+        $send_to_email = $send_to_email_raw;
+        if (!$send_to_email_exists || ($send_to_email_exists && $send_to_email === '')) {
+            // Old form or empty value: enable for backward compatibility if configured
+            if (!empty($recipients) && !empty($subject)) {
+                $send_to_email = '1';
+            } else {
+                $send_to_email = '0';
+            }
+        }
+        // If $send_to_email is '0' (explicitly disabled), keep it as '0'
+
         $form_config = [
             'form_id' => $form->ID,
             'form_slug' => $form->post_name,
             'form_title' => $form->post_title,
-            'recipients' => get_post_meta($form->ID, '_recipients', true),
-            'bcc_recipient' => get_post_meta($form->ID, '_bcc_recipient', true),
-            'subject' => get_post_meta($form->ID, '_subject', true),
-            'fields_config' => get_post_meta($form->ID, '_fields_config', true),
-            'send_to_telegram' => get_post_meta($form->ID, '_send_to_telegram', true),
-            'telegram_bot_token' => get_post_meta($form->ID, '_telegram_bot_token', true),
-            'telegram_chat_ids' => get_post_meta($form->ID, '_telegram_chat_ids', true),
-            'send_to_sheets' => get_post_meta($form->ID, '_send_to_sheets', true),
-            'sheets_spreadsheet_id' => get_post_meta($form->ID, '_sheets_spreadsheet_id', true),
-            'sheets_sheet_name' => get_post_meta($form->ID, '_sheets_sheet_name', true),
-            'save_to_admin' => get_post_meta($form->ID, '_save_to_admin', true),
+            'recipients' => $recipients,
+            'bcc_recipient' => $get_meta('_bcc_recipient'),
+            'subject' => $subject,
+            'send_to_email' => $send_to_email,
+            'fields_config' => $get_meta('_fields_config'),
+            'send_to_telegram' => $get_meta('_send_to_telegram'),
+            'telegram_bot_token' => $get_meta('_telegram_bot_token'),
+            'telegram_chat_ids' => $get_meta('_telegram_chat_ids'),
+            'use_custom_telegram_template' => $get_meta('_use_custom_telegram_template'),
+            'telegram_template' => $get_meta('_telegram_template'),
+            'send_to_sheets' => $get_meta('_send_to_sheets'),
+            'sheets_spreadsheet_id' => $get_meta('_sheets_spreadsheet_id'),
+            'sheets_sheet_name' => $get_meta('_sheets_sheet_name'),
+            'save_to_admin' => $get_meta('_save_to_admin'),
         ];
 
-        if (!$form_config['recipients'] || !$form_config['subject']) {
+        // Validate email configuration only if email is enabled
+        if ($form_config['send_to_email'] && (!$form_config['recipients'] || !$form_config['subject'])) {
             return new \WP_Error('form_config_error', __( 'Form is not configured correctly', 'mksddn-forms-handler' ), ['status' => 500]);
         }
 
@@ -1062,7 +1127,7 @@ class FormsHandler {
         
         // Original validation logic
         if (!$fields_config) {
-            return new \WP_Error('security_error', 'Form fields configuration is missing', ['status' => 400]);
+            return new \WP_Error('security_error', __( 'Form fields configuration is missing', 'mksddn-forms-handler' ), ['status' => 400]);
         }
 
         $fields = json_decode((string)$fields_config, true);
@@ -1122,7 +1187,7 @@ class FormsHandler {
             // Return error if unauthorized fields present
             return new \WP_Error(
                 'unauthorized_fields',
-                'Unauthorized fields detected: ' . implode(', ', $unauthorized_fields),
+                sprintf( /* translators: %s: field names */ __( 'Unauthorized fields detected: %s', 'mksddn-forms-handler' ), implode(', ', $unauthorized_fields) ),
                 ['status' => 400]
             );
         }
@@ -1510,7 +1575,7 @@ class FormsHandler {
             return true;
         }
 
-        return new \WP_Error('email_send_error', 'Failed to send email', ['status' => 500]);
+        return new \WP_Error('email_send_error', __( 'Failed to send email', 'mksddn-forms-handler' ), ['status' => 500]);
     }
     
     /**
@@ -1518,7 +1583,7 @@ class FormsHandler {
      */
     private function build_email_body(\WP_Error|array $form_data, $form_title, $fields_config = null): string {
         // Build field name to label mapping
-        $field_labels_map = $this->build_field_labels_map($fields_config);
+        $field_labels_map = self::build_field_labels_map($fields_config);
 
         /* translators: %s: form title */
         $body = sprintf( '<h2>' . __( 'Form Data: %s', 'mksddn-forms-handler' ) . '</h2>', esc_html( $form_title ) );
@@ -1526,7 +1591,7 @@ class FormsHandler {
         $body .= '<tr style="background-color: #f8f8f8;"><th style="padding: 10px; border: 1px solid #e9e9e9; text-align: left;">' . esc_html__( 'Field', 'mksddn-forms-handler' ) . '</th><th style="padding: 10px; border: 1px solid #e9e9e9; text-align: left;">' . esc_html__( 'Value', 'mksddn-forms-handler' ) . '</th></tr>';
 
         foreach ($form_data as $key => $value) {
-            $field_label = $field_labels_map[ $key ] ?? $this->get_system_field_label( $key );
+            $field_label = $field_labels_map[ $key ] ?? self::get_system_field_label( $key );
             $body .= '<tr>';
             $body .= "<td style='padding: 10px; border: 1px solid #e9e9e9;'><strong>" . esc_html($field_label) . '</strong></td>';
             
@@ -1555,49 +1620,6 @@ class FormsHandler {
         return $body . ( '<p><small>' . sprintf( __( 'Sent: %s', 'mksddn-forms-handler' ), current_time( 'd.m.Y H:i:s' ) ) . '</small></p>' );
     }
 
-    /**
-     * Get localized label for system-added field keys (e.g. Page URL).
-     *
-     * @param string $key Field key.
-     * @return string Label for display.
-     */
-    private function get_system_field_label( string $key ): string {
-        if ( $key === 'Page URL' ) {
-            return __( 'Page URL', 'mksddn-forms-handler' );
-        }
-        return $key;
-    }
-
-    /**
-     * Build field name to label mapping from fields configuration
-     * Priority: notification_label → label → name
-     *
-     * @param string|null $fields_config JSON fields configuration
-     * @return array Associative array mapping field names to labels
-     */
-    private function build_field_labels_map($fields_config): array {
-        $labels_map = [];
-        
-        if (!$fields_config) {
-            return $labels_map;
-        }
-        
-        $fields = json_decode((string)$fields_config, true);
-        if (!is_array($fields)) {
-            return $labels_map;
-        }
-        
-        foreach ($fields as $field) {
-            if (isset($field['name'])) {
-                $field_name = $field['name'];
-                // Priority: notification_label → label → name
-                $field_label = $field['notification_label'] ?? $field['label'] ?? $field_name;
-                $labels_map[$field_name] = $field_label;
-            }
-        }
-        
-        return $labels_map;
-    }
     
     /**
      * Check if array contains objects (associative arrays with multiple keys)

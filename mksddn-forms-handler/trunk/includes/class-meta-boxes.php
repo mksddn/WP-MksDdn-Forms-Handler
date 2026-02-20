@@ -74,10 +74,24 @@ class MetaBoxes {
         $recipients = get_post_meta($post->ID, '_recipients', true);
         $bcc_recipient = get_post_meta($post->ID, '_bcc_recipient', true);
         $subject = get_post_meta($post->ID, '_subject', true);
+        $send_to_email = get_post_meta($post->ID, '_send_to_email', true);
         $fields_config = get_post_meta($post->ID, '_fields_config', true);
         $telegram_bot_token = get_post_meta($post->ID, '_telegram_bot_token', true);
         $telegram_chat_ids = get_post_meta($post->ID, '_telegram_chat_ids', true);
         $send_to_telegram = get_post_meta($post->ID, '_send_to_telegram', true);
+        $use_custom_telegram_template = get_post_meta($post->ID, '_use_custom_telegram_template', true);
+        $telegram_template = get_post_meta($post->ID, '_telegram_template', true);
+        
+        // Generate default template for JavaScript (always generate if fields_config exists)
+        $default_telegram_template = '';
+        if ($fields_config) {
+            $default_telegram_template = TemplateParser::get_default_template($fields_config);
+        }
+        
+        // If custom template is enabled but template is empty, use default template
+        if ($use_custom_telegram_template && empty($telegram_template) && $fields_config) {
+            $telegram_template = $default_telegram_template;
+        }
         $send_to_sheets = get_post_meta($post->ID, '_send_to_sheets', true);
         $sheets_spreadsheet_id = get_post_meta($post->ID, '_sheets_spreadsheet_id', true);
         $sheets_sheet_name = get_post_meta($post->ID, '_sheets_sheet_name', true);
@@ -86,6 +100,7 @@ class MetaBoxes {
         $submit_button_text = get_post_meta($post->ID, '_submit_button_text', true);
         $custom_html_after_button = get_post_meta($post->ID, '_custom_html_after_button', true);
         $success_message_text = get_post_meta($post->ID, '_success_message_text', true);
+        $redirect_url = get_post_meta($post->ID, '_redirect_url', true);
         $form_custom_classes = get_post_meta($post->ID, '_form_custom_classes', true);
 
         // Set default values based on language if empty (only for new posts or when not set)
@@ -96,11 +111,11 @@ class MetaBoxes {
             $submit_button_text = __( 'Send', 'mksddn-forms-handler' );
         }
         
-        // Set default custom HTML after button for Russian
+        // Set default custom HTML after button based on locale
         if (empty($custom_html_after_button) && strpos($locale, 'ru') === 0) {
             // Only set default if this is a new post (auto-draft) or field is truly empty
             if ($post->post_status === 'auto-draft' || !get_post_meta($post->ID, '_custom_html_after_button', true)) {
-                $custom_html_after_button = '<small>Нажимая кнопку, вы соглашаетесь с <a href="/privacy-policy">политикой конфиденциальности</a></small>';
+                $custom_html_after_button = '<small>' . __( 'By clicking the button, you agree to the', 'mksddn-forms-handler' ) . ' <a href="/privacy-policy">' . __( 'privacy policy', 'mksddn-forms-handler' ) . '</a></small>';
             }
         }
         
@@ -316,6 +331,12 @@ class MetaBoxes {
             update_post_meta($post_id, '_subject', sanitize_text_field( wp_unslash($_POST['subject']) ));
         }
 
+        if (isset($_POST['send_to_email'])) {
+            update_post_meta($post_id, '_send_to_email', '1');
+        } else {
+            update_post_meta($post_id, '_send_to_email', '0');
+        }
+
         if (isset($_POST['fields_config'])) {
             // Raw JSON is unslashed first; content is sanitized below
             $raw_json = wp_unslash($_POST['fields_config']); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
@@ -343,6 +364,31 @@ class MetaBoxes {
 
         if (isset($_POST['telegram_chat_ids'])) {
             update_post_meta($post_id, '_telegram_chat_ids', sanitize_text_field( wp_unslash($_POST['telegram_chat_ids']) ));
+        }
+
+        if (isset($_POST['use_custom_telegram_template'])) {
+            update_post_meta($post_id, '_use_custom_telegram_template', '1');
+            
+            // If template is empty, generate default template
+            $fields_config = get_post_meta($post_id, '_fields_config', true);
+            $current_template = isset($_POST['telegram_template']) ? sanitize_textarea_field(wp_unslash($_POST['telegram_template'])) : '';
+            
+            if (empty(trim($current_template)) && $fields_config) {
+                $default_template = TemplateParser::get_default_template($fields_config);
+                update_post_meta($post_id, '_telegram_template', sanitize_textarea_field($default_template));
+            } elseif (isset($_POST['telegram_template'])) {
+                // Sanitize template but preserve placeholders and HTML tags
+                $template = sanitize_textarea_field(wp_unslash($_POST['telegram_template']));
+                update_post_meta($post_id, '_telegram_template', $template);
+            }
+        } else {
+            update_post_meta($post_id, '_use_custom_telegram_template', '0');
+            
+            // Save template even if checkbox is unchecked (user might want to re-enable later)
+            if (isset($_POST['telegram_template'])) {
+                $template = sanitize_textarea_field(wp_unslash($_POST['telegram_template']));
+                update_post_meta($post_id, '_telegram_template', $template);
+            }
         }
 
         if (isset($_POST['send_to_sheets'])) {
@@ -382,6 +428,58 @@ class MetaBoxes {
 
         if (isset($_POST['success_message_text'])) {
             update_post_meta($post_id, '_success_message_text', sanitize_text_field( wp_unslash($_POST['success_message_text']) ));
+        }
+
+        if (isset($_POST['redirect_url'])) {
+            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitized below based on URL type
+            $raw_url = trim(wp_unslash($_POST['redirect_url']));
+            if (!empty($raw_url)) {
+                // Check if URL is absolute (starts with http:// or https://)
+                if (preg_match('#^https?://#i', $raw_url)) {
+                    // Sanitize absolute URL before parsing
+                    $raw_url = esc_url_raw($raw_url);
+                    // Validate absolute URL - only allow same domain for security
+                    $url_host = wp_parse_url($raw_url, PHP_URL_HOST);
+                    $site_host = wp_parse_url(home_url(), PHP_URL_HOST);
+                    
+                    if ($url_host === $site_host) {
+                        // Same domain - safe to use
+                        $redirect_url = $raw_url;
+                    } else {
+                        // External domain - check whitelist
+                        $allowed_hosts = apply_filters('mksddn_fh_allowed_redirect_hosts', []);
+                        if (in_array($url_host, $allowed_hosts, true)) {
+                            $redirect_url = $raw_url;
+                        } else {
+                            // External domain not allowed
+                            add_settings_error(
+                                'mksddn_fh',
+                                'redirect_external',
+                                sprintf(
+                                    /* translators: %s: external domain */
+                                    __('External redirect URLs are not allowed (%s). Use relative URLs or add domain to whitelist.', 'mksddn-forms-handler'),
+                                    esc_html($url_host)
+                                )
+                            );
+                            $redirect_url = '';
+                        }
+                    }
+                } else {
+                    // Relative path - sanitize and ensure it starts with /
+                    $redirect_url = sanitize_text_field($raw_url);
+                    if (!empty($redirect_url) && !preg_match('#^/#', $redirect_url)) {
+                        $redirect_url = '/' . ltrim($redirect_url, '/');
+                    }
+                }
+                
+                if (!empty($redirect_url)) {
+                    update_post_meta($post_id, '_redirect_url', $redirect_url);
+                } else {
+                    delete_post_meta($post_id, '_redirect_url');
+                }
+            } else {
+                delete_post_meta($post_id, '_redirect_url');
+            }
         }
 
         if (isset($_POST['form_custom_classes'])) {
