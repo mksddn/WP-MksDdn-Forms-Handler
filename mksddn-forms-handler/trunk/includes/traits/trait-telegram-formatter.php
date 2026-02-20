@@ -58,7 +58,10 @@ trait TelegramFormatterTrait {
         
         // Check for JSON decode errors
         if (json_last_error() !== JSON_ERROR_NONE) {
-            error_log('TelegramFormatterTrait: Invalid JSON in fields_config - ' . json_last_error_msg());
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+                error_log('TelegramFormatterTrait: Invalid JSON in fields_config - ' . json_last_error_msg());
+            }
             return $labels_map;
         }
         

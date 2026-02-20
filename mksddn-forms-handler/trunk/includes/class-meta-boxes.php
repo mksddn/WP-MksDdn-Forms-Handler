@@ -371,23 +371,23 @@ class MetaBoxes {
             
             // If template is empty, generate default template
             $fields_config = get_post_meta($post_id, '_fields_config', true);
-            $current_template = isset($_POST['telegram_template']) ? wp_unslash($_POST['telegram_template']) : '';
+            $current_template = isset($_POST['telegram_template']) ? sanitize_textarea_field(wp_unslash($_POST['telegram_template'])) : '';
             
             if (empty(trim($current_template)) && $fields_config) {
                 $default_template = TemplateParser::get_default_template($fields_config);
                 update_post_meta($post_id, '_telegram_template', sanitize_textarea_field($default_template));
             } elseif (isset($_POST['telegram_template'])) {
                 // Sanitize template but preserve placeholders and HTML tags
-                $template = wp_unslash($_POST['telegram_template']);
-                update_post_meta($post_id, '_telegram_template', sanitize_textarea_field($template));
+                $template = sanitize_textarea_field(wp_unslash($_POST['telegram_template']));
+                update_post_meta($post_id, '_telegram_template', $template);
             }
         } else {
             update_post_meta($post_id, '_use_custom_telegram_template', '0');
             
             // Save template even if checkbox is unchecked (user might want to re-enable later)
             if (isset($_POST['telegram_template'])) {
-                $template = wp_unslash($_POST['telegram_template']);
-                update_post_meta($post_id, '_telegram_template', sanitize_textarea_field($template));
+                $template = sanitize_textarea_field(wp_unslash($_POST['telegram_template']));
+                update_post_meta($post_id, '_telegram_template', $template);
             }
         }
 
@@ -431,22 +431,25 @@ class MetaBoxes {
         }
 
         if (isset($_POST['redirect_url'])) {
-            $raw_url = trim( wp_unslash($_POST['redirect_url']) );
+            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitized below based on URL type
+            $raw_url = trim(wp_unslash($_POST['redirect_url']));
             if (!empty($raw_url)) {
                 // Check if URL is absolute (starts with http:// or https://)
                 if (preg_match('#^https?://#i', $raw_url)) {
+                    // Sanitize absolute URL before parsing
+                    $raw_url = esc_url_raw($raw_url);
                     // Validate absolute URL - only allow same domain for security
-                    $url_host = parse_url($raw_url, PHP_URL_HOST);
-                    $site_host = parse_url(home_url(), PHP_URL_HOST);
+                    $url_host = wp_parse_url($raw_url, PHP_URL_HOST);
+                    $site_host = wp_parse_url(home_url(), PHP_URL_HOST);
                     
                     if ($url_host === $site_host) {
                         // Same domain - safe to use
-                        $redirect_url = esc_url_raw($raw_url);
+                        $redirect_url = $raw_url;
                     } else {
                         // External domain - check whitelist
                         $allowed_hosts = apply_filters('mksddn_fh_allowed_redirect_hosts', []);
                         if (in_array($url_host, $allowed_hosts, true)) {
-                            $redirect_url = esc_url_raw($raw_url);
+                            $redirect_url = $raw_url;
                         } else {
                             // External domain not allowed
                             add_settings_error(

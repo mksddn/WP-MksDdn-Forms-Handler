@@ -37,11 +37,14 @@ class TemplateParser {
         // Validate template size (allow override via filter)
         $max_size = apply_filters('mksddn_fh_max_template_size', self::MAX_TEMPLATE_SIZE);
         if (strlen($template) > $max_size) {
-            error_log(sprintf(
-                'TemplateParser: Template exceeds maximum size (%d chars, max %d)',
-                strlen($template),
-                $max_size
-            ));
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+                error_log(sprintf(
+                    'TemplateParser: Template exceeds maximum size (%d chars, max %d)',
+                    strlen($template),
+                    $max_size
+                ));
+            }
             // Return default template instead of error message
             return self::get_default_template($fields_config);
         }
@@ -91,7 +94,10 @@ class TemplateParser {
             
             // Check for JSON decode errors
             if (json_last_error() !== JSON_ERROR_NONE) {
-                error_log('TemplateParser: Invalid JSON in fields_config - ' . json_last_error_msg());
+                if (defined('WP_DEBUG') && WP_DEBUG) {
+                    // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+                    error_log('TemplateParser: Invalid JSON in fields_config - ' . json_last_error_msg());
+                }
             } elseif (is_array($fields)) {
                 foreach ($fields as $field) {
                     if (isset($field['name']) && !isset($form_data[$field['name']])) {
@@ -151,7 +157,10 @@ class TemplateParser {
             
             // Check for JSON decode errors
             if (json_last_error() !== JSON_ERROR_NONE) {
-                error_log('TemplateParser::get_default_template: Invalid JSON - ' . json_last_error_msg());
+                if (defined('WP_DEBUG') && WP_DEBUG) {
+                    // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+                    error_log('TemplateParser::get_default_template: Invalid JSON - ' . json_last_error_msg());
+                }
             } elseif (is_array($fields)) {
                 foreach ($fields as $field) {
                     if (isset($field['name'])) {

@@ -146,7 +146,10 @@ class TelegramHandler {
             
             // Check for JSON decode errors
             if (json_last_error() !== JSON_ERROR_NONE) {
-                error_log('TelegramHandler::format_array_of_objects: Invalid JSON - ' . json_last_error_msg());
+                if (defined('WP_DEBUG') && WP_DEBUG) {
+                    // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+                    error_log('TelegramHandler::format_array_of_objects: Invalid JSON - ' . json_last_error_msg());
+                }
             } elseif (is_array($fields)) {
                 foreach ($fields as $field) {
                     if (($field['name'] ?? '') === $parent_field_name && isset($field['fields']) && is_array($field['fields'])) {
