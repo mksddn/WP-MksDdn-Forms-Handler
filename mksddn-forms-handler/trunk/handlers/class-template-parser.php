@@ -16,6 +16,12 @@ if (!defined('ABSPATH')) {
  * Parses template placeholders for Telegram notifications
  */
 class TemplateParser {
+    use TelegramFormatterTrait;
+    
+    /**
+     * Maximum template size in characters
+     */
+    private const MAX_TEMPLATE_SIZE = 10000;
     
     /**
      * Parse template and replace placeholders with actual values
@@ -27,14 +33,23 @@ class TemplateParser {
      * @return string Parsed template
      */
     public static function parse($template, $form_data, $form_title, $fields_config = null): string {
+        // Validate template size
+        if (strlen($template) > self::MAX_TEMPLATE_SIZE) {
+            error_log('TemplateParser: Template exceeds maximum size (' . self::MAX_TEMPLATE_SIZE . ' characters)');
+            return __('Template is too large', 'mksddn-forms-handler');
+        }
+        
         // Build field name to label mapping
         $field_labels_map = self::build_field_labels_map($fields_config);
         
-        // Replace system placeholders
-        $template = str_replace('{form_title}', self::escape_html_for_telegram($form_title), $template);
-        $template = str_replace('{date}', current_time('d.m.Y'), $template);
-        $template = str_replace('{time}', current_time('H:i:s'), $template);
-        $template = str_replace('{datetime}', current_time('d.m.Y H:i:s'), $template);
+        // Replace system placeholders using strtr for better performance
+        $replacements = [
+            '{form_title}' => self::escape_html_for_telegram($form_title),
+            '{date}' => current_time('d.m.Y'),
+            '{time}' => current_time('H:i:s'),
+            '{datetime}' => current_time('d.m.Y H:i:s'),
+        ];
+        $template = strtr($template, $replacements);
         
         // Replace Page URL if exists
         if (isset($form_data['Page URL'])) {
@@ -66,7 +81,11 @@ class TemplateParser {
         // This handles cases where template has placeholders for fields that weren't submitted
         if ($fields_config) {
             $fields = json_decode((string)$fields_config, true);
-            if (is_array($fields)) {
+            
+            // Check for JSON decode errors
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                error_log('TemplateParser: Invalid JSON in fields_config - ' . json_last_error_msg());
+            } elseif (is_array($fields)) {
                 foreach ($fields as $field) {
                     if (isset($field['name']) && !isset($form_data[$field['name']])) {
                         $field_name = $field['name'];
@@ -93,70 +112,23 @@ class TemplateParser {
      * @return string Formatted value
      */
     private static function format_field_value($value, $fields_config = null, $field_name = null): string {
-        if (is_array($value) && TelegramHandler::is_array_of_objects($value)) {
-            // Render array of objects (e.g., products)
-            return TelegramHandler::format_array_of_objects($value, $fields_config, $field_name);
-        } elseif (is_array($value)) {
+        // Check if TelegramHandler methods exist before calling
+        if (is_array($value) && method_exists('MksDdn\FormsHandler\TelegramHandler', 'is_array_of_objects')) {
+            if (TelegramHandler::is_array_of_objects($value)) {
+                // Render array of objects (e.g., products)
+                if (method_exists('MksDdn\FormsHandler\TelegramHandler', 'format_array_of_objects')) {
+                    return TelegramHandler::format_array_of_objects($value, $fields_config, $field_name);
+                }
+            }
+        }
+        
+        if (is_array($value)) {
             // Simple array: render as comma-separated list
             $value = implode(', ', array_map('strval', $value));
             return self::escape_html_for_telegram($value);
         } else {
             return self::escape_html_for_telegram((string) $value);
         }
-    }
-    
-    /**
-     * Escape HTML special characters for Telegram
-     *
-     * @param string $text Text to escape
-     * @return string Escaped text
-     */
-    private static function escape_html_for_telegram($text): string {
-        return htmlspecialchars($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-    }
-    
-    /**
-     * Get localized label for system-added field keys (e.g. Page URL).
-     *
-     * @param string $key Field key.
-     * @return string Label for display.
-     */
-    private static function get_system_field_label(string $key): string {
-        if ($key === 'Page URL') {
-            return __('Page URL', 'mksddn-forms-handler');
-        }
-        return $key;
-    }
-    
-    /**
-     * Build field name to label mapping from fields configuration
-     * Priority: notification_label → label → name
-     *
-     * @param string|null $fields_config JSON fields configuration
-     * @return array Associative array mapping field names to labels
-     */
-    private static function build_field_labels_map($fields_config): array {
-        $labels_map = [];
-        
-        if (!$fields_config) {
-            return $labels_map;
-        }
-        
-        $fields = json_decode((string)$fields_config, true);
-        if (!is_array($fields)) {
-            return $labels_map;
-        }
-        
-        foreach ($fields as $field) {
-            if (isset($field['name'])) {
-                $field_name = $field['name'];
-                // Priority: notification_label → label → name
-                $field_label = $field['notification_label'] ?? $field['label'] ?? $field_name;
-                $labels_map[$field_name] = $field_label;
-            }
-        }
-        
-        return $labels_map;
     }
     
     /**
@@ -174,7 +146,11 @@ class TemplateParser {
         // Add placeholders for all configured fields
         if ($fields_config) {
             $fields = json_decode((string)$fields_config, true);
-            if (is_array($fields)) {
+            
+            // Check for JSON decode errors
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                error_log('TemplateParser::get_default_template: Invalid JSON - ' . json_last_error_msg());
+            } elseif (is_array($fields)) {
                 foreach ($fields as $field) {
                     if (isset($field['name'])) {
                         $field_label = $field['notification_label'] ?? $field['label'] ?? $field['name'];

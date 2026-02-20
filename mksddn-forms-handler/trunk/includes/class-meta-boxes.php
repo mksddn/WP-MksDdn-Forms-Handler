@@ -111,11 +111,11 @@ class MetaBoxes {
             $submit_button_text = __( 'Send', 'mksddn-forms-handler' );
         }
         
-        // Set default custom HTML after button for Russian
+        // Set default custom HTML after button based on locale
         if (empty($custom_html_after_button) && strpos($locale, 'ru') === 0) {
             // Only set default if this is a new post (auto-draft) or field is truly empty
             if ($post->post_status === 'auto-draft' || !get_post_meta($post->ID, '_custom_html_after_button', true)) {
-                $custom_html_after_button = '<small>Нажимая кнопку, вы соглашаетесь с <a href="/privacy-policy">политикой конфиденциальности</a></small>';
+                $custom_html_after_button = '<small>' . __( 'By clicking the button, you agree to the', 'mksddn-forms-handler' ) . ' <a href="/privacy-policy">' . __( 'privacy policy', 'mksddn-forms-handler' ) . '</a></small>';
             }
         }
         

@@ -43,6 +43,9 @@ require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/includes/class-utilities.php';
 require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/includes/class-google-sheets-admin.php';
 require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/includes/class-assets.php';
 
+// Load traits
+require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/includes/traits/trait-telegram-formatter.php';
+
 // Load handlers
 require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/handlers/class-template-parser.php';
 require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/handlers/class-telegram-handler.php';

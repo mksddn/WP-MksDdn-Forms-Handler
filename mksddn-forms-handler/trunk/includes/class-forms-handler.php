@@ -30,6 +30,24 @@ class FormsHandler {
      */
     private const CACHE_TTL = 3600; // 1 hour
     
+    /**
+     * Maximum number of form fields allowed
+     * @var int
+     */
+    private const MAX_FORM_FIELDS = 50;
+    
+    /**
+     * Maximum total data size in bytes (100KB)
+     * @var int
+     */
+    private const MAX_DATA_SIZE = 100000;
+    
+    /**
+     * Rate limit window in seconds
+     * @var int
+     */
+    private const RATE_LIMIT_SECONDS = 10;
+    
     public function __construct() {
         add_action('rest_api_init', [$this, 'register_rest_routes']);
         add_action('admin_post_submit_form', [$this, 'handle_form_submission']);
@@ -252,11 +270,11 @@ class FormsHandler {
             return new \WP_Error('spam_detected', __( 'Spam detected', 'mksddn-forms-handler' ), ['status' => 400]);
         }
 
-        // Simple rate limiting: 1 request per 10 seconds per IP per form
+        // Simple rate limiting: 1 request per RATE_LIMIT_SECONDS per IP per form
         $ip = sanitize_text_field( wp_unslash($_SERVER['REMOTE_ADDR'] ?? 'unknown') );
         $rl_key = 'mksddn_fh_rate_' . md5($slug . '|' . $ip);
         $last_ts = get_transient($rl_key);
-        if ($last_ts && (time() - (int)$last_ts) < 10) {
+        if ($last_ts && (time() - (int)$last_ts) < self::RATE_LIMIT_SECONDS) {
             return new \WP_Error('rate_limited', __( 'Too many requests. Please wait a few seconds.', 'mksddn-forms-handler' ), ['status' => 429]);
         }
         set_transient($rl_key, time(), 15);
@@ -266,7 +284,7 @@ class FormsHandler {
         }
 
         // Check data size (protection against too large requests)
-        if (count($form_data) > 50) {
+        if (count($form_data) > self::MAX_FORM_FIELDS) {
             return new \WP_Error('too_many_fields', __( 'Too many form fields submitted', 'mksddn-forms-handler' ), ['status' => 400]);
         }
 
@@ -278,7 +296,7 @@ class FormsHandler {
             $total_size += $size_key + $size_val;
         }
 
-        if ($total_size > 100000) { // Maximum 100KB total data
+        if ($total_size > self::MAX_DATA_SIZE) {
             return new \WP_Error('data_too_large', __( 'Form data is too large', 'mksddn-forms-handler' ), ['status' => 400]);
         }
 
@@ -543,11 +561,11 @@ class FormsHandler {
             wp_die( esc_html__( 'Spam detected', 'mksddn-forms-handler' ) );
         }
 
-        // Simple rate limiting per IP+form: 1 request per 10 seconds
+        // Simple rate limiting per IP+form: 1 request per RATE_LIMIT_SECONDS
         $ip = sanitize_text_field( wp_unslash($_SERVER['REMOTE_ADDR'] ?? 'unknown') );
         $rl_key = 'mksddn_fh_rate_' . md5($form_id . '|' . $ip);
         $last_ts = get_transient($rl_key);
-        if ($last_ts && (time() - (int)$last_ts) < 10) {
+        if ($last_ts && (time() - (int)$last_ts) < self::RATE_LIMIT_SECONDS) {
             wp_die( esc_html__( 'Too many requests. Please wait a few seconds.', 'mksddn-forms-handler' ) );
         }
         set_transient($rl_key, time(), 15);
@@ -819,24 +837,32 @@ class FormsHandler {
         }
 
         // Get all form settings in one query to reduce database calls
+        // Use get_post_meta() without second parameter to fetch all meta at once
+        $all_meta = get_post_meta($form->ID);
+        
+        // Helper function to get meta value safely
+        $get_meta = function($key) use ($all_meta) {
+            return isset($all_meta[$key][0]) ? $all_meta[$key][0] : '';
+        };
+        
         $form_config = [
             'form_id' => $form->ID,
             'form_slug' => $form->post_name,
             'form_title' => $form->post_title,
-            'recipients' => get_post_meta($form->ID, '_recipients', true),
-            'bcc_recipient' => get_post_meta($form->ID, '_bcc_recipient', true),
-            'subject' => get_post_meta($form->ID, '_subject', true),
-            'send_to_email' => get_post_meta($form->ID, '_send_to_email', true),
-            'fields_config' => get_post_meta($form->ID, '_fields_config', true),
-            'send_to_telegram' => get_post_meta($form->ID, '_send_to_telegram', true),
-            'telegram_bot_token' => get_post_meta($form->ID, '_telegram_bot_token', true),
-            'telegram_chat_ids' => get_post_meta($form->ID, '_telegram_chat_ids', true),
-            'use_custom_telegram_template' => get_post_meta($form->ID, '_use_custom_telegram_template', true),
-            'telegram_template' => get_post_meta($form->ID, '_telegram_template', true),
-            'send_to_sheets' => get_post_meta($form->ID, '_send_to_sheets', true),
-            'sheets_spreadsheet_id' => get_post_meta($form->ID, '_sheets_spreadsheet_id', true),
-            'sheets_sheet_name' => get_post_meta($form->ID, '_sheets_sheet_name', true),
-            'save_to_admin' => get_post_meta($form->ID, '_save_to_admin', true),
+            'recipients' => $get_meta('_recipients'),
+            'bcc_recipient' => $get_meta('_bcc_recipient'),
+            'subject' => $get_meta('_subject'),
+            'send_to_email' => $get_meta('_send_to_email'),
+            'fields_config' => $get_meta('_fields_config'),
+            'send_to_telegram' => $get_meta('_send_to_telegram'),
+            'telegram_bot_token' => $get_meta('_telegram_bot_token'),
+            'telegram_chat_ids' => $get_meta('_telegram_chat_ids'),
+            'use_custom_telegram_template' => $get_meta('_use_custom_telegram_template'),
+            'telegram_template' => $get_meta('_telegram_template'),
+            'send_to_sheets' => $get_meta('_send_to_sheets'),
+            'sheets_spreadsheet_id' => $get_meta('_sheets_spreadsheet_id'),
+            'sheets_sheet_name' => $get_meta('_sheets_sheet_name'),
+            'save_to_admin' => $get_meta('_save_to_admin'),
         ];
 
         // Validate email configuration only if email is enabled

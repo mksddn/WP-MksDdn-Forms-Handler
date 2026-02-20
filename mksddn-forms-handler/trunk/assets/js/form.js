@@ -20,11 +20,18 @@
             method: 'POST',
             success: function(response) {
                 if (response && response.success) {
-                    // Check if redirect URL is configured
+                    // Check if redirect URL is configured and validate it
                     if (i18n.redirect_url && i18n.redirect_url.trim() !== '') {
-                        // Redirect to specified URL
-                        window.location.href = i18n.redirect_url;
-                        return;
+                        var redirectUrl = i18n.redirect_url.trim();
+                        // Validate URL: only allow http:// or https:// protocols
+                        if (/^https?:\/\//.test(redirectUrl)) {
+                            // Redirect to specified URL
+                            window.location.href = redirectUrl;
+                            return;
+                        } else {
+                            // Log error but don't block success message
+                            console.warn('Invalid redirect URL format:', redirectUrl);
+                        }
                     }
 
                     // Use custom success message if available, otherwise use default

@@ -221,41 +221,55 @@
          * Initialize tabs
          */
         initTabs: function() {
-            // Show first tab by default if no active tab is set
             var $tabs = $('.mksddn-form-tabs');
-            if ($tabs.length) {
-                // Hide all tab contents first
-                $tabs.find('.mksddn-form-tab-content').removeClass('active').hide();
-                
-                // Check if there's already an active tab
-                var $activeTab = $tabs.find('.mksddn-tab-nav.active');
-                var $activeContent = null;
-                
-                if ($activeTab.length > 0) {
-                    // Use existing active tab
-                    var activeHref = $activeTab.attr('href');
-                    if (activeHref) {
-                        $activeContent = $(activeHref);
+            if (!$tabs.length) {
+                return;
+            }
+            
+            this.hideAllTabContents($tabs);
+            var $activeContent = this.findActiveTab($tabs) || this.activateFirstTab($tabs);
+            if ($activeContent) {
+                $activeContent.addClass('active').show();
+            }
+        },
+
+        /**
+         * Hide all tab contents
+         */
+        hideAllTabContents: function($tabs) {
+            $tabs.find('.mksddn-form-tab-content').removeClass('active').hide();
+        },
+
+        /**
+         * Find existing active tab and return its content
+         */
+        findActiveTab: function($tabs) {
+            var $activeTab = $tabs.find('.mksddn-tab-nav.active');
+            if ($activeTab.length > 0) {
+                var activeHref = $activeTab.attr('href');
+                if (activeHref) {
+                    var $activeContent = $(activeHref);
+                    if ($activeContent.length) {
+                        return $activeContent;
                     }
-                }
-                
-                // If no active tab or content found, activate first tab
-                if (!$activeContent || !$activeContent.length) {
-                    var $firstTab = $tabs.find('.mksddn-tab-nav').first();
-                    $tabs.find('.mksddn-tab-nav').removeClass('active');
-                    $firstTab.addClass('active');
-                    
-                    var firstTabHref = $firstTab.attr('href');
-                    if (firstTabHref) {
-                        $activeContent = $(firstTabHref);
-                    }
-                }
-                
-                // Show active content
-                if ($activeContent && $activeContent.length) {
-                    $activeContent.addClass('active').show();
                 }
             }
+            return null;
+        },
+
+        /**
+         * Activate first tab and return its content
+         */
+        activateFirstTab: function($tabs) {
+            var $firstTab = $tabs.find('.mksddn-tab-nav').first();
+            $tabs.find('.mksddn-tab-nav').removeClass('active');
+            $firstTab.addClass('active');
+            
+            var firstTabHref = $firstTab.attr('href');
+            if (firstTabHref) {
+                return $(firstTabHref);
+            }
+            return null;
         },
 
         /**

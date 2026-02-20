@@ -11,10 +11,12 @@ namespace MksDdn\FormsHandler;
 if (!defined('ABSPATH')) {
     exit;
 }
+
 /**
  * Handles Telegram notifications
  */
 class TelegramHandler {
+    use TelegramFormatterTrait;
     
     /**
      * Send message to Telegram
@@ -64,16 +66,6 @@ class TelegramHandler {
     }
     
     /**
-     * Escape HTML special characters for Telegram
-     *
-     * @param string $text Text to escape
-     * @return string Escaped text
-     */
-    public static function escape_html_for_telegram($text): string {
-        return htmlspecialchars($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-    }
-
-    /**
      * Build Telegram message
      *
      * @param array $form_data Form submission data
@@ -119,19 +111,6 @@ class TelegramHandler {
     }
 
     /**
-     * Get localized label for system-added field keys (e.g. Page URL).
-     *
-     * @param string $key Field key.
-     * @return string Label for display.
-     */
-    private static function get_system_field_label( string $key ): string {
-        if ( $key === 'Page URL' ) {
-            return __( 'Page URL', 'mksddn-forms-handler' );
-        }
-        return $key;
-    }
-
-    /**
      * Check if array contains objects (associative arrays with multiple keys)
      *
      * @param array $value Array to check
@@ -164,7 +143,11 @@ class TelegramHandler {
         $nested_labels_map = [];
         if ($fields_config && $parent_field_name) {
             $fields = json_decode((string)$fields_config, true);
-            if (is_array($fields)) {
+            
+            // Check for JSON decode errors
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                error_log('TelegramHandler::format_array_of_objects: Invalid JSON - ' . json_last_error_msg());
+            } elseif (is_array($fields)) {
                 foreach ($fields as $field) {
                     if (($field['name'] ?? '') === $parent_field_name && isset($field['fields']) && is_array($field['fields'])) {
                         foreach ($field['fields'] as $nested_field) {
@@ -201,37 +184,6 @@ class TelegramHandler {
         }
         
         return $output;
-    }
-    
-    /**
-     * Build field name to label mapping from fields configuration
-     * Priority: notification_label → label → name
-     *
-     * @param string|null $fields_config JSON fields configuration
-     * @return array Associative array mapping field names to labels
-     */
-    private static function build_field_labels_map($fields_config): array {
-        $labels_map = [];
-        
-        if (!$fields_config) {
-            return $labels_map;
-        }
-        
-        $fields = json_decode((string)$fields_config, true);
-        if (!is_array($fields)) {
-            return $labels_map;
-        }
-        
-        foreach ($fields as $field) {
-            if (isset($field['name'])) {
-                $field_name = $field['name'];
-                // Priority: notification_label → label → name
-                $field_label = $field['notification_label'] ?? $field['label'] ?? $field_name;
-                $labels_map[$field_name] = $field_label;
-            }
-        }
-        
-        return $labels_map;
     }
     
     /**
