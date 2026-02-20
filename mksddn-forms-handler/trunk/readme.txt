@@ -274,7 +274,14 @@ Namespace: `mksddn-forms-handler/v1`
 
 1. Create a Telegram bot using @BotFather
 2. Get your bot token
-3. Find your chat ID (you can use @userinfobot)
+3. Find your chat ID using one of these methods:
+   * **Method 1 - Using getUpdates API**: Send a message to your bot (e.g., `/start`), then call:
+     ```
+     https://api.telegram.org/bot{your_bot_token}/getUpdates
+     ```
+     Look for the `"chat"` object in the JSON response and find the `"id"` field. Note: Group chat IDs are typically negative numbers.
+   * **Method 2 - Using helper bots**: Add @userinfobot, @ShowJsonBot, or @getidsbot to your chat - they will display the chat ID automatically
+   * **Method 3 - For groups**: Add your bot to the group, send a message, then use getUpdates API to retrieve the group chat ID
 4. Add the bot token and chat IDs in the form settings
 5. Enable "Send to Telegram" option
 
