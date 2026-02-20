@@ -56,6 +56,9 @@ require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/includes/template-functions.php
 
 // Initialize plugin
 add_action('plugins_loaded', function() {
+    // Run migration for email notification settings (one-time migration)
+    MksDdn\FormsHandler\Utilities::migrate_email_notification_settings();
+
     new MksDdn\FormsHandler\PostTypes();
     new MksDdn\FormsHandler\MetaBoxes();
     new MksDdn\FormsHandler\FormsHandler();

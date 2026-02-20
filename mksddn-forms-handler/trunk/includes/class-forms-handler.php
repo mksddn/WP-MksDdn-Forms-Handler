@@ -846,14 +846,36 @@ class FormsHandler {
             return isset($all_meta[$key][0]) ? $all_meta[$key][0] : '';
         };
         
+        // Check if _send_to_email meta exists (to distinguish between old forms and explicitly disabled)
+        $send_to_email_exists = isset($all_meta['_send_to_email']);
+        $send_to_email_raw = $get_meta('_send_to_email');
+        $recipients = $get_meta('_recipients');
+        $subject = $get_meta('_subject');
+
+        // Determine email sending status:
+        // - If meta doesn't exist (old form): enable for backward compatibility if recipients/subject exist
+        // - If meta exists and equals '0': explicitly disabled, don't send
+        // - If meta exists and equals '1': explicitly enabled, send
+        // - If meta exists but empty: enable for backward compatibility if recipients/subject exist
+        $send_to_email = $send_to_email_raw;
+        if (!$send_to_email_exists || ($send_to_email_exists && $send_to_email === '')) {
+            // Old form or empty value: enable for backward compatibility if configured
+            if (!empty($recipients) && !empty($subject)) {
+                $send_to_email = '1';
+            } else {
+                $send_to_email = '0';
+            }
+        }
+        // If $send_to_email is '0' (explicitly disabled), keep it as '0'
+
         $form_config = [
             'form_id' => $form->ID,
             'form_slug' => $form->post_name,
             'form_title' => $form->post_title,
-            'recipients' => $get_meta('_recipients'),
+            'recipients' => $recipients,
             'bcc_recipient' => $get_meta('_bcc_recipient'),
-            'subject' => $get_meta('_subject'),
-            'send_to_email' => $get_meta('_send_to_email'),
+            'subject' => $subject,
+            'send_to_email' => $send_to_email,
             'fields_config' => $get_meta('_fields_config'),
             'send_to_telegram' => $get_meta('_send_to_telegram'),
             'telegram_bot_token' => $get_meta('_telegram_bot_token'),
