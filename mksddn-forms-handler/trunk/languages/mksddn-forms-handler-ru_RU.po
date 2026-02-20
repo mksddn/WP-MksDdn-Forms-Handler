@@ -124,6 +124,10 @@ msgstr "User Agent:"
 msgid "Recipients"
 msgstr "Получатели"
 
+#: includes/class-admin-columns.php:47
+msgid "Email"
+msgstr "Email"
+
 #: includes/class-admin-columns.php:42
 msgid "Telegram"
 msgstr "Telegram"
@@ -253,6 +257,14 @@ msgstr "Указывается для отладки"
 #: templates/form-settings-meta-box.php:17
 msgid "Email Subject"
 msgstr "Тема письма"
+
+#: templates/form-settings-meta-box.php:37
+msgid "Send to Email"
+msgstr "Отправлять на Email"
+
+#: templates/form-settings-meta-box.php:41
+msgid "Enable email notifications for this form"
+msgstr "Включить уведомления на email для этой формы"
 
 #: templates/form-settings-meta-box.php:23
 msgid "Fields Configuration"

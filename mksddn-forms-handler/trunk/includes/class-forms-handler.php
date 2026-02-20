@@ -684,6 +684,7 @@ class FormsHandler {
             'email'         => [
                 'success' => false,
                 'error'   => null,
+                'enabled' => false,
             ],
             'telegram'      => [
                 'success' => false,
@@ -702,19 +703,22 @@ class FormsHandler {
             ],
         ];
 
-        // Prepare and send email
-        $email_result = $this->prepare_and_send_email(
-            $form_config['recipients'], 
-            $form_config['bcc_recipient'], 
-            $form_config['subject'], 
-            $filtered_form_data, 
-            $form_config['form_title'],
-            $email_attachments,
-            $form_config['fields_config']
-        );
-        $delivery_results['email']['success'] = !is_wp_error($email_result);
-        if (is_wp_error($email_result)) {
-            $delivery_results['email']['error'] = $email_result->get_error_message();
+        // Send email if enabled
+        if ($form_config['send_to_email'] && $form_config['recipients'] && $form_config['subject']) {
+            $delivery_results['email']['enabled'] = true;
+            $email_result = $this->prepare_and_send_email(
+                $form_config['recipients'], 
+                $form_config['bcc_recipient'], 
+                $form_config['subject'], 
+                $filtered_form_data, 
+                $form_config['form_title'],
+                $email_attachments,
+                $form_config['fields_config']
+            );
+            $delivery_results['email']['success'] = !is_wp_error($email_result);
+            if (is_wp_error($email_result)) {
+                $delivery_results['email']['error'] = $email_result->get_error_message();
+            }
         }
 
         // Send to Telegram
@@ -761,7 +765,7 @@ class FormsHandler {
         $this->log_form_submission($form_config['form_id'], true);
 
         // Check if at least one delivery method succeeded
-        $any_success = $delivery_results['email']['success'] ||
+        $any_success = ($delivery_results['email']['enabled'] && $delivery_results['email']['success']) ||
                       ($delivery_results['telegram']['enabled'] && $delivery_results['telegram']['success']) ||
                       ($delivery_results['google_sheets']['enabled'] && $delivery_results['google_sheets']['success']) ||
                       ($delivery_results['admin_storage']['enabled'] && $delivery_results['admin_storage']['success']);
@@ -814,6 +818,7 @@ class FormsHandler {
             'recipients' => get_post_meta($form->ID, '_recipients', true),
             'bcc_recipient' => get_post_meta($form->ID, '_bcc_recipient', true),
             'subject' => get_post_meta($form->ID, '_subject', true),
+            'send_to_email' => get_post_meta($form->ID, '_send_to_email', true),
             'fields_config' => get_post_meta($form->ID, '_fields_config', true),
             'send_to_telegram' => get_post_meta($form->ID, '_send_to_telegram', true),
             'telegram_bot_token' => get_post_meta($form->ID, '_telegram_bot_token', true),
@@ -824,7 +829,8 @@ class FormsHandler {
             'save_to_admin' => get_post_meta($form->ID, '_save_to_admin', true),
         ];
 
-        if (!$form_config['recipients'] || !$form_config['subject']) {
+        // Validate email configuration only if email is enabled
+        if ($form_config['send_to_email'] && (!$form_config['recipients'] || !$form_config['subject'])) {
             return new \WP_Error('form_config_error', __( 'Form is not configured correctly', 'mksddn-forms-handler' ), ['status' => 500]);
         }
 

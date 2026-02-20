@@ -44,6 +44,7 @@ class AdminColumns {
             $new_columns[$key] = $value;
             if ($key === 'title') {
                 $new_columns['recipients'] = __( 'Recipients', 'mksddn-forms-handler' );
+                $new_columns['email'] = __( 'Email', 'mksddn-forms-handler' );
                 $new_columns['telegram'] = __( 'Telegram', 'mksddn-forms-handler' );
                 $new_columns['sheets'] = __( 'Google Sheets', 'mksddn-forms-handler' );
                 $new_columns['admin_storage'] = __( 'Admin Storage', 'mksddn-forms-handler' );
@@ -63,6 +64,10 @@ class AdminColumns {
             case 'recipients':
                 $recipients = get_post_meta($post_id, '_recipients', true);
                 echo esc_html($recipients ?: 'Not configured');
+                break;
+            case 'email':
+                $email_enabled = get_post_meta($post_id, '_send_to_email', true) === '1';
+                echo $email_enabled ? '<span style="color: green;">' . esc_html__( '✓ Enabled', 'mksddn-forms-handler' ) . '</span>' : '<span style="color: #999;">' . esc_html__( '✗ Disabled', 'mksddn-forms-handler' ) . '</span>';
                 break;
             case 'telegram':
                 $telegram_enabled = get_post_meta($post_id, '_send_to_telegram', true) === '1';

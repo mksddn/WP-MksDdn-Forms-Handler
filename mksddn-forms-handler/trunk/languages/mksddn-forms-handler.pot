@@ -82,6 +82,10 @@ msgstr ""
 msgid "Recipients"
 msgstr ""
 
+#: includes/class-admin-columns.php:47
+msgid "Email"
+msgstr ""
+
 #: includes/class-admin-columns.php:42
 msgid "Telegram"
 msgstr ""
@@ -218,6 +222,14 @@ msgstr ""
 
 #: templates/form-settings-meta-box.php:17
 msgid "Email Subject"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:37
+msgid "Send to Email"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:41
+msgid "Enable email notifications for this form"
 msgstr ""
 
 #: templates/form-settings-meta-box.php:23

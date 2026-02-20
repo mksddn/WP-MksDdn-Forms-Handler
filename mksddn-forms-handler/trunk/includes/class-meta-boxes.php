@@ -74,6 +74,7 @@ class MetaBoxes {
         $recipients = get_post_meta($post->ID, '_recipients', true);
         $bcc_recipient = get_post_meta($post->ID, '_bcc_recipient', true);
         $subject = get_post_meta($post->ID, '_subject', true);
+        $send_to_email = get_post_meta($post->ID, '_send_to_email', true);
         $fields_config = get_post_meta($post->ID, '_fields_config', true);
         $telegram_bot_token = get_post_meta($post->ID, '_telegram_bot_token', true);
         $telegram_chat_ids = get_post_meta($post->ID, '_telegram_chat_ids', true);
@@ -314,6 +315,12 @@ class MetaBoxes {
 
         if (isset($_POST['subject'])) {
             update_post_meta($post_id, '_subject', sanitize_text_field( wp_unslash($_POST['subject']) ));
+        }
+
+        if (isset($_POST['send_to_email'])) {
+            update_post_meta($post_id, '_send_to_email', '1');
+        } else {
+            update_post_meta($post_id, '_send_to_email', '0');
         }
 
         if (isset($_POST['fields_config'])) {

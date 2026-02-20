@@ -31,6 +31,17 @@
     <div id="mksddn-tab-email" class="mksddn-form-tab-content">
         <table class="form-table">
             <tr>
+                <th scope="row">
+                    <label>
+                        <input type="checkbox" name="send_to_email" id="send_to_email" value="1" <?php checked($send_to_email, '1'); ?> />
+                        <?php echo esc_html__( 'Send to Email', 'mksddn-forms-handler' ); ?>
+                    </label>
+                </th>
+                <td>
+                    <p class="description"><?php echo esc_html__( 'Enable email notifications for this form', 'mksddn-forms-handler' ); ?></p>
+                </td>
+            </tr>
+            <tr>
                 <th scope="row"><label for="recipients"><?php echo esc_html__( 'Recipients (comma separated)', 'mksddn-forms-handler' ); ?></label></th>
                 <td>
                     <input type="text" name="recipients" id="recipients" value="<?php echo esc_attr($recipients); ?>" class="regular-text" />
