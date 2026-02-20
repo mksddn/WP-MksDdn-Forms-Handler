@@ -4,7 +4,7 @@ Tags: forms, telegram, google-sheets, rest-api, form-handler
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 8.0
-Stable tag: 2.3.0
+Stable tag: 2.4.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -197,6 +197,13 @@ Submit forms via REST API without page reload:
         return array_merge($allowed_fields, ['custom_field_1', 'custom_field_2']);
     }, 10, 3);
 
+`mksddn_fh_allowed_redirect_hosts` - Whitelist external domains for redirect URLs
+
+    add_filter('mksddn_fh_allowed_redirect_hosts', function($hosts) {
+        // Allow specific external domains for redirects
+        return array_merge($hosts, ['example.com', 'trusted-partner.com']);
+    });
+
 **Actions:**
 
 `mksddn_forms_handler_log_security` - Fired when unauthorized fields are detected
@@ -285,6 +292,13 @@ Namespace: `mksddn-forms-handler/v1`
 4. Add the bot token and chat IDs in the form settings
 5. Enable "Send to Telegram" option
 
+**Custom Telegram Templates:**
+You can create custom templates for Telegram notifications with placeholders:
+* System placeholders: `{form_title}`, `{date}`, `{time}`, `{datetime}`, `{page_url}`
+* Field placeholders: `{field:field_name}` for field value, `{field_label:field_name}` for field label
+* Supports HTML formatting: `b`, `i`, `u`, `s`, `code`, `pre`, `a`
+Enable "Use Custom Template" in Telegram settings and enter your template in the textarea.
+
 = How do I integrate with Google Sheets? =
 
 1. Set up Google Sheets API credentials
@@ -312,6 +326,13 @@ Yes! The plugin provides REST API endpoints for AJAX form submissions. Check the
 = Can I use custom forms from my theme without configuring fields? =
 
 Yes! Enable "Accept any fields from frontend" in form settings (Advanced Settings section). This allows submitting any field names without defining them in Fields Configuration - perfect for custom forms where you control the HTML. All fields are still sanitized, but type validation is skipped. You can also use the `mksddn_fh_allowed_fields` filter in your theme's functions.php to dynamically allow specific fields or all fields (`return ['*']`).
+
+= Can I redirect users after form submission? =
+
+Yes! Configure a redirect URL in form settings (Display tab). You can use:
+* Absolute URLs (same domain only for security)
+* Relative paths (e.g., `/thank-you`)
+External domains are blocked by default for security. To allow external redirects, use the `mksddn_fh_allowed_redirect_hosts` filter to whitelist specific domains.
 
 == Supported Field Types ==
 
@@ -444,6 +465,9 @@ The `array_of_objects` type allows you to define arrays with nested field valida
 
 == Upgrade Notice ==
 
+= 2.4.0 =
+New feature: Redirect URL after form submission and custom Telegram templates with placeholders. Email notification settings migration. Enhanced error logging and localization. Recommended update.
+
 = 2.3.0 =
 Improvement: Localization for error messages and Telegram/email/Google Sheets UI. Telegram and email notifications use field labels from form config. Regex pattern validation fix. Attachment metadata generated only for images (faster uploads). Recommended update.
 
@@ -475,6 +499,14 @@ Security update: Fixed URL escaping in template examples. Recommended update for
 New feature: Template functions for custom forms integration. Bug fix: Improved Telegram message formatting. Fully backward compatible.
 
 == Changelog ==
+
+= 2.4.0 =
+* Feature: Redirect URL after form submission - configure absolute URLs (same domain) or relative paths; external domains require whitelist filter
+* Feature: Custom Telegram templates with placeholders for form fields, system data (date, time, page URL), and field labels; supports HTML formatting
+* Improved: Email notification settings migration for existing forms
+* Improved: Enhanced error logging and input sanitization
+* Improved: Localization support for admin confirmation and error messages
+* Technical: TemplateParser class and TelegramFormatterTrait for template handling
 
 = 2.3.0 =
 * Improved: Localization — error messages (spam, rate limit, invalid data), notification labels (Telegram/email), default email subject, and Google Sheets connection messages are now translatable
