@@ -4,7 +4,7 @@ Tags: forms, telegram, google-sheets, rest-api, form-handler
 Requires at least: 5.0
 Tested up to: 6.9
 Requires PHP: 8.0
-Stable tag: 2.4.0
+Stable tag: 2.4.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -465,6 +465,9 @@ The `array_of_objects` type allows you to define arrays with nested field valida
 
 == Upgrade Notice ==
 
+= 2.4.1 =
+Improvement: Loading state and accessibility for the AJAX submit button (spinner, aria-busy, label restored after response). Optional update.
+
 = 2.4.0 =
 New feature: Redirect URL after form submission and custom Telegram templates with placeholders. Email notification settings migration. Enhanced error logging and localization. Recommended update.
 
@@ -499,6 +502,10 @@ Security update: Fixed URL escaping in template examples. Recommended update for
 New feature: Template functions for custom forms integration. Bug fix: Improved Telegram message formatting. Fully backward compatible.
 
 == Changelog ==
+
+= 2.4.1 =
+* Improved: Submit button shows a loading spinner during AJAX submission; original button markup is restored on complete (custom labels/HTML preserved)
+* Improved: Accessibility — disabled state, aria-busy, and aria-label on the submit button while the request is in progress
 
 = 2.4.0 =
 * Feature: Redirect URL after form submission - configure absolute URLs (same domain) or relative paths; external domains require whitelist filter
