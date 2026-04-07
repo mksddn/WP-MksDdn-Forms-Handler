@@ -1,7 +1,7 @@
 (function($){
     'use strict';
 
-    $(document).on('submit', '.wp-form', function(e){
+    $(document).on('submit', '.mksddn-form', function(e){
         e.preventDefault();
 
         var $form = $(this);
