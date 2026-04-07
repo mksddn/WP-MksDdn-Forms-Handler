@@ -1,15 +1,41 @@
 (function($){
     'use strict';
 
-    $(document).on('submit', '.wp-form', function(e){
+    function ensureLoaderStyles() {
+        if (document.getElementById('mksddn-fh-loader-style')) {
+            return;
+        }
+
+        var style = document.createElement('style');
+        style.id = 'mksddn-fh-loader-style';
+        style.textContent =
+            '.mksddn-form .submit-button.is-loading{position:relative;min-width:44px;}' +
+            '.mksddn-form .submit-button .mksddn-fh-loader{' +
+            'display:inline-block;width:1em;height:1em;border:2px solid currentColor;' +
+            'border-right-color:transparent;border-radius:50%;animation:mksddn-fh-spin .7s linear infinite;' +
+            'vertical-align:middle;}' +
+            '@keyframes mksddn-fh-spin{to{transform:rotate(360deg);}}';
+        document.head.appendChild(style);
+    }
+
+    $(document).on('submit', '.mksddn-form', function(e){
         e.preventDefault();
 
         var $form = $(this);
         var $message = $form.siblings('.form-message');
         var $submitButton = $form.find('.submit-button');
+        var originalButtonHtml = $submitButton.html();
+        var originalButtonText = $.trim($submitButton.text());
+
+        ensureLoaderStyles();
 
         var i18n = mksddn_fh_form || {};
-        $submitButton.prop('disabled', true).text(i18n.sending_text || 'Sending...');
+        $submitButton
+            .prop('disabled', true)
+            .attr('aria-busy', 'true')
+            .attr('aria-label', originalButtonText || 'Loading')
+            .addClass('is-loading')
+            .html('<span class="mksddn-fh-loader" aria-hidden="true"></span>');
         $message.hide();
 
         // Check if form has file inputs
@@ -95,7 +121,12 @@
                 $message.removeClass('success').addClass('error').html(i18n.error_sending || 'An error occurred while sending the form').show();
             },
             complete: function() {
-                $submitButton.prop('disabled', false).text(i18n.send_text || 'Send');
+                // Restore per-form button label from markup to keep custom text and locale.
+                $submitButton
+                    .prop('disabled', false)
+                    .removeAttr('aria-busy')
+                    .removeClass('is-loading')
+                    .html(originalButtonHtml);
             }
         };
 
