@@ -791,6 +791,42 @@ msgstr ""
 msgid "Current template: %1$s (%2$s KB)"
 msgstr ""
 
+#: templates/form-settings-meta-box.php:146
+msgid "Status:"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:147
+msgid "HTML template is saved and will be used for auto-reply emails."
+msgstr ""
+
+#: templates/form-settings-meta-box.php:153
+msgid "Stored template: %1$s (%2$s KB)"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:163
+msgid "No HTML template stored. Upload a file and click Update to save."
+msgstr ""
+
+#: includes/class-meta-boxes.php:566
+msgid "HTML template is required when HTML file reply type is selected. Upload a file and save the form."
+msgstr ""
+
+#: includes/class-meta-boxes.php:703
+msgid "HTML template saved: %1$s (%2$s KB). It will be used for auto-reply emails."
+msgstr ""
+
+#: includes/class-meta-boxes.php:802
+msgid "HTML template upload was interrupted. Please try again."
+msgstr ""
+
+#: includes/class-meta-boxes.php:806
+msgid "Server could not store the uploaded HTML template file."
+msgstr ""
+
+#: includes/class-meta-boxes.php:541
+msgid "Selected user email field is not valid. Choose an email field from the form configuration."
+msgstr ""
+
 #: templates/form-settings-meta-box.php:137
 msgid "uploaded file"
 msgstr ""
@@ -824,7 +860,7 @@ msgid "HTML template must not contain PHP code."
 msgstr ""
 
 #: handlers/class-template-parser.php:216
-msgid "Hello {field:name},"
+msgid "Hello,"
 msgstr ""
 
 #: handlers/class-template-parser.php:217

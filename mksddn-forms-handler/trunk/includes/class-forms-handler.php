@@ -810,7 +810,8 @@ class FormsHandler {
         $any_success = ($delivery_results['email']['enabled'] && $delivery_results['email']['success']) ||
                       ($delivery_results['telegram']['enabled'] && $delivery_results['telegram']['success']) ||
                       ($delivery_results['google_sheets']['enabled'] && $delivery_results['google_sheets']['success']) ||
-                      ($delivery_results['admin_storage']['enabled'] && $delivery_results['admin_storage']['success']);
+                      ($delivery_results['admin_storage']['enabled'] && $delivery_results['admin_storage']['success']) ||
+                      ($delivery_results['user_reply_email']['enabled'] && $delivery_results['user_reply_email']['success']);
 
         if (!$any_success) {
             return new \WP_Error(
@@ -925,12 +926,7 @@ class FormsHandler {
      */
     public function clear_form_cache($post_id, $post): void {
         if ($post->post_type === 'mksddn_fh_forms') {
-            $cache_key = 'form_config_' . md5($post_id);
-            wp_cache_delete($cache_key, 'mksddn_forms_handler');
-            
-            // Also clear by slug
-            $cache_key_slug = 'form_config_' . md5($post->post_name);
-            wp_cache_delete($cache_key_slug, 'mksddn_forms_handler');
+            Utilities::clear_form_config_cache((int) $post_id);
         }
     }
     

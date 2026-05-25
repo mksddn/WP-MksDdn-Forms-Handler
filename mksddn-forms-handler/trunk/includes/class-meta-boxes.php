@@ -531,7 +531,25 @@ class MetaBoxes {
         }
 
         if (isset($_POST['user_reply_email_field'])) {
-            update_post_meta($post_id, '_user_reply_email_field', sanitize_key( wp_unslash($_POST['user_reply_email_field']) ));
+            $user_reply_field_name = sanitize_key(wp_unslash($_POST['user_reply_email_field']));
+            $fields_config_for_reply = get_post_meta($post_id, '_fields_config', true);
+            $allowed_email_fields = array_column(
+                self::get_email_fields_from_config($fields_config_for_reply),
+                'name'
+            );
+
+            if ($user_reply_field_name === '' || in_array($user_reply_field_name, $allowed_email_fields, true)) {
+                update_post_meta($post_id, '_user_reply_email_field', $user_reply_field_name);
+            } else {
+                delete_post_meta($post_id, '_user_reply_email_field');
+                if (false === $this->peek_form_admin_notice($post_id)) {
+                    $this->set_form_admin_notice(
+                        $post_id,
+                        'warning',
+                        __('Selected user email field is not valid. Choose an email field from the form configuration.', 'mksddn-forms-handler')
+                    );
+                }
+            }
         }
 
         $user_reply_type = isset($_POST['user_reply_type']) ? sanitize_key( wp_unslash($_POST['user_reply_type']) ) : 'text';
@@ -545,13 +563,13 @@ class MetaBoxes {
         }
 
         if (isset($_POST['user_reply_message'])) {
-            update_post_meta($post_id, '_user_reply_message', sanitize_textarea_field( wp_unslash($_POST['user_reply_message']) ));
+            update_post_meta($post_id, '_user_reply_message', wp_kses_post(wp_unslash($_POST['user_reply_message'])));
         }
 
         if (isset($_POST['remove_user_reply_html_template']) && $_POST['remove_user_reply_html_template'] === '1') {
             delete_post_meta($post_id, '_user_reply_html_template');
             delete_post_meta($post_id, '_user_reply_html_template_filename');
-            $this->clear_form_config_cache($post_id);
+            Utilities::clear_form_config_cache($post_id);
         }
 
         $this->maybe_save_user_reply_html_template($post_id);
@@ -691,9 +709,11 @@ class MetaBoxes {
             return;
         }
 
+        $content = Utilities::sanitize_email_html_template($content);
+
         update_post_meta($post_id, '_user_reply_html_template', $content);
         update_post_meta($post_id, '_user_reply_html_template_filename', $filename);
-        $this->clear_form_config_cache($post_id);
+        Utilities::clear_form_config_cache($post_id);
 
         $this->set_form_admin_notice(
             $post_id,
@@ -789,17 +809,4 @@ class MetaBoxes {
         }
     }
 
-    /**
-     * Clear cached form configuration after template changes
-     *
-     * @param int $post_id Form post ID
-     */
-    private function clear_form_config_cache(int $post_id): void {
-        wp_cache_delete('form_config_' . md5((string) $post_id), 'mksddn_forms_handler');
-
-        $post = get_post($post_id);
-        if ($post && $post->post_name) {
-            wp_cache_delete('form_config_' . md5($post->post_name), 'mksddn_forms_handler');
-        }
-    }
 } 

@@ -159,9 +159,9 @@ Optional auto-reply to the user who submitted the form. Configure in the form Em
 
 Placeholders: `{form_title}`, `{date}`, `{time}`, `{datetime}`, `{page_url}`, `{field:field_name}`, `{field_label:field_name}`.
 
-HTML template upload: `.html`/`.htm` only, max 100 KB (filter `mksddn_fh_max_html_template_size`). PHP code in templates is rejected.
+HTML template upload: `.html`/`.htm` only, max 100 KB (filter `mksddn_fh_max_html_template_size`). PHP code and script tags in templates are rejected.
 
-Auto-reply failure does not block successful form submission; result is reported in `delivery_results.user_reply_email`.
+User reply can be the only enabled delivery channel — a successful auto-reply counts as a successful form submission. Auto-reply failure alone does not block submission when another channel succeeds; result is reported in `delivery_results.user_reply_email`.
 
 **3. REST API (AJAX)**
 Submit forms via REST API without page reload:
