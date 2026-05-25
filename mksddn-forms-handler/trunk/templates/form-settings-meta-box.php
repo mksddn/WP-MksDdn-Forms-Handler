@@ -81,9 +81,9 @@
                 <td>
                     <select name="user_reply_email_field" id="user_reply_email_field" class="regular-text">
                         <option value=""><?php echo esc_html__( '— Select field —', 'mksddn-forms-handler' ); ?></option>
-                        <?php foreach ($user_reply_email_fields as $email_field) : ?>
-                            <option value="<?php echo esc_attr($email_field['name']); ?>" <?php selected($user_reply_email_field, $email_field['name']); ?>>
-                                <?php echo esc_html($email_field['label'] . ' (' . $email_field['name'] . ')'); ?>
+                        <?php foreach ($user_reply_email_fields as $mksddn_email_field) : ?>
+                            <option value="<?php echo esc_attr($mksddn_email_field['name']); ?>" <?php selected($user_reply_email_field, $mksddn_email_field['name']); ?>>
+                                <?php echo esc_html($mksddn_email_field['label'] . ' (' . $mksddn_email_field['name'] . ')'); ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
@@ -129,14 +129,14 @@
                 <td>
                     <?php if (!empty($user_reply_admin_notice)) : ?>
                         <?php
-                        $notice_class = 'notice-warning';
+                        $mksddn_notice_class = 'notice-warning';
                         if ($user_reply_admin_notice['type'] === 'success') {
-                            $notice_class = 'notice-success';
+                            $mksddn_notice_class = 'notice-success';
                         } elseif ($user_reply_admin_notice['type'] === 'error') {
-                            $notice_class = 'notice-error';
+                            $mksddn_notice_class = 'notice-error';
                         }
                         ?>
-                        <div class="notice <?php echo esc_attr($notice_class); ?> inline mksddn-user-reply-html-notice">
+                        <div class="notice <?php echo esc_attr($mksddn_notice_class); ?> inline mksddn-user-reply-html-notice">
                             <p><?php echo esc_html($user_reply_admin_notice['message']); ?></p>
                         </div>
                     <?php endif; ?>
@@ -147,12 +147,14 @@
                             <?php echo esc_html__( 'HTML template is saved and will be used for auto-reply emails.', 'mksddn-forms-handler' ); ?>
                             <br>
                             <?php
-                            /* translators: 1: file name, 2: file size in KB */
-                            echo esc_html(sprintf(
-                                __('Stored template: %1$s (%2$s KB)', 'mksddn-forms-handler'),
-                                $user_reply_html_template_filename ?: __('uploaded file', 'mksddn-forms-handler'),
-                                number_format(strlen($user_reply_html_template) / 1024, 1)
-                            ));
+                            echo esc_html(
+                                sprintf(
+                                    /* translators: 1: file name, 2: file size in KB */
+                                    __('Stored template: %1$s (%2$s KB)', 'mksddn-forms-handler'),
+                                    $user_reply_html_template_filename ?: __('uploaded file', 'mksddn-forms-handler'),
+                                    number_format(strlen($user_reply_html_template) / 1024, 1)
+                                )
+                            );
                             ?>
                         </div>
                     <?php elseif ($send_user_reply === '1' && $user_reply_type === 'html') : ?>
@@ -171,10 +173,10 @@
                     <?php endif; ?>
                     <p class="description">
                         <?php
-                        /* translators: %d: maximum HTML template size in kilobytes */
                         echo esc_html(
                             sprintf(
-                                __( 'Upload an HTML file with placeholders. Max size: %d KB.', 'mksddn-forms-handler' ),
+                                /* translators: %d: maximum HTML template size in kilobytes */
+                                __('Upload an HTML file with placeholders. Max size: %d KB.', 'mksddn-forms-handler'),
                                 $user_reply_html_max_kb
                             )
                         );

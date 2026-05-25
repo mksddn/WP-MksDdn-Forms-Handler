@@ -608,10 +608,12 @@ class MetaBoxes {
      * @param int $post_id Form post ID
      */
     private function maybe_save_user_reply_html_template(int $post_id): void {
-        if (empty($_FILES['user_reply_html_file']['name'])) {
+        // Nonce verified in save_form_settings() before this method is called.
+        if (empty($_FILES['user_reply_html_file']['name'])) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
             return;
         }
 
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- file upload validated below via is_uploaded_file() and sanitize_file_name().
         $file = $_FILES['user_reply_html_file'];
         $upload_error = isset($file['error']) ? (int) $file['error'] : UPLOAD_ERR_NO_FILE;
 
