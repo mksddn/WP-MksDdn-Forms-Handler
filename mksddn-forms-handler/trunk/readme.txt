@@ -4,7 +4,7 @@ Tags: forms, telegram, google-sheets, rest-api, form-handler
 Requires at least: 5.0
 Tested up to: 7.0
 Requires PHP: 8.0
-Stable tag: 2.4.1
+Stable tag: 2.5.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -485,6 +485,9 @@ The `array_of_objects` type allows you to define arrays with nested field valida
 
 == Upgrade Notice ==
 
+= 2.5.0 =
+New feature: User reply email — optional auto-reply to the submitter with text template or uploaded HTML file. Recommended update.
+
 = 2.4.1 =
 Improvement: Loading state and accessibility for the AJAX submit button (spinner, aria-busy, label restored after response). Optional update.
 
@@ -523,7 +526,7 @@ New feature: Template functions for custom forms integration. Bug fix: Improved 
 
 == Changelog ==
 
-= Unreleased =
+= 2.5.0 =
 * Feature: User reply email — optional auto-reply to the submitter in Email Settings (text template with placeholders or uploaded HTML file)
 * Feature: `TemplateParser::parse_for_email()` for HTML-safe placeholder replacement in user reply emails
 * Filter: `mksddn_fh_max_html_template_size` for HTML template upload size limit
