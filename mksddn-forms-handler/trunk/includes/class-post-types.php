@@ -21,6 +21,21 @@ class PostTypes {
     public function __construct() {
         add_action('init', [$this, 'register_post_types']);
         add_action('init', [$this, 'remove_unused_supports'], 20);
+        add_filter('use_block_editor_for_post_type', [$this, 'disable_block_editor_for_forms'], 10, 2);
+    }
+
+    /**
+     * Use the classic editor for forms so meta box file uploads work on save
+     *
+     * @param bool   $use_block_editor Whether the block editor is enabled
+     * @param string $post_type        Post type name
+     */
+    public function disable_block_editor_for_forms(bool $use_block_editor, string $post_type): bool {
+        if ($post_type === 'mksddn_fh_forms') {
+            return false;
+        }
+
+        return $use_block_editor;
     }
     
     /**

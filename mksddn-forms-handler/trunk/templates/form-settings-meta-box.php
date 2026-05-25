@@ -62,6 +62,127 @@
                 </td>
             </tr>
         </table>
+
+        <h3><?php echo esc_html__( 'User Reply Email', 'mksddn-forms-handler' ); ?></h3>
+        <table class="form-table mksddn-user-reply-settings">
+            <tr>
+                <th scope="row">
+                    <label>
+                        <input type="checkbox" name="send_user_reply" id="send_user_reply" value="1" <?php checked($send_user_reply, '1'); ?> />
+                        <?php echo esc_html__( 'Send auto-reply to user', 'mksddn-forms-handler' ); ?>
+                    </label>
+                </th>
+                <td>
+                    <p class="description"><?php echo esc_html__( 'Send a confirmation email to the user who submitted the form', 'mksddn-forms-handler' ); ?></p>
+                </td>
+            </tr>
+            <tr class="mksddn-user-reply-row" style="<?php echo $send_user_reply === '1' ? '' : 'display: none;'; ?>">
+                <th scope="row"><label for="user_reply_email_field"><?php echo esc_html__( 'User email field', 'mksddn-forms-handler' ); ?></label></th>
+                <td>
+                    <select name="user_reply_email_field" id="user_reply_email_field" class="regular-text">
+                        <option value=""><?php echo esc_html__( '— Select field —', 'mksddn-forms-handler' ); ?></option>
+                        <?php foreach ($user_reply_email_fields as $email_field) : ?>
+                            <option value="<?php echo esc_attr($email_field['name']); ?>" <?php selected($user_reply_email_field, $email_field['name']); ?>>
+                                <?php echo esc_html($email_field['label'] . ' (' . $email_field['name'] . ')'); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <p class="description mksddn-user-reply-no-email-fields" style="<?php echo empty($user_reply_email_fields) ? '' : 'display: none;'; ?>">
+                        <?php echo esc_html__( 'No email fields found in Fields Configuration. Add a field with type "email".', 'mksddn-forms-handler' ); ?>
+                    </p>
+                </td>
+            </tr>
+            <tr class="mksddn-user-reply-row" style="<?php echo $send_user_reply === '1' ? '' : 'display: none;'; ?>">
+                <th scope="row"><label for="user_reply_subject"><?php echo esc_html__( 'Reply email subject', 'mksddn-forms-handler' ); ?></label></th>
+                <td>
+                    <input type="text" name="user_reply_subject" id="user_reply_subject" value="<?php echo esc_attr($user_reply_subject); ?>" class="regular-text" />
+                    <p class="description"><?php echo esc_html__( 'Supports placeholders: {form_title}, {field:name}, {datetime}, {page_url}', 'mksddn-forms-handler' ); ?></p>
+                </td>
+            </tr>
+            <tr class="mksddn-user-reply-row" style="<?php echo $send_user_reply === '1' ? '' : 'display: none;'; ?>">
+                <th scope="row"><?php echo esc_html__( 'Reply content type', 'mksddn-forms-handler' ); ?></th>
+                <td>
+                    <label>
+                        <input type="radio" name="user_reply_type" value="text" <?php checked($user_reply_type, 'text'); ?> />
+                        <?php echo esc_html__( 'Text template', 'mksddn-forms-handler' ); ?>
+                    </label>
+                    <br>
+                    <label>
+                        <input type="radio" name="user_reply_type" value="html" <?php checked($user_reply_type, 'html'); ?> />
+                        <?php echo esc_html__( 'HTML file', 'mksddn-forms-handler' ); ?>
+                    </label>
+                </td>
+            </tr>
+            <tr class="mksddn-user-reply-text-row mksddn-user-reply-row" style="<?php echo ($send_user_reply === '1' && $user_reply_type === 'text') ? '' : 'display: none;'; ?>">
+                <th scope="row"><label for="user_reply_message"><?php echo esc_html__( 'Reply message template', 'mksddn-forms-handler' ); ?></label></th>
+                <td>
+                    <textarea name="user_reply_message" id="user_reply_message" rows="10" cols="50" class="large-text code"><?php echo esc_textarea($user_reply_message); ?></textarea>
+                    <p class="description">
+                        <?php echo esc_html__( 'Supports placeholders:', 'mksddn-forms-handler' ); ?><br>
+                        <code>{form_title}</code>, <code>{date}</code>, <code>{time}</code>, <code>{datetime}</code>, <code>{page_url}</code><br>
+                        <code>{field:field_name}</code>, <code>{field_label:field_name}</code>
+                    </p>
+                </td>
+            </tr>
+            <tr class="mksddn-user-reply-html-row mksddn-user-reply-row" style="<?php echo ($send_user_reply === '1' && $user_reply_type === 'html') ? '' : 'display: none;'; ?>">
+                <th scope="row"><label for="user_reply_html_file"><?php echo esc_html__( 'HTML template file', 'mksddn-forms-handler' ); ?></label></th>
+                <td>
+                    <?php if (!empty($user_reply_admin_notice)) : ?>
+                        <?php
+                        $notice_class = 'notice-warning';
+                        if ($user_reply_admin_notice['type'] === 'success') {
+                            $notice_class = 'notice-success';
+                        } elseif ($user_reply_admin_notice['type'] === 'error') {
+                            $notice_class = 'notice-error';
+                        }
+                        ?>
+                        <div class="notice <?php echo esc_attr($notice_class); ?> inline mksddn-user-reply-html-notice">
+                            <p><?php echo esc_html($user_reply_admin_notice['message']); ?></p>
+                        </div>
+                    <?php endif; ?>
+
+                    <?php if ($user_reply_html_ready) : ?>
+                        <div class="mksddn-user-reply-html-status mksddn-user-reply-html-status--ready">
+                            <strong><?php echo esc_html__( 'Status:', 'mksddn-forms-handler' ); ?></strong>
+                            <?php echo esc_html__( 'HTML template is saved and will be used for auto-reply emails.', 'mksddn-forms-handler' ); ?>
+                            <br>
+                            <?php
+                            /* translators: 1: file name, 2: file size in KB */
+                            echo esc_html(sprintf(
+                                __('Stored template: %1$s (%2$s KB)', 'mksddn-forms-handler'),
+                                $user_reply_html_template_filename ?: __('uploaded file', 'mksddn-forms-handler'),
+                                number_format(strlen($user_reply_html_template) / 1024, 1)
+                            ));
+                            ?>
+                        </div>
+                    <?php elseif ($send_user_reply === '1' && $user_reply_type === 'html') : ?>
+                        <div class="mksddn-user-reply-html-status mksddn-user-reply-html-status--missing">
+                            <strong><?php echo esc_html__( 'Status:', 'mksddn-forms-handler' ); ?></strong>
+                            <?php echo esc_html__( 'No HTML template stored. Upload a file and click Update to save.', 'mksddn-forms-handler' ); ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <input type="file" name="user_reply_html_file" id="user_reply_html_file" accept=".html,.htm" />
+                    <?php if ($user_reply_html_configured) : ?>
+                        <label style="display: block; margin-top: 8px;">
+                            <input type="checkbox" name="remove_user_reply_html_template" value="1" />
+                            <?php echo esc_html__( 'Remove current HTML template', 'mksddn-forms-handler' ); ?>
+                        </label>
+                    <?php endif; ?>
+                    <p class="description">
+                        <?php
+                        /* translators: %d: maximum HTML template size in kilobytes */
+                        echo esc_html(
+                            sprintf(
+                                __( 'Upload an HTML file with placeholders. Max size: %d KB.', 'mksddn-forms-handler' ),
+                                $user_reply_html_max_kb
+                            )
+                        );
+                        ?>
+                    </p>
+                </td>
+            </tr>
+        </table>
     </div>
 
     <!-- Telegram Tab -->

@@ -731,6 +731,131 @@ msgstr ""
 msgid "Email Subject"
 msgstr ""
 
+#: templates/form-settings-meta-box.php:66
+msgid "User Reply Email"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:72
+msgid "Send auto-reply to user"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:76
+msgid "Send a confirmation email to the user who submitted the form"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:80
+msgid "User email field"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:83
+msgid "— Select field —"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:91
+msgid "No email fields found in Fields Configuration. Add a field with type \"email\"."
+msgstr ""
+
+#: templates/form-settings-meta-box.php:96
+msgid "Reply email subject"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:99
+msgid "Supports placeholders: {form_title}, {field:name}, {datetime}, {page_url}"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:103
+msgid "Reply content type"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:107
+msgid "Text template"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:112
+msgid "HTML file"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:117
+msgid "Reply message template"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:121
+msgid "Supports placeholders:"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:128
+msgid "HTML template file"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:135
+msgid "Current template: %1$s (%2$s KB)"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:137
+msgid "uploaded file"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:144
+msgid "Remove current HTML template"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:147
+msgid "Upload an HTML file with placeholders. Max size: %d KB."
+msgstr ""
+
+#: includes/class-meta-boxes.php:567
+msgid "Failed to upload HTML template file."
+msgstr ""
+
+#: includes/class-meta-boxes.php:579
+msgid "HTML template file exceeds maximum allowed size."
+msgstr ""
+
+#: includes/class-meta-boxes.php:591
+msgid "Only .html and .htm files are allowed for email templates."
+msgstr ""
+
+#: includes/class-meta-boxes.php:603
+msgid "Could not read uploaded HTML template file."
+msgstr ""
+
+#: includes/class-meta-boxes.php:612
+msgid "HTML template must not contain PHP code."
+msgstr ""
+
+#: handlers/class-template-parser.php:216
+msgid "Hello {field:name},"
+msgstr ""
+
+#: handlers/class-template-parser.php:217
+msgid "Thank you for your message. We have received your submission and will get back to you soon."
+msgstr ""
+
+#: includes/class-forms-handler.php:1600
+msgid "User reply email field is not configured"
+msgstr ""
+
+#: includes/class-forms-handler.php:1609
+msgid "User email address is missing from submission"
+msgstr ""
+
+#: includes/class-forms-handler.php:1618
+msgid "User email address is invalid"
+msgstr ""
+
+#: includes/class-forms-handler.php:1628
+msgid "HTML reply template is not configured"
+msgstr ""
+
+#: includes/class-forms-handler.php:1642
+#: includes/class-meta-boxes.php:128
+msgid "Thank you for contacting us"
+msgstr ""
+
+#: includes/class-forms-handler.php:1669
+msgid "Failed to send user reply email"
+msgstr ""
+
 #: templates/form-settings-meta-box.php:74
 msgid "Send to Telegram"
 msgstr ""

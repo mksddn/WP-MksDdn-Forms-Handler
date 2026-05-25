@@ -22,6 +22,18 @@ class MetaBoxes {
         add_action('add_meta_boxes', [$this, 'add_forms_meta_boxes']);
         add_action('add_meta_boxes', [$this, 'add_submissions_meta_boxes']);
         add_action('save_post', [$this, 'save_form_settings']);
+        add_action('post_edit_form_tag', [$this, 'add_form_edit_enctype']);
+    }
+
+    /**
+     * Add multipart enctype for form settings file uploads
+     */
+    public function add_form_edit_enctype(): void {
+        global $post;
+
+        if ($post && $post->post_type === 'mksddn_fh_forms') {
+            echo ' enctype="multipart/form-data"';
+        }
     }
     
     /**
@@ -102,6 +114,28 @@ class MetaBoxes {
         $success_message_text = get_post_meta($post->ID, '_success_message_text', true);
         $redirect_url = get_post_meta($post->ID, '_redirect_url', true);
         $form_custom_classes = get_post_meta($post->ID, '_form_custom_classes', true);
+        $send_user_reply = get_post_meta($post->ID, '_send_user_reply', true);
+        $user_reply_email_field = get_post_meta($post->ID, '_user_reply_email_field', true);
+        $user_reply_type = get_post_meta($post->ID, '_user_reply_type', true) ?: 'text';
+        $user_reply_subject = get_post_meta($post->ID, '_user_reply_subject', true);
+        $user_reply_message = get_post_meta($post->ID, '_user_reply_message', true);
+        $user_reply_html_template = get_post_meta($post->ID, '_user_reply_html_template', true);
+        $user_reply_html_template_filename = get_post_meta($post->ID, '_user_reply_html_template_filename', true);
+        $user_reply_email_fields = self::get_email_fields_from_config($fields_config);
+        $user_reply_html_max_size = (int) apply_filters('mksddn_fh_max_html_template_size', 102400);
+        $user_reply_html_max_kb = max(1, (int) ceil($user_reply_html_max_size / 1024));
+
+        if (empty($user_reply_subject)) {
+            $user_reply_subject = __( 'Thank you for contacting us', 'mksddn-forms-handler' );
+        }
+
+        if (empty($user_reply_message)) {
+            $user_reply_message = TemplateParser::get_default_user_reply_template();
+        }
+
+        $user_reply_html_configured = !empty(trim((string) $user_reply_html_template));
+        $user_reply_html_ready = ($send_user_reply === '1' && $user_reply_type === 'html' && $user_reply_html_configured);
+        $user_reply_admin_notice = $this->get_and_clear_form_admin_notice($post->ID);
 
         // Set default values based on language if empty (only for new posts or when not set)
         $locale = get_locale();
@@ -319,6 +353,10 @@ class MetaBoxes {
             return;
         }
 
+        if (get_post_type($post_id) !== 'mksddn_fh_forms') {
+            return;
+        }
+
         if (isset($_POST['recipients'])) {
             update_post_meta($post_id, '_recipients', sanitize_text_field( wp_unslash($_POST['recipients']) ));
         }
@@ -484,6 +522,282 @@ class MetaBoxes {
 
         if (isset($_POST['form_custom_classes'])) {
             update_post_meta($post_id, '_form_custom_classes', sanitize_text_field( wp_unslash($_POST['form_custom_classes']) ));
+        }
+
+        if (isset($_POST['send_user_reply'])) {
+            update_post_meta($post_id, '_send_user_reply', '1');
+        } else {
+            update_post_meta($post_id, '_send_user_reply', '0');
+        }
+
+        if (isset($_POST['user_reply_email_field'])) {
+            update_post_meta($post_id, '_user_reply_email_field', sanitize_key( wp_unslash($_POST['user_reply_email_field']) ));
+        }
+
+        $user_reply_type = isset($_POST['user_reply_type']) ? sanitize_key( wp_unslash($_POST['user_reply_type']) ) : 'text';
+        if (!in_array($user_reply_type, ['text', 'html'], true)) {
+            $user_reply_type = 'text';
+        }
+        update_post_meta($post_id, '_user_reply_type', $user_reply_type);
+
+        if (isset($_POST['user_reply_subject'])) {
+            update_post_meta($post_id, '_user_reply_subject', sanitize_text_field( wp_unslash($_POST['user_reply_subject']) ));
+        }
+
+        if (isset($_POST['user_reply_message'])) {
+            update_post_meta($post_id, '_user_reply_message', sanitize_textarea_field( wp_unslash($_POST['user_reply_message']) ));
+        }
+
+        if (isset($_POST['remove_user_reply_html_template']) && $_POST['remove_user_reply_html_template'] === '1') {
+            delete_post_meta($post_id, '_user_reply_html_template');
+            delete_post_meta($post_id, '_user_reply_html_template_filename');
+            $this->clear_form_config_cache($post_id);
+        }
+
+        $this->maybe_save_user_reply_html_template($post_id);
+
+        $send_user_reply_enabled = isset($_POST['send_user_reply']);
+        if ($send_user_reply_enabled && $user_reply_type === 'html' && empty($_FILES['user_reply_html_file']['name'])) {
+            $html_template = get_post_meta($post_id, '_user_reply_html_template', true);
+            if (empty(trim((string) $html_template)) && false === $this->peek_form_admin_notice($post_id)) {
+                $this->set_form_admin_notice(
+                    $post_id,
+                    'warning',
+                    __('HTML template is required when HTML file reply type is selected. Upload a file and save the form.', 'mksddn-forms-handler')
+                );
+            }
+        }
+    }
+
+    /**
+     * Extract email fields from fields configuration JSON
+     *
+     * @param string|null $fields_config Fields configuration JSON
+     * @return array<int, array{name: string, label: string}>
+     */
+    public static function get_email_fields_from_config($fields_config): array {
+        if (empty($fields_config)) {
+            return [];
+        }
+
+        $fields = json_decode((string) $fields_config, true);
+        if (!is_array($fields)) {
+            return [];
+        }
+
+        $email_fields = [];
+        foreach ($fields as $field) {
+            if (!isset($field['name'], $field['type']) || $field['type'] !== 'email') {
+                continue;
+            }
+
+            $email_fields[] = [
+                'name'  => (string) $field['name'],
+                'label' => (string) ($field['notification_label'] ?? $field['label'] ?? $field['name']),
+            ];
+        }
+
+        return $email_fields;
+    }
+
+    /**
+     * Save uploaded HTML template for user reply email
+     *
+     * Reads the file directly from the upload temp path (no Media Library upload).
+     *
+     * @param int $post_id Form post ID
+     */
+    private function maybe_save_user_reply_html_template(int $post_id): void {
+        if (empty($_FILES['user_reply_html_file']['name'])) {
+            return;
+        }
+
+        $file = $_FILES['user_reply_html_file'];
+        $upload_error = isset($file['error']) ? (int) $file['error'] : UPLOAD_ERR_NO_FILE;
+
+        if (UPLOAD_ERR_NO_FILE === $upload_error) {
+            return;
+        }
+
+        if (UPLOAD_ERR_OK !== $upload_error) {
+            $message = $this->get_upload_error_message($upload_error);
+            $this->set_form_admin_notice(
+                $post_id,
+                'error',
+                $message ?: __('Failed to upload HTML template file.', 'mksddn-forms-handler')
+            );
+            return;
+        }
+
+        $max_size = (int) apply_filters('mksddn_fh_max_html_template_size', 102400);
+        if (!empty($file['size']) && (int) $file['size'] > $max_size) {
+            $this->set_form_admin_notice(
+                $post_id,
+                'error',
+                __('HTML template file exceeds maximum allowed size.', 'mksddn-forms-handler')
+            );
+            return;
+        }
+
+        $filename = sanitize_file_name(wp_unslash($file['name']));
+        $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+        if (!in_array($extension, ['html', 'htm'], true)) {
+            $this->set_form_admin_notice(
+                $post_id,
+                'error',
+                __('Only .html and .htm files are allowed for email templates.', 'mksddn-forms-handler')
+            );
+            return;
+        }
+
+        $tmp_name = isset($file['tmp_name']) ? (string) $file['tmp_name'] : '';
+        if ($tmp_name === '' || !is_uploaded_file($tmp_name)) {
+            $this->set_form_admin_notice(
+                $post_id,
+                'error',
+                __('Could not read uploaded HTML template file.', 'mksddn-forms-handler')
+            );
+            return;
+        }
+
+        // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- reading uploaded temp file
+        $content = file_get_contents($tmp_name);
+        if ($content === false || $content === '') {
+            $this->set_form_admin_notice(
+                $post_id,
+                'error',
+                __('Could not read uploaded HTML template file.', 'mksddn-forms-handler')
+            );
+            return;
+        }
+
+        if (strlen($content) > $max_size) {
+            $this->set_form_admin_notice(
+                $post_id,
+                'error',
+                __('HTML template file exceeds maximum allowed size.', 'mksddn-forms-handler')
+            );
+            return;
+        }
+
+        if (stripos($content, '<?php') !== false || stripos($content, '<?=') !== false) {
+            $this->set_form_admin_notice(
+                $post_id,
+                'error',
+                __('HTML template must not contain PHP code.', 'mksddn-forms-handler')
+            );
+            return;
+        }
+
+        update_post_meta($post_id, '_user_reply_html_template', $content);
+        update_post_meta($post_id, '_user_reply_html_template_filename', $filename);
+        $this->clear_form_config_cache($post_id);
+
+        $this->set_form_admin_notice(
+            $post_id,
+            'success',
+            sprintf(
+                /* translators: 1: file name, 2: file size in KB */
+                __('HTML template saved: %1$s (%2$s KB). It will be used for auto-reply emails.', 'mksddn-forms-handler'),
+                $filename,
+                number_format(strlen($content) / 1024, 1)
+            )
+        );
+    }
+
+    /**
+     * Transient key for form save notices (per post and user)
+     *
+     * @param int $post_id Form post ID
+     */
+    private function get_form_admin_notice_key(int $post_id): string {
+        return 'mksddn_fh_form_notice_' . $post_id . '_' . get_current_user_id();
+    }
+
+    /**
+     * Store an admin notice to show after redirect on form save
+     *
+     * @param int    $post_id Form post ID
+     * @param string $type    notice-success|notice-error|notice-warning
+     * @param string $message Notice message
+     */
+    private function set_form_admin_notice(int $post_id, string $type, string $message): void {
+        set_transient(
+            $this->get_form_admin_notice_key($post_id),
+            [
+                'type'    => $type,
+                'message' => $message,
+            ],
+            60
+        );
+    }
+
+    /**
+     * Check whether a form save notice is already queued
+     *
+     * @param int $post_id Form post ID
+     */
+    private function peek_form_admin_notice(int $post_id): bool {
+        return false !== get_transient($this->get_form_admin_notice_key($post_id));
+    }
+
+    /**
+     * Get and remove a form save notice for display in the meta box
+     *
+     * @param int $post_id Form post ID
+     * @return array{type: string, message: string}|null
+     */
+    private function get_and_clear_form_admin_notice(int $post_id): ?array {
+        $key = $this->get_form_admin_notice_key($post_id);
+        $notice = get_transient($key);
+        if ($notice) {
+            delete_transient($key);
+        }
+
+        if (!is_array($notice) || empty($notice['message'])) {
+            return null;
+        }
+
+        $type = in_array($notice['type'] ?? '', ['success', 'error', 'warning'], true) ? $notice['type'] : 'warning';
+
+        return [
+            'type'    => $type,
+            'message' => (string) $notice['message'],
+        ];
+    }
+
+    /**
+     * Map PHP upload error codes to a readable message
+     *
+     * @param int $error_code PHP upload error constant
+     */
+    private function get_upload_error_message(int $error_code): string {
+        switch ($error_code) {
+            case UPLOAD_ERR_INI_SIZE:
+            case UPLOAD_ERR_FORM_SIZE:
+                return __('HTML template file exceeds maximum allowed size.', 'mksddn-forms-handler');
+            case UPLOAD_ERR_PARTIAL:
+                return __('HTML template upload was interrupted. Please try again.', 'mksddn-forms-handler');
+            case UPLOAD_ERR_NO_TMP_DIR:
+            case UPLOAD_ERR_CANT_WRITE:
+            case UPLOAD_ERR_EXTENSION:
+                return __('Server could not store the uploaded HTML template file.', 'mksddn-forms-handler');
+            default:
+                return __('Failed to upload HTML template file.', 'mksddn-forms-handler');
+        }
+    }
+
+    /**
+     * Clear cached form configuration after template changes
+     *
+     * @param int $post_id Form post ID
+     */
+    private function clear_form_config_cache(int $post_id): void {
+        wp_cache_delete('form_config_' . md5((string) $post_id), 'mksddn_forms_handler');
+
+        $post = get_post($post_id);
+        if ($post && $post->post_name) {
+            wp_cache_delete('form_config_' . md5($post->post_name), 'mksddn_forms_handler');
         }
     }
 } 

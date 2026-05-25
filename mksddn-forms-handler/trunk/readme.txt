@@ -69,6 +69,7 @@ MksDdn Forms Handler is a powerful and flexible form processing plugin that allo
 **Handlers (handlers/)**
 * `TelegramHandler` - Telegram Bot API integration
 * `GoogleSheetsHandler` - Google Sheets API integration
+* `TemplateParser` - placeholder parsing for Telegram and user reply emails
 
 **Assets (assets/)**
 * `css/` - Admin and frontend styles
@@ -102,7 +103,8 @@ MksDdn Forms Handler is a powerful and flexible form processing plugin that allo
     │   └── template-functions.php
     ├── handlers/                     # External service handlers
     │   ├── class-telegram-handler.php
-    │   └── class-google-sheets-handler.php
+    │   ├── class-google-sheets-handler.php
+    │   └── class-template-parser.php
     ├── templates/                    # Template files
     │   ├── form-settings-meta-box.php
     │   └── custom-form-examples.php
@@ -144,6 +146,22 @@ Integrate pre-built forms in theme templates:
 For custom forms where you control field names in templates, enable "Accept any fields from frontend" in form settings to skip field validation. This allows submitting ANY field names without defining them in Fields Configuration. All fields are still sanitized but type validation is skipped.
 
 See `/templates/custom-form-examples.php` for detailed examples.
+
+**User Reply Email (Email Settings tab):**
+Optional auto-reply to the user who submitted the form. Configure in the form Email Settings tab:
+
+* `_send_user_reply` — enable/disable auto-reply (`0` / `1`)
+* `_user_reply_email_field` — field name from Fields Configuration (`type: email`)
+* `_user_reply_type` — `text` (template with placeholders) or `html` (uploaded HTML file)
+* `_user_reply_subject` — reply subject with placeholders
+* `_user_reply_message` — text template body
+* `_user_reply_html_template` — HTML file content stored in post meta
+
+Placeholders: `{form_title}`, `{date}`, `{time}`, `{datetime}`, `{page_url}`, `{field:field_name}`, `{field_label:field_name}`.
+
+HTML template upload: `.html`/`.htm` only, max 100 KB (filter `mksddn_fh_max_html_template_size`). PHP code in templates is rejected.
+
+Auto-reply failure does not block successful form submission; result is reported in `delivery_results.user_reply_email`.
 
 **3. REST API (AJAX)**
 Submit forms via REST API without page reload:
@@ -198,6 +216,8 @@ Submit forms via REST API without page reload:
     }, 10, 3);
 
 `mksddn_fh_allowed_redirect_hosts` - Whitelist external domains for redirect URLs
+
+`mksddn_fh_max_html_template_size` - Maximum size in bytes for uploaded user reply HTML templates (default: 102400)
 
     add_filter('mksddn_fh_allowed_redirect_hosts', function($hosts) {
         // Allow specific external domains for redirects
@@ -502,6 +522,11 @@ Security update: Fixed URL escaping in template examples. Recommended update for
 New feature: Template functions for custom forms integration. Bug fix: Improved Telegram message formatting. Fully backward compatible.
 
 == Changelog ==
+
+= Unreleased =
+* Feature: User reply email — optional auto-reply to the submitter in Email Settings (text template with placeholders or uploaded HTML file)
+* Feature: `TemplateParser::parse_for_email()` for HTML-safe placeholder replacement in user reply emails
+* Filter: `mksddn_fh_max_html_template_size` for HTML template upload size limit
 
 = 2.4.1 =
 * Improved: Submit button shows a loading spinner during AJAX submission; original button markup is restored on complete (custom labels/HTML preserved)

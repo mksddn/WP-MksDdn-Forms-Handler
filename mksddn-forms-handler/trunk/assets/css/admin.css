@@ -225,6 +225,28 @@ body.post-type-mksddn_fh_submits .subsubsub .add-new-h2 {
     margin-top: 0;
 }
 
+/* User reply HTML template status */
+.mksddn-user-reply-html-status {
+    margin: 0 0 12px;
+    padding: 10px 12px;
+    border-left: 4px solid #dba617;
+    background: #fff8e5;
+}
+
+.mksddn-user-reply-html-status--ready {
+    border-left-color: #00a32a;
+    background: #edfaef;
+}
+
+.mksddn-user-reply-html-status--missing {
+    border-left-color: #d63638;
+    background: #fcf0f1;
+}
+
+.mksddn-user-reply-html-notice {
+    margin: 0 0 12px;
+}
+
 /* Responsive tabs */
 @media (max-width: 782px) {
     .mksddn-form-tabs-nav {
