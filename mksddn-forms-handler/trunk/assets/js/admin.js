@@ -48,8 +48,14 @@
             // Telegram custom template toggle
             $(document).on('change', '#use_custom_telegram_template', this.toggleTelegramTemplate);
             
+            // User reply email settings
+            $(document).on('change', '#send_user_reply', this.toggleUserReplySettings);
+            $(document).on('change', 'input[name="user_reply_type"]', this.toggleUserReplyType);
+            $(document).on('input change', '#fields_config', this.updateUserReplyEmailFields);
+            
             // Initialize telegram template visibility on page load
             this.initTelegramTemplate();
+            this.initUserReplyEmail();
         },
 
         /**
@@ -466,6 +472,106 @@
                 } else {
                     $templateRow.hide();
                 }
+            }
+        },
+
+        /**
+         * Initialize user reply email settings visibility
+         */
+        initUserReplyEmail: function() {
+            this.updateUserReplyEmailFields();
+            this.toggleUserReplySettings.call($('#send_user_reply'));
+            this.toggleUserReplyType();
+        },
+
+        /**
+         * Toggle user reply email settings rows
+         */
+        toggleUserReplySettings: function() {
+            var $checkbox = $(this);
+            var $rows = $('.mksddn-user-reply-row');
+
+            if ($checkbox.is(':checked')) {
+                $rows.show();
+                MksDdnFormsHandler.toggleUserReplyType();
+            } else {
+                $rows.hide();
+            }
+        },
+
+        /**
+         * Toggle text/html reply content fields
+         */
+        toggleUserReplyType: function() {
+            if (!$('#send_user_reply').is(':checked')) {
+                return;
+            }
+
+            var replyType = $('input[name="user_reply_type"]:checked').val() || 'text';
+
+            if (replyType === 'html') {
+                $('.mksddn-user-reply-text-row').hide();
+                $('.mksddn-user-reply-html-row').show();
+            } else {
+                $('.mksddn-user-reply-text-row').show();
+                $('.mksddn-user-reply-html-row').hide();
+            }
+        },
+
+        /**
+         * Rebuild user email field dropdown from fields_config JSON
+         */
+        updateUserReplyEmailFields: function() {
+            var $select = $('#user_reply_email_field');
+            if (!$select.length) {
+                return;
+            }
+
+            var selectedValue = $select.val();
+            var fieldsConfig = $('#fields_config').val();
+            var emailFields = [];
+            var i18n = (typeof mksddn_fh_admin !== 'undefined') ? mksddn_fh_admin : {};
+            var selectLabel = i18n.select_email_field || '— Select field —';
+
+            if (fieldsConfig) {
+                try {
+                    var fields = JSON.parse(fieldsConfig);
+                    if (Array.isArray(fields)) {
+                        fields.forEach(function(field) {
+                            if (field && field.type === 'email' && field.name) {
+                                emailFields.push({
+                                    name: field.name,
+                                    label: field.notification_label || field.label || field.name
+                                });
+                            }
+                        });
+                    }
+                } catch (e) {
+                    emailFields = [];
+                }
+            }
+
+            $select.empty();
+            $select.append($('<option>', {
+                value: '',
+                text: selectLabel
+            }));
+
+            emailFields.forEach(function(field) {
+                $select.append($('<option>', {
+                    value: field.name,
+                    text: field.label + ' (' + field.name + ')'
+                }));
+            });
+
+            if (selectedValue && emailFields.some(function(field) { return field.name === selectedValue; })) {
+                $select.val(selectedValue);
+            }
+
+            if (emailFields.length === 0) {
+                $('.mksddn-user-reply-no-email-fields').show();
+            } else {
+                $('.mksddn-user-reply-no-email-fields').hide();
             }
         }
     };

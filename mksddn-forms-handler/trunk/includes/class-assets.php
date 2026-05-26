@@ -76,6 +76,7 @@ class Assets {
                     'error_generating_preview_retry' => __( 'Error generating preview. Please try again.', 'mksddn-forms-handler' ),
                     'field_required' => __( 'This field is required.', 'mksddn-forms-handler' ),
                     'enter_valid_email' => __( 'Please enter a valid email address.', 'mksddn-forms-handler' ),
+                    'select_email_field' => __( '— Select field —', 'mksddn-forms-handler' ),
                 ]
             );
         }

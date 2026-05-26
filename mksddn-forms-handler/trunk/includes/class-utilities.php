@@ -428,4 +428,32 @@ class Utilities {
 
         return $migrated_count;
     }
+
+    /**
+     * Clear cached form configuration by post ID and slug
+     *
+     * @param int $post_id Form post ID
+     */
+    public static function clear_form_config_cache(int $post_id): void {
+        wp_cache_delete('form_config_' . md5((string) $post_id), 'mksddn_forms_handler');
+
+        $post = get_post($post_id);
+        if ($post && $post->post_name) {
+            wp_cache_delete('form_config_' . md5($post->post_name), 'mksddn_forms_handler');
+        }
+    }
+
+    /**
+     * Strip dangerous content from admin-uploaded HTML email templates
+     *
+     * @param string $content Raw HTML template content
+     * @return string Sanitized HTML
+     */
+    public static function sanitize_email_html_template(string $content): string {
+        $content = preg_replace('/<script\b[^>]*>.*?<\/script>/is', '', $content) ?? $content;
+        $content = preg_replace('/\s*on\w+\s*=\s*("[^"]*"|\'[^\']*\'|[^\s>]+)/i', '', $content) ?? $content;
+        $content = preg_replace('/javascript\s*:/i', '', $content) ?? $content;
+
+        return $content;
+    }
 } 

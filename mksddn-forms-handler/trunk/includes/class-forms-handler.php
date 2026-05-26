@@ -720,6 +720,11 @@ class FormsHandler {
                 'error'   => null,
                 'enabled' => false,
             ],
+            'user_reply_email' => [
+                'success' => false,
+                'error'   => null,
+                'enabled' => false,
+            ],
         ];
 
         // Send email if enabled
@@ -737,6 +742,16 @@ class FormsHandler {
             $delivery_results['email']['success'] = !is_wp_error($email_result);
             if (is_wp_error($email_result)) {
                 $delivery_results['email']['error'] = $email_result->get_error_message();
+            }
+        }
+
+        // Send auto-reply to user if enabled
+        if ($form_config['send_user_reply'] === '1') {
+            $delivery_results['user_reply_email']['enabled'] = true;
+            $user_reply_result = $this->send_user_reply_email($form_config, $filtered_form_data);
+            $delivery_results['user_reply_email']['success'] = !is_wp_error($user_reply_result);
+            if (is_wp_error($user_reply_result)) {
+                $delivery_results['user_reply_email']['error'] = $user_reply_result->get_error_message();
             }
         }
 
@@ -795,7 +810,8 @@ class FormsHandler {
         $any_success = ($delivery_results['email']['enabled'] && $delivery_results['email']['success']) ||
                       ($delivery_results['telegram']['enabled'] && $delivery_results['telegram']['success']) ||
                       ($delivery_results['google_sheets']['enabled'] && $delivery_results['google_sheets']['success']) ||
-                      ($delivery_results['admin_storage']['enabled'] && $delivery_results['admin_storage']['success']);
+                      ($delivery_results['admin_storage']['enabled'] && $delivery_results['admin_storage']['success']) ||
+                      ($delivery_results['user_reply_email']['enabled'] && $delivery_results['user_reply_email']['success']);
 
         if (!$any_success) {
             return new \WP_Error(
@@ -886,6 +902,12 @@ class FormsHandler {
             'sheets_spreadsheet_id' => $get_meta('_sheets_spreadsheet_id'),
             'sheets_sheet_name' => $get_meta('_sheets_sheet_name'),
             'save_to_admin' => $get_meta('_save_to_admin'),
+            'send_user_reply' => $get_meta('_send_user_reply') ?: '0',
+            'user_reply_email_field' => $get_meta('_user_reply_email_field'),
+            'user_reply_type' => $get_meta('_user_reply_type') ?: 'text',
+            'user_reply_subject' => $get_meta('_user_reply_subject'),
+            'user_reply_message' => $get_meta('_user_reply_message'),
+            'user_reply_html_template' => $get_meta('_user_reply_html_template'),
         ];
 
         // Validate email configuration only if email is enabled
@@ -904,12 +926,7 @@ class FormsHandler {
      */
     public function clear_form_cache($post_id, $post): void {
         if ($post->post_type === 'mksddn_fh_forms') {
-            $cache_key = 'form_config_' . md5($post_id);
-            wp_cache_delete($cache_key, 'mksddn_forms_handler');
-            
-            // Also clear by slug
-            $cache_key_slug = 'form_config_' . md5($post->post_name);
-            wp_cache_delete($cache_key_slug, 'mksddn_forms_handler');
+            Utilities::clear_form_config_cache((int) $post_id);
         }
     }
     
@@ -1576,6 +1593,92 @@ class FormsHandler {
         }
 
         return new \WP_Error('email_send_error', __( 'Failed to send email', 'mksddn-forms-handler' ), ['status' => 500]);
+    }
+
+    /**
+     * Send auto-reply email to the user who submitted the form
+     *
+     * @param array $form_config Form configuration
+     * @param array $form_data Filtered form submission data
+     * @return \WP_Error|bool
+     */
+    private function send_user_reply_email(array $form_config, array $form_data): \WP_Error|bool {
+        $email_field = $form_config['user_reply_email_field'] ?? '';
+        if (empty($email_field)) {
+            return new \WP_Error(
+                'user_reply_no_field',
+                __( 'User reply email field is not configured', 'mksddn-forms-handler' ),
+                ['status' => 500]
+            );
+        }
+
+        if (!isset($form_data[$email_field])) {
+            return new \WP_Error(
+                'user_reply_missing_email',
+                __( 'User email address is missing from submission', 'mksddn-forms-handler' ),
+                ['status' => 500]
+            );
+        }
+
+        $user_email = sanitize_email((string) $form_data[$email_field]);
+        if (!is_email($user_email)) {
+            return new \WP_Error(
+                'user_reply_invalid_email',
+                __( 'User email address is invalid', 'mksddn-forms-handler' ),
+                ['status' => 500]
+            );
+        }
+
+        $reply_type = $form_config['user_reply_type'] ?? 'text';
+        if ($reply_type === 'html') {
+            $template = $form_config['user_reply_html_template'] ?? '';
+            if (empty(trim($template))) {
+                return new \WP_Error(
+                    'user_reply_no_html_template',
+                    __( 'HTML reply template is not configured', 'mksddn-forms-handler' ),
+                    ['status' => 500]
+                );
+            }
+        } else {
+            $template = $form_config['user_reply_message'] ?? '';
+            if (empty(trim($template))) {
+                $template = TemplateParser::get_default_user_reply_template();
+            }
+        }
+
+        $subject_template = $form_config['user_reply_subject'] ?? '';
+        if (empty(trim($subject_template))) {
+            $subject_template = __( 'Thank you for contacting us', 'mksddn-forms-handler' );
+        }
+
+        $subject = TemplateParser::parse_for_email(
+            $subject_template,
+            $form_data,
+            $form_config['form_title'],
+            $form_config['fields_config']
+        );
+        $body = TemplateParser::parse_for_email(
+            $template,
+            $form_data,
+            $form_config['form_title'],
+            $form_config['fields_config']
+        );
+
+        if ($reply_type === 'text' && !preg_match('/<[a-z][\s\S]*>/i', $body)) {
+            $body = wpautop($body);
+        }
+
+        $headers = ['Content-Type: text/html; charset=UTF-8'];
+
+        if (wp_mail($user_email, $subject, $body, $headers)) {
+            return true;
+        }
+
+        return new \WP_Error(
+            'user_reply_send_error',
+            __( 'Failed to send user reply email', 'mksddn-forms-handler' ),
+            ['status' => 500]
+        );
     }
     
     /**
