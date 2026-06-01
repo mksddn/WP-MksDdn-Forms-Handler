@@ -50,12 +50,16 @@ class GoogleSheetsHandler {
             }
         }
 
-        // Get sheet name
-        $target_sheet = $sheet_name ?: 'Sheet1';
+        $range = self::build_append_range($sheet_name);
+        $append_url = sprintf(
+            'https://sheets.googleapis.com/v4/spreadsheets/%s/values/%s:append?valueInputOption=USER_ENTERED',
+            rawurlencode($spreadsheet_id),
+            rawurlencode($range)
+        );
 
         // Send to Google Sheets
         $response = wp_remote_post(
-            "https://sheets.googleapis.com/v4/spreadsheets/{$spreadsheet_id}/values/{$target_sheet}!A:Z:append?valueInputOption=USER_ENTERED",
+            $append_url,
             [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $access_token,
@@ -232,6 +236,27 @@ class GoogleSheetsHandler {
         ]);
     }
     
+    /**
+     * Build A1 range for values.append.
+     *
+     * Empty sheet name uses column-only notation (A:Z), which targets the first
+     * sheet per Google Sheets API. A configured name selects that tab explicitly.
+     *
+     * @param string|null $sheet_name   Tab name from form settings (optional).
+     * @param string      $column_range Column range, default A:Z.
+     * @return string A1 notation range.
+     */
+    private static function build_append_range(?string $sheet_name, string $column_range = 'A:Z'): string {
+        $sheet_name = trim((string) $sheet_name);
+        if ($sheet_name === '') {
+            return $column_range;
+        }
+
+        $escaped_title = str_replace("'", "''", $sheet_name);
+
+        return "'{$escaped_title}'!{$column_range}";
+    }
+
     /**
      * Check if array contains objects (associative arrays with multiple keys)
      *

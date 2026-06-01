@@ -273,7 +273,7 @@
                 <th scope="row"><label for="sheets_sheet_name"><?php echo esc_html__( 'Sheet Name', 'mksddn-forms-handler' ); ?></label></th>
                 <td>
                     <input type="text" name="sheets_sheet_name" id="sheets_sheet_name" value="<?php echo esc_attr($sheets_sheet_name); ?>" class="regular-text" />
-                    <p class="description"><?php echo esc_html__( 'Sheet name (optional, defaults to first sheet)', 'mksddn-forms-handler' ); ?></p>
+                    <p class="description"><?php echo esc_html__( 'Tab name as shown in Google Sheets (optional). If empty, data is appended to the first tab.', 'mksddn-forms-handler' ); ?></p>
                 </td>
             </tr>
         </table>
