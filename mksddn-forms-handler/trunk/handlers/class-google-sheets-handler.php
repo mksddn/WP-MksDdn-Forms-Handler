@@ -19,9 +19,17 @@ if (!defined('ABSPATH')) {
 class GoogleSheetsHandler {
     
     /**
-     * Send data to Google Sheets
+     * Send data to Google Sheets.
+     *
+     * Each row: timestamp, form title, then field values in submission order.
+     *
+     * @param string|null $spreadsheet_id Google Sheets spreadsheet ID.
+     * @param string|null $sheet_name     Tab name from form settings (optional).
+     * @param array       $form_data      Filtered submission field values.
+     * @param string      $form_title     Form post title.
+     * @return true|\WP_Error
      */
-    public static function send_data(?string $spreadsheet_id, ?string $sheet_name, $form_data, $form_title) {
+    public static function send_data(?string $spreadsheet_id, ?string $sheet_name, array $form_data, string $form_title): \WP_Error|bool {
         if (!$spreadsheet_id) {
             return new \WP_Error('sheets_config_error', __( 'Google Sheets spreadsheet ID not configured', 'mksddn-forms-handler' ));
         }
@@ -172,7 +180,10 @@ class GoogleSheetsHandler {
 
         // Test reading spreadsheet
         $response = wp_remote_get(
-            "https://sheets.googleapis.com/v4/spreadsheets/{$spreadsheet_id}",
+            sprintf(
+                'https://sheets.googleapis.com/v4/spreadsheets/%s',
+                rawurlencode($spreadsheet_id)
+            ),
             [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $access_token,

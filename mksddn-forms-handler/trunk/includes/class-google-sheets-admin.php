@@ -349,7 +349,7 @@ class GoogleSheetsAdmin {
                     <ul>
                         <li><?php esc_html_e( 'Check "Send to Google Sheets"', 'mksddn-forms-handler' ); ?></li>
                         <li><?php esc_html_e( 'Enter your Spreadsheet ID (from URL: docs.google.com/spreadsheets/d/SPREADSHEET_ID)', 'mksddn-forms-handler' ); ?></li>
-                        <li><?php esc_html_e( 'Optionally specify Sheet Name', 'mksddn-forms-handler' ); ?></li>
+                        <li><?php esc_html_e( 'Optionally specify tab name (defaults to the first tab)', 'mksddn-forms-handler' ); ?></li>
                     </ul>
                     <li><?php esc_html_e( 'Save the form', 'mksddn-forms-handler' ); ?></li>
                 </ol>

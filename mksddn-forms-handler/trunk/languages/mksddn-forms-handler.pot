@@ -502,6 +502,10 @@ msgstr ""
 msgid "❌ Google Sheets connection failed: %s"
 msgstr ""
 
+#: includes/class-google-sheets-admin.php:352
+msgid "Optionally specify tab name (defaults to the first tab)"
+msgstr ""
+
 #: includes/class-export-handler.php:49 includes/class-export-handler.php:50
 #: includes/class-export-handler.php:319
 msgid "Export Submissions"
@@ -934,12 +938,12 @@ msgid ""
 "SPREADSHEET_ID)"
 msgstr ""
 
-#: templates/form-settings-meta-box.php:120
-msgid "Sheet Name"
+#: templates/form-settings-meta-box.php:273
+msgid "Tab Name"
 msgstr ""
 
-#: templates/form-settings-meta-box.php:123
-msgid "Sheet name (optional, defaults to first sheet)"
+#: templates/form-settings-meta-box.php:276
+msgid "Tab name as shown in Google Sheets (optional). If empty, data is appended to the first tab."
 msgstr ""
 
 #: templates/form-settings-meta-box.php:136
