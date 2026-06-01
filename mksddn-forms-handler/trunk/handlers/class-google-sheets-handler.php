@@ -205,6 +205,13 @@ class GoogleSheetsHandler {
     }
     
     /**
+     * OAuth redirect URI registered in Google Cloud Console.
+     */
+    public static function get_oauth_redirect_uri(): string {
+        return admin_url( 'admin.php?page=mksddn-fh-google-sheets-settings' );
+    }
+
+    /**
      * Get OAuth authorization URL
      */
     public static function get_auth_url(): string {
@@ -213,11 +220,9 @@ class GoogleSheetsHandler {
             return '';
         }
 
-        $redirect_uri = admin_url('options-general.php?page=google-sheets-settings');
-        
         return 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_query([
             'client_id'     => $client_id,
-            'redirect_uri'  => $redirect_uri,
+            'redirect_uri'  => self::get_oauth_redirect_uri(),
             'scope'         => 'https://www.googleapis.com/auth/spreadsheets',
             'response_type' => 'code',
             'access_type'   => 'offline',
