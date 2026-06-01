@@ -785,7 +785,8 @@ class FormsHandler {
             $sheets_result = \MksDdn\FormsHandler\GoogleSheetsHandler::send_data(
                 $form_config['sheets_spreadsheet_id'],
                 $form_config['sheets_sheet_name'],
-                $filtered_form_data
+                $filtered_form_data,
+                $form_config['form_title']
             );
             $delivery_results['google_sheets']['success'] = !is_wp_error($sheets_result);
             if (is_wp_error($sheets_result)) {

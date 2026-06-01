@@ -4,7 +4,7 @@ Tags: forms, telegram, google-sheets, rest-api, form-handler
 Requires at least: 5.0
 Tested up to: 7.0
 Requires PHP: 8.0
-Stable tag: 2.5.1
+Stable tag: 2.5.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -485,6 +485,9 @@ The `array_of_objects` type allows you to define arrays with nested field valida
 
 == Upgrade Notice ==
 
+= 2.5.2 =
+Bug fix: Google Sheets form submissions and tab name handling. Form title is now written to the sheet. Recommended update if you use Google Sheets integration.
+
 = 2.5.1 =
 Bug fix: Google Sheets OAuth "Connect to Google" used an incorrect redirect URI after the settings page move in 2.5.0. Recommended update if you use Google Sheets integration.
 
@@ -528,6 +531,12 @@ Security update: Fixed URL escaping in template examples. Recommended update for
 New feature: Template functions for custom forms integration. Bug fix: Improved Telegram message formatting. Fully backward compatible.
 
 == Changelog ==
+
+= 2.5.2 =
+* Fixed: Google Sheets submissions failed on PHP 8+ because form title was not passed to the API handler
+* Fixed: Sheet tab targeting — empty tab name appends to the first tab; named tabs use correct A1 notation and URL encoding
+* Improved: Form title is included as the second column in Google Sheets rows
+* Improved: Google Sheets tab name field label and help text
 
 = 2.5.1 =
 * Fixed: Google Sheets OAuth redirect URI mismatch — "Connect to Google" now uses the same redirect URI as the token exchange and setup instructions
