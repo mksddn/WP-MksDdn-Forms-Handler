@@ -206,6 +206,8 @@ class GoogleSheetsHandler {
     
     /**
      * OAuth redirect URI registered in Google Cloud Console.
+     *
+     * @return string Admin URL used as Google OAuth redirect target.
      */
     public static function get_oauth_redirect_uri(): string {
         return admin_url( 'admin.php?page=mksddn-fh-google-sheets-settings' );
