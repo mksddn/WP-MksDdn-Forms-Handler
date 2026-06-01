@@ -54,8 +54,8 @@ class Assets {
             $should_enqueue = true;
         }
 
-        // Settings page: options-general.php?page=google-sheets-settings
-        if ( strpos( $screen_id, 'settings_page_google-sheets-settings' ) !== false ) {
+        // Google Sheets settings submenu under Forms
+        if ( strpos( $screen_id, 'mksddn_fh_forms_page_mksddn-fh-google-sheets-settings' ) !== false ) {
             $should_enqueue = true;
         }
 

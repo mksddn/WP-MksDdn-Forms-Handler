@@ -4,7 +4,7 @@ Tags: forms, telegram, google-sheets, rest-api, form-handler
 Requires at least: 5.0
 Tested up to: 7.0
 Requires PHP: 8.0
-Stable tag: 2.5.0
+Stable tag: 2.5.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -485,6 +485,9 @@ The `array_of_objects` type allows you to define arrays with nested field valida
 
 == Upgrade Notice ==
 
+= 2.5.1 =
+Bug fix: Google Sheets OAuth "Connect to Google" used an incorrect redirect URI after the settings page move in 2.5.0. Recommended update if you use Google Sheets integration.
+
 = 2.5.0 =
 New feature: User reply email — optional auto-reply to the submitter with text template or uploaded HTML file. Recommended update.
 
@@ -525,6 +528,11 @@ Security update: Fixed URL escaping in template examples. Recommended update for
 New feature: Template functions for custom forms integration. Bug fix: Improved Telegram message formatting. Fully backward compatible.
 
 == Changelog ==
+
+= 2.5.1 =
+* Fixed: Google Sheets OAuth redirect URI mismatch — "Connect to Google" now uses the same redirect URI as the token exchange and setup instructions
+* Improved: Single source of truth for OAuth redirect URI via `GoogleSheetsHandler::get_oauth_redirect_uri()`
+* Fixed: Admin assets enqueue on the Google Sheets settings submenu page
 
 = 2.5.0 =
 * Feature: User reply email — optional auto-reply to the submitter in Email Settings (text template with placeholders or uploaded HTML file)

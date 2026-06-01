@@ -60,7 +60,7 @@ class GoogleSheetsAdmin {
                             'code'          => $code,
                             'grant_type'    => 'authorization_code',
                             // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- OAuth redirect target
-                            'redirect_uri'  => admin_url('admin.php?page=mksddn-fh-google-sheets-settings'),
+                            'redirect_uri'  => GoogleSheetsHandler::get_oauth_redirect_uri(),
                         ],
                         'timeout' => 30,
                     ]
@@ -247,7 +247,7 @@ class GoogleSheetsAdmin {
                             <li><?php esc_html_e( 'Go to "APIs &amp; Services" → "Credentials"', 'mksddn-forms-handler' ); ?></li>
                             <li><?php esc_html_e( 'Click "Create Credentials" → "OAuth 2.0 Client IDs"', 'mksddn-forms-handler' ); ?></li>
                             <li><?php esc_html_e( 'Choose "Web application"', 'mksddn-forms-handler' ); ?></li>
-                            <li><?php esc_html_e( 'Add authorized redirect URI:', 'mksddn-forms-handler' ); ?> <code><?php echo esc_html( admin_url('admin.php?page=mksddn-fh-google-sheets-settings') ); ?></code></li>
+                            <li><?php esc_html_e( 'Add authorized redirect URI:', 'mksddn-forms-handler' ); ?> <code><?php echo esc_html( GoogleSheetsHandler::get_oauth_redirect_uri() ); ?></code></li>
                             <li><strong><?php esc_html_e( 'Important:', 'mksddn-forms-handler' ); ?></strong> <?php esc_html_e( 'Make sure this exact URL is added to your Google Cloud Console OAuth credentials', 'mksddn-forms-handler' ); ?></li>
                             <li><?php esc_html_e( 'Save Client ID and Client Secret', 'mksddn-forms-handler' ); ?></li>
                         </ul>
