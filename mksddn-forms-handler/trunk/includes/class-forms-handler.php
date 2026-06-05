@@ -1981,6 +1981,7 @@ class FormsHandler {
         }
 
         if (!in_array($mode, ['same_site', 'allowlist'], true)) {
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
             error_log(
                 sprintf(
                     'Forms Handler: Invalid trusted_origins_mode "%s" for form %d; validation skipped (treated as off).',
@@ -2040,7 +2041,7 @@ class FormsHandler {
      */
     private function extract_request_origin(bool $fallback_referer): ?string {
         if (isset($_SERVER['HTTP_ORIGIN'])) {
-            $origin = wp_unslash((string) $_SERVER['HTTP_ORIGIN']);
+            $origin = sanitize_text_field(wp_unslash((string) $_SERVER['HTTP_ORIGIN']));
             if ('null' !== $origin) {
                 $origin = sanitize_url($origin);
             }

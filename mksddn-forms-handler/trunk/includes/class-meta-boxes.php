@@ -602,9 +602,12 @@ class MetaBoxes {
     /**
      * Save trusted origins settings from Advanced tab
      *
+     * Nonce verification is performed in save_form_settings() before this method is called.
+     *
      * @param int $post_id Form post ID
      */
     private function save_trusted_origins_settings(int $post_id): void {
+        // phpcs:disable WordPress.Security.NonceVerification.Missing -- Verified in save_form_settings().
         $allowed_modes = ['off', 'same_site', 'allowlist'];
         $mode = isset($_POST['trusted_origins_mode']) ? sanitize_key(wp_unslash($_POST['trusted_origins_mode'])) : 'off';
         if (!in_array($mode, $allowed_modes, true)) {
@@ -620,6 +623,7 @@ class MetaBoxes {
 
         if (!isset($_POST['trusted_origins_list'])) {
             Utilities::clear_form_config_cache($post_id);
+            // phpcs:enable WordPress.Security.NonceVerification.Missing
             return;
         }
 
@@ -646,6 +650,7 @@ class MetaBoxes {
 
         update_post_meta($post_id, '_trusted_origins_list', implode("\n", $parsed['valid']));
         Utilities::clear_form_config_cache($post_id);
+        // phpcs:enable WordPress.Security.NonceVerification.Missing
     }
 
     /**
