@@ -585,10 +585,15 @@ class FormsHandler {
 
         $origin_check = $this->validate_request_origin($form_config);
         if (is_wp_error($origin_check)) {
+            $error_data = $origin_check->get_error_data();
+            $error_status = isset($error_data['status']) ? (int) $error_data['status'] : 403;
+            if ($error_status < 100 || $error_status > 599) {
+                $error_status = 403;
+            }
             wp_send_json_error([
                 'message' => $origin_check->get_error_message(),
                 'code'    => $origin_check->get_error_code(),
-            ]);
+            ], $error_status);
             return;
         }
 
