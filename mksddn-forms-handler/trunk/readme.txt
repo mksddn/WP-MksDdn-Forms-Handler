@@ -4,7 +4,7 @@ Tags: forms, telegram, google-sheets, rest-api, form-handler
 Requires at least: 5.0
 Tested up to: 7.0
 Requires PHP: 8.0
-Stable tag: 2.5.2
+Stable tag: 2.6.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -186,6 +186,7 @@ Submit forms via REST API without page reload:
 * Nonce verification (CSRF protection)
 * Capability checks
 * Rate limiting (1 request per 10 seconds per IP per form)
+* Optional trusted origins check (Origin/Referer) per form — off by default
 
 **Performance**
 * Minimal database queries
@@ -218,6 +219,16 @@ Submit forms via REST API without page reload:
 `mksddn_fh_allowed_redirect_hosts` - Whitelist external domains for redirect URLs
 
 `mksddn_fh_max_html_template_size` - Maximum size in bytes for uploaded user reply HTML templates (default: 102400)
+
+`mksddn_fh_trusted_origins_bypass` - Skip trusted origins validation for a request (default: false)
+
+    add_filter('mksddn_fh_trusted_origins_bypass', function($bypass, $form_id, $mode) {
+        // Allow server-side proxy submissions for a specific form
+        if ($form_id === 123 && $mode === 'allowlist') {
+            return true;
+        }
+        return $bypass;
+    }, 10, 3);
 
     add_filter('mksddn_fh_allowed_redirect_hosts', function($hosts) {
         // Allow specific external domains for redirects
@@ -259,6 +270,28 @@ Namespace: `mksddn-forms-handler/v1`
 * Required fields, email, URL, number (min/max/step), tel (pattern), date, time, datetime-local are validated
 * Maximum 50 fields; total payload size ≤ 100 KB
 * Rate limiting: 1 request per 10 seconds per IP per form
+* Optional trusted origins check per form (see below); disabled by default (`off`)
+
+= Trusted Origins (opt-in) =
+
+Additional layer on top of nonce, honeypot, and rate limiting. Configure per form in **Advanced** tab.
+
+**Modes**
+* `off` (default) — no origin check; existing forms behave unchanged after plugin update
+* `same_site` — accept submissions only from the WordPress site origin (`home_url` / `site_url`)
+* `allowlist` — accept only origins listed in the form settings (one per line, e.g. `https://www.example.com`)
+
+**Headers**
+* Primary: `Origin`
+* Fallback: `Referer` when enabled (default on) for browser form posts without `Origin`
+
+**Errors**
+* Blocked requests return `origin_not_allowed` (HTTP 403) in REST and admin-post JSON responses
+
+**Notes**
+* Subdomains, `www`, and ports are distinct origins — list each explicitly in allowlist mode
+* No database migration: missing meta uses runtime defaults (`off`, referer fallback on)
+* Filter `mksddn_fh_trusted_origins_bypass` for infrastructure edge cases
 
 = Examples =
 
@@ -485,6 +518,9 @@ The `array_of_objects` type allows you to define arrays with nested field valida
 
 == Upgrade Notice ==
 
+= 2.6.0 =
+New feature: Trusted origins — optional per-form Origin/Referer protection in Advanced settings. Opt-in only; default is off, so existing forms keep working unchanged.
+
 = 2.5.2 =
 Bug fix: Google Sheets form submissions and tab name handling. Form title is now written to the sheet. Recommended update if you use Google Sheets integration.
 
@@ -531,6 +567,13 @@ Security update: Fixed URL escaping in template examples. Recommended update for
 New feature: Template functions for custom forms integration. Bug fix: Improved Telegram message formatting. Fully backward compatible.
 
 == Changelog ==
+
+= 2.6.0 =
+* Feature: Trusted origins — optional per-form Origin/Referer allowlist (`off` | `same_site` | `allowlist`) in Advanced settings
+* Feature: Referer fallback toggle for browser compatibility when Origin header is absent
+* Security: Submissions blocked with `origin_not_allowed` before file processing and delivery integrations
+* Filter: `mksddn_fh_trusted_origins_bypass` for edge-case infrastructure bypass
+* Compatibility: Default mode is `off`; no migration required for existing forms
 
 = 2.5.2 =
 * Fixed: Google Sheets submissions failed on PHP 8+ because form title was not passed to the API handler

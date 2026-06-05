@@ -354,6 +354,50 @@
                     </p>
                 </td>
             </tr>
+            <tr>
+                <th scope="row"><label for="trusted_origins_mode"><?php echo esc_html__( 'Trusted origins', 'mksddn-forms-handler' ); ?></label></th>
+                <td>
+                    <?php if (!empty($trusted_origins_admin_notice)) : ?>
+                        <?php
+                        $mksddn_trusted_notice_class = 'notice-warning';
+                        if ($trusted_origins_admin_notice['type'] === 'success') {
+                            $mksddn_trusted_notice_class = 'notice-success';
+                        } elseif ($trusted_origins_admin_notice['type'] === 'error') {
+                            $mksddn_trusted_notice_class = 'notice-error';
+                        }
+                        ?>
+                        <div class="notice <?php echo esc_attr($mksddn_trusted_notice_class); ?> inline">
+                            <p><?php echo esc_html($trusted_origins_admin_notice['message']); ?></p>
+                        </div>
+                    <?php endif; ?>
+                    <select name="trusted_origins_mode" id="trusted_origins_mode" class="regular-text">
+                        <option value="off" <?php selected($trusted_origins_mode, 'off'); ?>><?php echo esc_html__( 'Off (default, backward compatible)', 'mksddn-forms-handler' ); ?></option>
+                        <option value="same_site" <?php selected($trusted_origins_mode, 'same_site'); ?>><?php echo esc_html__( 'Same site only', 'mksddn-forms-handler' ); ?></option>
+                        <option value="allowlist" <?php selected($trusted_origins_mode, 'allowlist'); ?>><?php echo esc_html__( 'Allowlist', 'mksddn-forms-handler' ); ?></option>
+                    </select>
+                    <p class="description"><?php echo esc_html__( 'Optional extra layer: restrict submissions by Origin/Referer. Disabled by default for existing forms.', 'mksddn-forms-handler' ); ?></p>
+                </td>
+            </tr>
+            <tr class="mksddn-trusted-origins-allowlist-row" style="<?php echo ($trusted_origins_mode === 'allowlist') ? '' : 'display: none;'; ?>">
+                <th scope="row"><label for="trusted_origins_list"><?php echo esc_html__( 'Allowed origins', 'mksddn-forms-handler' ); ?></label></th>
+                <td>
+                    <textarea name="trusted_origins_list" id="trusted_origins_list" rows="6" cols="50" class="large-text code"><?php echo esc_textarea($trusted_origins_list ?? ''); ?></textarea>
+                    <p class="description">
+                        <?php echo esc_html__( 'One origin per line. Use scheme + host only, e.g. https://www.example.com or https://app.example.com:8443', 'mksddn-forms-handler' ); ?>
+                    </p>
+                </td>
+            </tr>
+            <tr class="mksddn-trusted-origins-options-row" style="<?php echo ($trusted_origins_mode === 'off') ? 'display: none;' : ''; ?>">
+                <th scope="row">
+                    <label>
+                        <input type="checkbox" name="trusted_origins_fallback_referer" id="trusted_origins_fallback_referer" value="1" <?php checked($trusted_origins_fallback_referer, '1'); ?> />
+                        <?php echo esc_html__( 'Fallback to Referer when Origin is missing', 'mksddn-forms-handler' ); ?>
+                    </label>
+                </th>
+                <td>
+                    <p class="description"><?php echo esc_html__( 'Recommended for browser form posts. Disable for strict API-only clients that must send Origin.', 'mksddn-forms-handler' ); ?></p>
+                </td>
+            </tr>
         </table>
     </div>
 </div> 

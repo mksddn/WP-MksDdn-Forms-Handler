@@ -280,6 +280,16 @@ class FormsHandler {
         }
         set_transient($rl_key, time(), 15);
 
+        $form_config_early = $this->get_form_config($slug);
+        if (is_wp_error($form_config_early)) {
+            return $form_config_early;
+        }
+
+        $origin_check = $this->validate_request_origin((int) $form_config_early['form_id']);
+        if (is_wp_error($origin_check)) {
+            return $origin_check;
+        }
+
         if (!$form_data && empty($file_params)) {
             return new \WP_Error('invalid_data', __( 'Invalid form data', 'mksddn-forms-handler' ), ['status' => 400]);
         }
@@ -304,11 +314,7 @@ class FormsHandler {
         // Build files if present
         $email_attachments = [];
         if (!empty($file_params)) {
-            $fields_config = $this->get_form_config($slug);
-            if (is_wp_error($fields_config)) {
-                return $fields_config;
-            }
-            $files_result = $this->process_uploaded_files($file_params, $fields_config['fields_config']);
+            $files_result = $this->process_uploaded_files($file_params, $form_config_early['fields_config']);
             if (is_wp_error($files_result)) {
                 return $files_result;
             }
@@ -575,6 +581,15 @@ class FormsHandler {
         $form_config = $this->get_form_config($form_id);
         if (is_wp_error($form_config)) {
             wp_die( esc_html( $form_config->get_error_message() ) );
+        }
+
+        $origin_check = $this->validate_request_origin((int) $form_config['form_id']);
+        if (is_wp_error($origin_check)) {
+            wp_send_json_error([
+                'message' => $origin_check->get_error_message(),
+                'code'    => $origin_check->get_error_code(),
+            ]);
+            return;
         }
         
         // Check if allow_any_fields is enabled
@@ -1926,6 +1941,100 @@ class FormsHandler {
         return $submission_id;
     }
     
+    /**
+     * Validate request origin against per-form trusted origins settings
+     *
+     * @param int $form_id Form post ID
+     * @return \WP_Error|true
+     */
+    private function validate_request_origin(int $form_id): \WP_Error|bool {
+        $mode = get_post_meta($form_id, '_trusted_origins_mode', true);
+        if ($mode === '' || $mode === 'off') {
+            return true;
+        }
+
+        if (!in_array($mode, ['same_site', 'allowlist'], true)) {
+            return true;
+        }
+
+        /**
+         * Bypass trusted origins validation for infrastructure edge cases.
+         *
+         * @param bool   $bypass  Whether to skip origin validation
+         * @param int    $form_id Form post ID
+         * @param string $mode    Trusted origins mode (same_site|allowlist)
+         */
+        if (apply_filters('mksddn_fh_trusted_origins_bypass', false, $form_id, $mode)) {
+            return true;
+        }
+
+        $fallback_referer = get_post_meta($form_id, '_trusted_origins_fallback_referer', true);
+        $use_referer_fallback = ($fallback_referer === '' || $fallback_referer === '1');
+        $request_origin = $this->extract_request_origin($use_referer_fallback);
+
+        if ($request_origin === null) {
+            return new \WP_Error(
+                'origin_not_allowed',
+                __( 'Form submission from this origin is not allowed.', 'mksddn-forms-handler' ),
+                ['status' => 403]
+            );
+        }
+
+        if ($mode === 'same_site') {
+            $allowed_origins = Utilities::get_site_origins();
+        } else {
+            $allowed_origins = $this->get_trusted_origins_allowlist($form_id);
+        }
+
+        if (!in_array($request_origin, $allowed_origins, true)) {
+            return new \WP_Error(
+                'origin_not_allowed',
+                __( 'Form submission from this origin is not allowed.', 'mksddn-forms-handler' ),
+                ['status' => 403]
+            );
+        }
+
+        return true;
+    }
+
+    /**
+     * Extract normalized request origin from Origin/Referer headers
+     *
+     * @param bool $fallback_referer Whether Referer may be used when Origin is missing
+     * @return string|null Normalized origin or null
+     */
+    private function extract_request_origin(bool $fallback_referer): ?string {
+        if (isset($_SERVER['HTTP_ORIGIN'])) {
+            $origin = sanitize_text_field(wp_unslash((string) $_SERVER['HTTP_ORIGIN']));
+            $normalized = Utilities::normalize_origin($origin);
+            if ($normalized !== null) {
+                return $normalized;
+            }
+        }
+
+        if ($fallback_referer && isset($_SERVER['HTTP_REFERER'])) {
+            $referer = sanitize_text_field(wp_unslash((string) $_SERVER['HTTP_REFERER']));
+            return Utilities::normalize_origin($referer);
+        }
+
+        return null;
+    }
+
+    /**
+     * Get normalized allowlist origins for a form
+     *
+     * @param int $form_id Form post ID
+     * @return string[]
+     */
+    private function get_trusted_origins_allowlist(int $form_id): array {
+        $raw_list = get_post_meta($form_id, '_trusted_origins_list', true);
+        if (!is_string($raw_list) || trim($raw_list) === '') {
+            return [];
+        }
+
+        return Utilities::parse_trusted_origins_list($raw_list)['valid'];
+    }
+
     /**
      * Get page URL from referer or POST
      *

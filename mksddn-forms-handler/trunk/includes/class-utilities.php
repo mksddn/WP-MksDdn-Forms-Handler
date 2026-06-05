@@ -456,4 +456,94 @@ class Utilities {
 
         return $content;
     }
+
+    /**
+     * Normalize a URL or Origin header value to scheme://host[:port]
+     *
+     * @param string $url Raw URL or origin string
+     * @return string|null Normalized origin or null when invalid
+     */
+    public static function normalize_origin(string $url): ?string {
+        $url = trim($url);
+        if ($url === '') {
+            return null;
+        }
+
+        $parsed = wp_parse_url($url);
+        if (empty($parsed['scheme']) || empty($parsed['host'])) {
+            return null;
+        }
+
+        $scheme = strtolower((string) $parsed['scheme']);
+        if (!in_array($scheme, ['http', 'https'], true)) {
+            return null;
+        }
+
+        $host = strtolower((string) $parsed['host']);
+        $port = isset($parsed['port']) ? (int) $parsed['port'] : null;
+
+        if ($port === 80 && $scheme === 'http') {
+            $port = null;
+        }
+        if ($port === 443 && $scheme === 'https') {
+            $port = null;
+        }
+
+        $origin = $scheme . '://' . $host;
+        if ($port !== null) {
+            $origin .= ':' . $port;
+        }
+
+        return $origin;
+    }
+
+    /**
+     * Parse and validate trusted origins textarea input
+     *
+     * @param string $text Newline-separated origin list
+     * @return array{valid: string[], invalid: string[]}
+     */
+    public static function parse_trusted_origins_list(string $text): array {
+        $valid = [];
+        $invalid = [];
+        $lines = preg_split('/\r\n|\r|\n/', $text) ?: [];
+
+        foreach ($lines as $line) {
+            $line = trim((string) $line);
+            if ($line === '') {
+                continue;
+            }
+
+            $normalized = self::normalize_origin($line);
+            if ($normalized === null) {
+                $invalid[] = $line;
+                continue;
+            }
+
+            $valid[] = $normalized;
+        }
+
+        return [
+            'valid'   => array_values(array_unique($valid)),
+            'invalid' => $invalid,
+        ];
+    }
+
+    /**
+     * Get normalized site origins (home and site URLs)
+     *
+     * @return string[]
+     */
+    public static function get_site_origins(): array {
+        $origins = [];
+
+        foreach ([home_url(), site_url()] as $url) {
+            $normalized = self::normalize_origin((string) $url);
+            if ($normalized !== null) {
+                $origins[] = $normalized;
+            }
+        }
+
+        return array_values(array_unique($origins));
+    }
 } 
