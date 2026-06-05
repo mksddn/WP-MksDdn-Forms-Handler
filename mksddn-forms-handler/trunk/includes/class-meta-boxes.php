@@ -623,7 +623,6 @@ class MetaBoxes {
 
         if (!isset($_POST['trusted_origins_list'])) {
             Utilities::clear_form_config_cache($post_id);
-            // phpcs:enable WordPress.Security.NonceVerification.Missing
             return;
         }
 
