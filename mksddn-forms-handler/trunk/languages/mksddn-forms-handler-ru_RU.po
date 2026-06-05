@@ -1509,8 +1509,12 @@ msgstr "Отправка формы с этого источника не раз
 msgid "External redirect URLs are not allowed (%s). Use relative URLs or add domain to whitelist."
 msgstr "Внешние URL перенаправления не разрешены (%s). Используйте относительные URL или добавьте домен в белый список."
 
+#: includes/class-meta-boxes.php:633
+msgid "Allowlist mode requires at least one valid origin."
+msgstr "Режим белого списка требует хотя бы один валидный origin."
+
 #. translators: %s: comma-separated invalid origin strings
-#: includes/class-meta-boxes.php:635
+#: includes/class-meta-boxes.php:641
 #, php-format
 msgid "Some trusted origins were skipped because they are invalid: %s"
 msgstr "Некоторые доверенные origin пропущены из-за неверного формата: %s"

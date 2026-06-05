@@ -59,7 +59,7 @@
             // Initialize telegram template visibility on page load
             this.initTelegramTemplate();
             this.initUserReplyEmail();
-            this.initTrustedOriginsSettings();
+            this.toggleTrustedOriginsSettings();
         },
 
         /**
@@ -577,13 +577,6 @@
             } else {
                 $('.mksddn-user-reply-no-email-fields').hide();
             }
-        },
-
-        /**
-         * Initialize trusted origins settings visibility
-         */
-        initTrustedOriginsSettings: function() {
-            this.toggleTrustedOriginsSettings();
         },
 
         /**

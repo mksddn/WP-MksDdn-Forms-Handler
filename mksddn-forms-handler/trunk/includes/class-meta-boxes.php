@@ -626,7 +626,13 @@ class MetaBoxes {
         $raw_list = sanitize_textarea_field(wp_unslash($_POST['trusted_origins_list']));
         $parsed = Utilities::parse_trusted_origins_list($raw_list);
 
-        if ($parsed['invalid'] !== []) {
+        if ($mode === 'allowlist' && $parsed['valid'] === []) {
+            $this->set_trusted_origins_notice(
+                $post_id,
+                'error',
+                __('Allowlist mode requires at least one valid origin.', 'mksddn-forms-handler')
+            );
+        } elseif ($parsed['invalid'] !== []) {
             $this->set_trusted_origins_notice(
                 $post_id,
                 'warning',

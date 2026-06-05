@@ -278,17 +278,18 @@ class FormsHandler {
         if ($last_ts && (time() - (int)$last_ts) < self::RATE_LIMIT_SECONDS) {
             return new \WP_Error('rate_limited', __( 'Too many requests. Please wait a few seconds.', 'mksddn-forms-handler' ), ['status' => 429]);
         }
-        set_transient($rl_key, time(), 15);
 
         $form_config_early = $this->get_form_config($slug);
         if (is_wp_error($form_config_early)) {
             return $form_config_early;
         }
 
-        $origin_check = $this->validate_request_origin((int) $form_config_early['form_id']);
+        $origin_check = $this->validate_request_origin($form_config_early);
         if (is_wp_error($origin_check)) {
             return $origin_check;
         }
+
+        set_transient($rl_key, time(), 15);
 
         if (!$form_data && empty($file_params)) {
             return new \WP_Error('invalid_data', __( 'Invalid form data', 'mksddn-forms-handler' ), ['status' => 400]);
@@ -575,7 +576,6 @@ class FormsHandler {
         if ($last_ts && (time() - (int)$last_ts) < self::RATE_LIMIT_SECONDS) {
             wp_die( esc_html__( 'Too many requests. Please wait a few seconds.', 'mksddn-forms-handler' ) );
         }
-        set_transient($rl_key, time(), 15);
 
         // Build form data using whitelist from form configuration
         $form_config = $this->get_form_config($form_id);
@@ -583,7 +583,7 @@ class FormsHandler {
             wp_die( esc_html( $form_config->get_error_message() ) );
         }
 
-        $origin_check = $this->validate_request_origin((int) $form_config['form_id']);
+        $origin_check = $this->validate_request_origin($form_config);
         if (is_wp_error($origin_check)) {
             wp_send_json_error([
                 'message' => $origin_check->get_error_message(),
@@ -591,6 +591,8 @@ class FormsHandler {
             ]);
             return;
         }
+
+        set_transient($rl_key, time(), 15);
         
         // Check if allow_any_fields is enabled
         $allow_any_fields = get_post_meta($form_config['form_id'], '_allow_any_fields', true);
@@ -924,6 +926,14 @@ class FormsHandler {
             'user_reply_subject' => $get_meta('_user_reply_subject'),
             'user_reply_message' => $get_meta('_user_reply_message'),
             'user_reply_html_template' => $get_meta('_user_reply_html_template'),
+            // Defaults keep pre-2.6.0 forms working without migration or admin changes.
+            'trusted_origins_mode' => $get_meta('_trusted_origins_mode') ?: 'off',
+            'trusted_origins_fallback_referer' => $get_meta('_trusted_origins_fallback_referer') !== '0' ? '1' : '0',
+            'trusted_origins_list' => $get_meta('_trusted_origins_list'),
+            'trusted_origins_allowlist' => self::build_trusted_origins_allowlist(
+                $get_meta('_trusted_origins_mode') ?: 'off',
+                $get_meta('_trusted_origins_list')
+            ),
         ];
 
         // Validate email configuration only if email is enabled
@@ -1942,18 +1952,43 @@ class FormsHandler {
     }
     
     /**
+     * Build normalized allowlist origins from cached form config values
+     *
+     * @param string $mode     Trusted origins mode
+     * @param string $raw_list Newline-separated origin list
+     * @return string[]
+     */
+    private static function build_trusted_origins_allowlist(string $mode, string $raw_list): array {
+        if ($mode !== 'allowlist' || trim($raw_list) === '') {
+            return [];
+        }
+
+        return Utilities::parse_trusted_origins_list($raw_list)['valid'];
+    }
+
+    /**
      * Validate request origin against per-form trusted origins settings
      *
-     * @param int $form_id Form post ID
+     * @param array $form_config Cached form configuration
      * @return \WP_Error|true
      */
-    private function validate_request_origin(int $form_id): \WP_Error|bool {
-        $mode = get_post_meta($form_id, '_trusted_origins_mode', true);
+    private function validate_request_origin(array $form_config): \WP_Error|true {
+        $form_id = (int) ($form_config['form_id'] ?? 0);
+        $mode = (string) ($form_config['trusted_origins_mode'] ?? '');
+
         if ($mode === '' || $mode === 'off') {
             return true;
         }
 
         if (!in_array($mode, ['same_site', 'allowlist'], true)) {
+            error_log(
+                sprintf(
+                    'Forms Handler: Invalid trusted_origins_mode "%s" for form %d; validation skipped (treated as off).',
+                    $mode,
+                    $form_id
+                )
+            );
+
             return true;
         }
 
@@ -1968,7 +2003,7 @@ class FormsHandler {
             return true;
         }
 
-        $fallback_referer = get_post_meta($form_id, '_trusted_origins_fallback_referer', true);
+        $fallback_referer = (string) ($form_config['trusted_origins_fallback_referer'] ?? '');
         $use_referer_fallback = ($fallback_referer === '' || $fallback_referer === '1');
         $request_origin = $this->extract_request_origin($use_referer_fallback);
 
@@ -1983,7 +2018,7 @@ class FormsHandler {
         if ($mode === 'same_site') {
             $allowed_origins = Utilities::get_site_origins();
         } else {
-            $allowed_origins = $this->get_trusted_origins_allowlist($form_id);
+            $allowed_origins = $form_config['trusted_origins_allowlist'] ?? [];
         }
 
         if (!in_array($request_origin, $allowed_origins, true)) {
@@ -2005,7 +2040,10 @@ class FormsHandler {
      */
     private function extract_request_origin(bool $fallback_referer): ?string {
         if (isset($_SERVER['HTTP_ORIGIN'])) {
-            $origin = sanitize_text_field(wp_unslash((string) $_SERVER['HTTP_ORIGIN']));
+            $origin = wp_unslash((string) $_SERVER['HTTP_ORIGIN']);
+            if ('null' !== $origin) {
+                $origin = sanitize_url($origin);
+            }
             $normalized = Utilities::normalize_origin($origin);
             if ($normalized !== null) {
                 return $normalized;
@@ -2013,26 +2051,11 @@ class FormsHandler {
         }
 
         if ($fallback_referer && isset($_SERVER['HTTP_REFERER'])) {
-            $referer = sanitize_text_field(wp_unslash((string) $_SERVER['HTTP_REFERER']));
+            $referer = sanitize_url(wp_unslash((string) $_SERVER['HTTP_REFERER']));
             return Utilities::normalize_origin($referer);
         }
 
         return null;
-    }
-
-    /**
-     * Get normalized allowlist origins for a form
-     *
-     * @param int $form_id Form post ID
-     * @return string[]
-     */
-    private function get_trusted_origins_allowlist(int $form_id): array {
-        $raw_list = get_post_meta($form_id, '_trusted_origins_list', true);
-        if (!is_string($raw_list) || trim($raw_list) === '') {
-            return [];
-        }
-
-        return Utilities::parse_trusted_origins_list($raw_list)['valid'];
     }
 
     /**

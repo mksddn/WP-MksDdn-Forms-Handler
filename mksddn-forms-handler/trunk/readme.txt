@@ -572,8 +572,13 @@ New feature: Template functions for custom forms integration. Bug fix: Improved 
 * Feature: Trusted origins — optional per-form Origin/Referer allowlist (`off` | `same_site` | `allowlist`) in Advanced settings
 * Feature: Referer fallback toggle for browser compatibility when Origin header is absent
 * Security: Submissions blocked with `origin_not_allowed` before file processing and delivery integrations
+* Security: Origin/Referer headers sanitized with `sanitize_url` (WordPress convention)
 * Filter: `mksddn_fh_trusted_origins_bypass` for edge-case infrastructure bypass
-* Compatibility: Default mode is `off`; no migration required for existing forms
+* Improved: Trusted origins settings cached in form config to avoid extra meta queries
+* Improved: Rate limit is not consumed when a request is blocked by origin validation
+* Improved: Admin error notice when allowlist mode is saved without valid origins
+* Improved: Invalid `trusted_origins_mode` values are treated as `off` (logged, request allowed)
+* Compatibility: Default mode is `off`; explicit runtime defaults; no migration required for existing forms
 
 = 2.5.2 =
 * Fixed: Google Sheets submissions failed on PHP 8+ because form title was not passed to the API handler
