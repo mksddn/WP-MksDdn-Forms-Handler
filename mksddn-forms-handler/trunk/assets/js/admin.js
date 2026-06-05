@@ -52,10 +52,14 @@
             $(document).on('change', '#send_user_reply', this.toggleUserReplySettings);
             $(document).on('change', 'input[name="user_reply_type"]', this.toggleUserReplyType);
             $(document).on('input change', '#fields_config', this.updateUserReplyEmailFields);
+
+            // Trusted origins settings
+            $(document).on('change', '#trusted_origins_mode', this.toggleTrustedOriginsSettings);
             
             // Initialize telegram template visibility on page load
             this.initTelegramTemplate();
             this.initUserReplyEmail();
+            this.toggleTrustedOriginsSettings();
         },
 
         /**
@@ -572,6 +576,26 @@
                 $('.mksddn-user-reply-no-email-fields').show();
             } else {
                 $('.mksddn-user-reply-no-email-fields').hide();
+            }
+        },
+
+        /**
+         * Toggle trusted origins allowlist and options rows
+         */
+        toggleTrustedOriginsSettings: function() {
+            var mode = $('#trusted_origins_mode').val() || 'off';
+            var $allowlistRow = $('.mksddn-trusted-origins-allowlist-row');
+            var $optionsRow = $('.mksddn-trusted-origins-options-row');
+
+            if (mode === 'allowlist') {
+                $allowlistRow.show();
+                $optionsRow.show();
+            } else if (mode === 'same_site') {
+                $allowlistRow.hide();
+                $optionsRow.show();
+            } else {
+                $allowlistRow.hide();
+                $optionsRow.hide();
             }
         }
     };

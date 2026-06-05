@@ -109,6 +109,16 @@ class MetaBoxes {
         $sheets_sheet_name = get_post_meta($post->ID, '_sheets_sheet_name', true);
         $save_to_admin = get_post_meta($post->ID, '_save_to_admin', true);
         $allow_any_fields = get_post_meta($post->ID, '_allow_any_fields', true);
+        $trusted_origins_mode = get_post_meta($post->ID, '_trusted_origins_mode', true);
+        if ($trusted_origins_mode === '') {
+            $trusted_origins_mode = 'off';
+        }
+        $trusted_origins_list = get_post_meta($post->ID, '_trusted_origins_list', true);
+        $trusted_origins_fallback_referer = get_post_meta($post->ID, '_trusted_origins_fallback_referer', true);
+        if ($trusted_origins_fallback_referer === '') {
+            $trusted_origins_fallback_referer = '1';
+        }
+        $trusted_origins_admin_notice = $this->get_and_clear_trusted_origins_notice($post->ID);
         $submit_button_text = get_post_meta($post->ID, '_submit_button_text', true);
         $custom_html_after_button = get_post_meta($post->ID, '_custom_html_after_button', true);
         $success_message_text = get_post_meta($post->ID, '_success_message_text', true);
@@ -455,6 +465,8 @@ class MetaBoxes {
             update_post_meta($post_id, '_allow_any_fields', '0');
         }
 
+        $this->save_trusted_origins_settings($post_id);
+
         if (isset($_POST['submit_button_text'])) {
             update_post_meta($post_id, '_submit_button_text', sanitize_text_field( wp_unslash($_POST['submit_button_text']) ));
         }
@@ -585,6 +597,111 @@ class MetaBoxes {
                 );
             }
         }
+    }
+
+    /**
+     * Save trusted origins settings from Advanced tab
+     *
+     * Nonce verification is performed in save_form_settings() before this method is called.
+     *
+     * @param int $post_id Form post ID
+     */
+    private function save_trusted_origins_settings(int $post_id): void {
+        // phpcs:disable WordPress.Security.NonceVerification.Missing -- Verified in save_form_settings().
+        $allowed_modes = ['off', 'same_site', 'allowlist'];
+        $mode = isset($_POST['trusted_origins_mode']) ? sanitize_key(wp_unslash($_POST['trusted_origins_mode'])) : 'off';
+        if (!in_array($mode, $allowed_modes, true)) {
+            $mode = 'off';
+        }
+        update_post_meta($post_id, '_trusted_origins_mode', $mode);
+
+        if (isset($_POST['trusted_origins_fallback_referer'])) {
+            update_post_meta($post_id, '_trusted_origins_fallback_referer', '1');
+        } else {
+            update_post_meta($post_id, '_trusted_origins_fallback_referer', '0');
+        }
+
+        if (!isset($_POST['trusted_origins_list'])) {
+            Utilities::clear_form_config_cache($post_id);
+            return;
+        }
+
+        $raw_list = sanitize_textarea_field(wp_unslash($_POST['trusted_origins_list']));
+        $parsed = Utilities::parse_trusted_origins_list($raw_list);
+
+        if ($mode === 'allowlist' && $parsed['valid'] === []) {
+            $this->set_trusted_origins_notice(
+                $post_id,
+                'error',
+                __('Allowlist mode requires at least one valid origin.', 'mksddn-forms-handler')
+            );
+        } elseif ($parsed['invalid'] !== []) {
+            $this->set_trusted_origins_notice(
+                $post_id,
+                'warning',
+                sprintf(
+                    /* translators: %s: comma-separated invalid origin strings */
+                    __('Some trusted origins were skipped because they are invalid: %s', 'mksddn-forms-handler'),
+                    implode(', ', $parsed['invalid'])
+                )
+            );
+        }
+
+        update_post_meta($post_id, '_trusted_origins_list', implode("\n", $parsed['valid']));
+        Utilities::clear_form_config_cache($post_id);
+        // phpcs:enable WordPress.Security.NonceVerification.Missing
+    }
+
+    /**
+     * Transient key for trusted origins save notices
+     *
+     * @param int $post_id Form post ID
+     */
+    private function get_trusted_origins_notice_key(int $post_id): string {
+        return 'mksddn_fh_trusted_origins_notice_' . $post_id . '_' . get_current_user_id();
+    }
+
+    /**
+     * Store trusted origins admin notice
+     *
+     * @param int    $post_id Form post ID
+     * @param string $type    notice-success|notice-error|notice-warning
+     * @param string $message Notice message
+     */
+    private function set_trusted_origins_notice(int $post_id, string $type, string $message): void {
+        set_transient(
+            $this->get_trusted_origins_notice_key($post_id),
+            [
+                'type'    => $type,
+                'message' => $message,
+            ],
+            60
+        );
+    }
+
+    /**
+     * Get and remove trusted origins notice for display
+     *
+     * @param int $post_id Form post ID
+     * @return array{type: string, message: string}|null
+     */
+    private function get_and_clear_trusted_origins_notice(int $post_id): ?array {
+        $key = $this->get_trusted_origins_notice_key($post_id);
+        $notice = get_transient($key);
+        if ($notice) {
+            delete_transient($key);
+        }
+
+        if (!is_array($notice) || empty($notice['message'])) {
+            return null;
+        }
+
+        $type = in_array($notice['type'] ?? '', ['success', 'error', 'warning'], true) ? $notice['type'] : 'warning';
+
+        return [
+            'type'    => $type,
+            'message' => (string) $notice['message'],
+        ];
     }
 
     /**
