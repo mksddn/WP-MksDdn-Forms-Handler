@@ -336,6 +336,7 @@ class SpamProtection {
             );
         }
 
+        // phpcs:ignore PluginCheck.CodeAnalysis.Offloading.OffloadedContent -- Cloudflare Turnstile server-side verification API, not offloaded plugin assets.
         $response = wp_remote_post(
             'https://challenges.cloudflare.com/turnstile/v0/siteverify',
             [
@@ -641,11 +642,12 @@ class SpamProtection {
             return;
         }
 
+        // phpcs:ignore PluginCheck.CodeAnalysis.EnqueuedResourceOffloading.OffloadedContent -- Cloudflare Turnstile CAPTCHA widget from official CDN.
         wp_enqueue_script(
             'cloudflare-turnstile',
             'https://challenges.cloudflare.com/turnstile/v0/api.js',
             [],
-            null,
+            MKSDDN_FORMS_HANDLER_VERSION,
             [
                 'strategy'  => 'async',
                 'in_footer' => true,

@@ -60,14 +60,14 @@ class SpamSettingsAdmin {
         if (isset($_POST['global_rate_limit_max'])) {
             update_option(
                 'mksddn_fh_global_rate_limit_max',
-                max(1, (int) wp_unslash($_POST['global_rate_limit_max']))
+                max(1, absint(wp_unslash($_POST['global_rate_limit_max'])))
             );
         }
 
         if (isset($_POST['global_rate_limit_window'])) {
             update_option(
                 'mksddn_fh_global_rate_limit_window',
-                max(60, (int) wp_unslash($_POST['global_rate_limit_window']))
+                max(60, absint(wp_unslash($_POST['global_rate_limit_window'])))
             );
         }
 
