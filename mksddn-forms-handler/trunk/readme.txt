@@ -40,6 +40,8 @@ MksDdn Forms Handler is a powerful and flexible form processing plugin that allo
 * Proper error handling
 * Extensible logging via WordPress action hooks
 
+Developer documentation, REST API reference, field types, and external services are in the FAQ section below.
+
 == Installation ==
 
 1. Upload the plugin files to the `/wp-content/plugins/mksddn-forms-handler` directory, or install the plugin through the WordPress plugins screen directly.
@@ -47,7 +49,75 @@ MksDdn Forms Handler is a powerful and flexible form processing plugin that allo
 3. Use the **Forms** and **Submissions** admin menus to create forms and review submissions
 4. Use the shortcode `[mksddn_fh_form id="form_id"]` or `[mksddn_fh_form slug="form-slug"]` to display forms on your pages
 
-== For Developers ==
+== Frequently Asked Questions ==
+
+= How do I create my first form? =
+
+1. Go to Forms > Add New in your WordPress admin
+2. Fill in the form title and description
+3. Configure the form settings in the meta box
+4. Add form fields in JSON format
+5. Set up delivery methods (email, Telegram, Google Sheets)
+6. Publish the form and use the shortcode to display it
+
+= How do I set up Telegram notifications? =
+
+1. Create a Telegram bot using @BotFather
+2. Get your bot token
+3. Find your chat ID using one of these methods:
+   * **Method 1 - Using getUpdates API**: Send a message to your bot (e.g., `/start`), then call:
+     ```
+     https://api.telegram.org/bot{your_bot_token}/getUpdates
+     ```
+     Look for the `"chat"` object in the JSON response and find the `"id"` field. Note: Group chat IDs are typically negative numbers.
+   * **Method 2 - Using helper bots**: Add @userinfobot, @ShowJsonBot, or @getidsbot to your chat - they will display the chat ID automatically
+   * **Method 3 - For groups**: Add your bot to the group, send a message, then use getUpdates API to retrieve the group chat ID
+4. Add the bot token and chat IDs in the form settings
+5. Enable "Send to Telegram" option
+
+**Custom Telegram Templates:**
+You can create custom templates for Telegram notifications with placeholders:
+* System placeholders: `{form_title}`, `{date}`, `{time}`, `{datetime}`, `{page_url}`
+* Field placeholders: `{field:field_name}` for field value, `{field_label:field_name}` for field label
+* Supports HTML formatting: `b`, `i`, `u`, `s`, `code`, `pre`, `a`
+Enable "Use Custom Template" in Telegram settings and enter your template in the textarea.
+
+= How do I integrate with Google Sheets? =
+
+1. Set up Google Sheets API credentials
+2. Create a spreadsheet and get the ID from the URL
+3. Configure the sheet name and API credentials
+4. Enable "Send to Google Sheets" option
+
+= Can I use this with custom themes? =
+
+Yes! The plugin is designed to work with any WordPress theme. Forms are displayed using shortcodes and can be styled with CSS.
+
+= Is the plugin secure? =
+
+Yes, the plugin includes comprehensive security measures:
+* Input validation and sanitization
+* Nonce verification
+* Capability checks
+* Rate limiting protection
+* SQL injection prevention
+
+= Can I submit forms via AJAX? =
+
+Yes! The plugin provides REST API endpoints for AJAX form submissions. Check the REST API section for details.
+
+= Can I use custom forms from my theme without configuring fields? =
+
+Yes! Enable "Accept any fields from frontend" in form settings (Advanced Settings section). This allows submitting any field names without defining them in Fields Configuration - perfect for custom forms where you control the HTML. All fields are still sanitized, but type validation is skipped. You can also use the `mksddn_fh_allowed_fields` filter in your theme's functions.php to dynamically allow specific fields or all fields (`return ['*']`).
+
+= Can I redirect users after form submission? =
+
+Yes! Configure a redirect URL in form settings (Display tab). You can use:
+* Absolute URLs (same domain only for security)
+* Relative paths (e.g., `/thank-you`)
+External domains are blocked by default for security. To allow external redirects, use the `mksddn_fh_allowed_redirect_hosts` filter to whitelist specific domains.
+
+= For Developers =
 
 = Architecture =
 
@@ -281,7 +351,7 @@ Submit forms via REST API without page reload:
 `mksddn_forms_handler_log_security` - Fired when unauthorized fields are detected (hook for custom logging; no built-in log storage)
 `mksddn_forms_handler_log_submission` - Fired when form submission is processed (hook for custom logging)
 
-== REST API ==
+= REST API =
 
 Namespace: `mksddn-forms-handler/v1`
 
@@ -389,75 +459,7 @@ Additional layer on top of nonce, honeypot, and rate limiting. Configure per for
       -F 'attachments[]=@/path/to/file2.png' \
       'https://example.com/wp-json/mksddn-forms-handler/v1/forms/contact/submit'
 
-== Frequently Asked Questions ==
-
-= How do I create my first form? =
-
-1. Go to Forms > Add New in your WordPress admin
-2. Fill in the form title and description
-3. Configure the form settings in the meta box
-4. Add form fields in JSON format
-5. Set up delivery methods (email, Telegram, Google Sheets)
-6. Publish the form and use the shortcode to display it
-
-= How do I set up Telegram notifications? =
-
-1. Create a Telegram bot using @BotFather
-2. Get your bot token
-3. Find your chat ID using one of these methods:
-   * **Method 1 - Using getUpdates API**: Send a message to your bot (e.g., `/start`), then call:
-     ```
-     https://api.telegram.org/bot{your_bot_token}/getUpdates
-     ```
-     Look for the `"chat"` object in the JSON response and find the `"id"` field. Note: Group chat IDs are typically negative numbers.
-   * **Method 2 - Using helper bots**: Add @userinfobot, @ShowJsonBot, or @getidsbot to your chat - they will display the chat ID automatically
-   * **Method 3 - For groups**: Add your bot to the group, send a message, then use getUpdates API to retrieve the group chat ID
-4. Add the bot token and chat IDs in the form settings
-5. Enable "Send to Telegram" option
-
-**Custom Telegram Templates:**
-You can create custom templates for Telegram notifications with placeholders:
-* System placeholders: `{form_title}`, `{date}`, `{time}`, `{datetime}`, `{page_url}`
-* Field placeholders: `{field:field_name}` for field value, `{field_label:field_name}` for field label
-* Supports HTML formatting: `b`, `i`, `u`, `s`, `code`, `pre`, `a`
-Enable "Use Custom Template" in Telegram settings and enter your template in the textarea.
-
-= How do I integrate with Google Sheets? =
-
-1. Set up Google Sheets API credentials
-2. Create a spreadsheet and get the ID from the URL
-3. Configure the sheet name and API credentials
-4. Enable "Send to Google Sheets" option
-
-= Can I use this with custom themes? =
-
-Yes! The plugin is designed to work with any WordPress theme. Forms are displayed using shortcodes and can be styled with CSS.
-
-= Is the plugin secure? =
-
-Yes, the plugin includes comprehensive security measures:
-* Input validation and sanitization
-* Nonce verification
-* Capability checks
-* Rate limiting protection
-* SQL injection prevention
-
-= Can I submit forms via AJAX? =
-
-Yes! The plugin provides REST API endpoints for AJAX form submissions. Check the REST API section for details.
-
-= Can I use custom forms from my theme without configuring fields? =
-
-Yes! Enable "Accept any fields from frontend" in form settings (Advanced Settings section). This allows submitting any field names without defining them in Fields Configuration - perfect for custom forms where you control the HTML. All fields are still sanitized, but type validation is skipped. You can also use the `mksddn_fh_allowed_fields` filter in your theme's functions.php to dynamically allow specific fields or all fields (`return ['*']`).
-
-= Can I redirect users after form submission? =
-
-Yes! Configure a redirect URL in form settings (Display tab). You can use:
-* Absolute URLs (same domain only for security)
-* Relative paths (e.g., `/thank-you`)
-External domains are blocked by default for security. To allow external redirects, use the `mksddn_fh_allowed_redirect_hosts` filter to whitelist specific domains.
-
-== Supported Field Types ==
+= Supported Field Types =
 
 Fields are configured as JSON in the form settings. Supported types:
 
@@ -585,6 +587,29 @@ The `array_of_objects` type allows you to define arrays with nested field valida
         }
       ]
     }
+
+= External Services =
+
+This plugin can connect to external services when explicitly enabled in a form's settings:
+
+= Google OAuth2 and Google Sheets API =
+* **Purpose**: Authenticate and append rows to a spreadsheet
+* **When**: Only if "Send to Google Sheets" is enabled for a form and valid credentials are provided
+* **Data sent**: Form fields configured for the form, form title, timestamp
+* **Endpoints used**: `https://oauth2.googleapis.com/token`, `https://sheets.googleapis.com/v4/spreadsheets/...`
+* **Terms**: https://policies.google.com/terms
+* **Privacy**: https://policies.google.com/privacy
+
+= Telegram Bot API =
+* **Purpose**: Send a message with submission content to specified chat(s)
+* **When**: Only if "Send to Telegram" is enabled for a form and bot token + chat IDs are configured
+* **Data sent**: Form fields configured for the form, form title
+* **Endpoint used**: `https://api.telegram.org/bot<token>/sendMessage`
+* **Terms/Privacy**: https://telegram.org/privacy
+
+= Privacy Notes =
+* No IP address or user agent is transmitted to external services; only form field values are sent
+* External delivery is opt-in per form and disabled by default
 
 == Upgrade Notice ==
 
@@ -817,26 +842,3 @@ New feature: Template functions for custom forms integration. Bug fix: Improved 
 * Custom post types for forms and submissions
 * Security measures and validation
 * Clean, maintainable code structure
-
-== External Services ==
-
-This plugin can connect to external services when explicitly enabled in a form's settings:
-
-= Google OAuth2 and Google Sheets API =
-* **Purpose**: Authenticate and append rows to a spreadsheet
-* **When**: Only if "Send to Google Sheets" is enabled for a form and valid credentials are provided
-* **Data sent**: Form fields configured for the form, form title, timestamp
-* **Endpoints used**: `https://oauth2.googleapis.com/token`, `https://sheets.googleapis.com/v4/spreadsheets/...`
-* **Terms**: https://policies.google.com/terms
-* **Privacy**: https://policies.google.com/privacy
-
-= Telegram Bot API =
-* **Purpose**: Send a message with submission content to specified chat(s)
-* **When**: Only if "Send to Telegram" is enabled for a form and bot token + chat IDs are configured
-* **Data sent**: Form fields configured for the form, form title
-* **Endpoint used**: `https://api.telegram.org/bot<token>/sendMessage`
-* **Terms/Privacy**: https://telegram.org/privacy
-
-= Privacy Notes =
-* No IP address or user agent is transmitted to external services; only form field values are sent
-* External delivery is opt-in per form and disabled by default
