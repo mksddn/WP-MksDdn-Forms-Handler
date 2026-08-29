@@ -30,7 +30,7 @@ if ($mksddn_fh_user_id) {
     delete_transient('mksddn_fh_fields_config_json_value_' . $mksddn_fh_user_id);
 }
 
-// Intentionally keep CPT data (mksddn_fh_forms, mksddn_fh_form_submissions) to avoid data loss
+// Intentionally keep CPT data (mksddn_fh_forms, mksddn_fh_submits) to avoid data loss
 // If in the future a data deletion option is introduced, handle it here conditionally.
 
 

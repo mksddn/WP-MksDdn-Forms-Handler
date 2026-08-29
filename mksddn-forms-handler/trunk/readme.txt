@@ -38,13 +38,13 @@ MksDdn Forms Handler is a powerful and flexible form processing plugin that allo
 * GPL v2+ licensed
 * Clean, maintainable code
 * Proper error handling
-* Comprehensive logging
+* Extensible logging via WordPress action hooks
 
 == Installation ==
 
 1. Upload the plugin files to the `/wp-content/plugins/mksddn-forms-handler` directory, or install the plugin through the WordPress plugins screen directly.
 2. Activate the plugin through the 'Plugins' screen in WordPress
-3. Use the Forms menu to create and manage your forms
+3. Use the **Forms** and **Submissions** admin menus to create forms and review submissions
 4. Use the shortcode `[mksddn_fh_form id="form_id"]` or `[mksddn_fh_form slug="form-slug"]` to display forms on your pages
 
 == For Developers ==
@@ -56,11 +56,11 @@ MksDdn Forms Handler is a powerful and flexible form processing plugin that allo
 **Core Components (includes/)**
 * `PostTypes` - custom post types registration (`mksddn_fh_forms`, `mksddn_fh_submits`)
 * `MetaBoxes` - form settings and submission data management
-* `FormsHandler` - main processing logic with REST API support
+* `FormsHandler` - main processing logic, REST API, per-form rate limiting, delivery orchestration
 * `Shortcodes` - form rendering with AJAX functionality
 * `AdminColumns` - admin interface customization
 * `ExportHandler` - CSV export with filtering
-* `Security` - rate limiting and security checks
+* `Security` - admin restrictions for submissions (blocks manual create/edit in wp-admin)
 * `SpamProtection` - global rate limit, heuristics, Turnstile verification
 * `SpamSettingsAdmin` - global spam protection settings page
 * `Utilities` - helper functions and form creation utilities
@@ -68,15 +68,19 @@ MksDdn Forms Handler is a powerful and flexible form processing plugin that allo
 * `Assets` - asset registration and conditional enqueuing
 * `Template Functions` - global functions for PHP template integration
 
+**Traits (includes/traits/)**
+* `TelegramFormatterTrait` - HTML escaping and formatting for Telegram messages
+
 **Handlers (handlers/)**
 * `TelegramHandler` - Telegram Bot API integration
 * `GoogleSheetsHandler` - Google Sheets API integration
 * `TemplateParser` - placeholder parsing for Telegram and user reply emails
 
 **Assets (assets/)**
-* `css/` - Admin and frontend styles
-* `js/` - Admin and form scripts
-* `images/` - Plugin images
+* `css/admin.css` - Admin styles (form settings, export, Google Sheets and spam settings pages)
+* `js/admin.js` - Admin scripts (tabs, previews, user reply and trusted origins UI)
+* `js/form.js` - Frontend AJAX form submission (enqueued by shortcode or template helpers)
+* `js/turnstile-loader.js` - Local loader for Cloudflare Turnstile widget script
 
 = Technology Stack =
 
@@ -104,7 +108,9 @@ MksDdn Forms Handler is a powerful and flexible form processing plugin that allo
     │   ├── class-spam-settings-admin.php
     │   ├── class-google-sheets-admin.php
     │   ├── class-assets.php
-    │   └── template-functions.php
+    │   ├── template-functions.php
+    │   └── traits/
+    │       └── trait-telegram-formatter.php
     ├── handlers/                     # External service handlers
     │   ├── class-telegram-handler.php
     │   ├── class-google-sheets-handler.php
@@ -114,8 +120,11 @@ MksDdn Forms Handler is a powerful and flexible form processing plugin that allo
     │   └── custom-form-examples.php
     ├── assets/                       # Static resources
     │   ├── css/
-    │   ├── js/
-    │   └── images/
+    │   │   └── admin.css
+    │   └── js/
+    │       ├── admin.js
+    │       ├── form.js
+    │       └── turnstile-loader.js
     ├── languages/                    # Translations
     └── uninstall.php                # Cleanup script
 
@@ -145,9 +154,12 @@ Integrate pre-built forms in theme templates:
 * `mksddn_fh_get_rest_endpoint($slug)` - get REST API endpoint for AJAX
 * `mksddn_fh_form_has_files($slug)` - check for file fields
 * `mksddn_fh_enqueue_form_script()` - enqueue AJAX script
+* `mksddn_fh_render_turnstile($slug)` - output Turnstile widget markup (when required)
+* `mksddn_fh_enqueue_turnstile()` - enqueue Turnstile loader script
+* `mksddn_fh_form_requires_turnstile($slug)` - check if form requires Turnstile
 
 **Accept Any Fields (Advanced):**
-For custom forms where you control field names in templates, enable "Accept any fields from frontend" in form settings to skip field validation. This allows submitting ANY field names without defining them in Fields Configuration. All fields are still sanitized but type validation is skipped.
+For custom forms where you control field names in templates, enable "Accept any fields from frontend" in form settings (Advanced tab) to skip field validation. Stored as post meta `_allow_any_fields` (`0` / `1`). This allows submitting ANY field names without defining them in Fields Configuration. All fields are still sanitized but type validation is skipped.
 
 See `/templates/custom-form-examples.php` for detailed examples.
 
@@ -203,9 +215,8 @@ Submit forms via REST API without page reload:
 **Compatibility**
 * WordPress 5.3+ minimum
 * PHP 8.0+ minimum
-* Multisite support
-* RTL support
-* Accessibility standards (WCAG)
+* Works on WordPress multisite (no network-specific settings UI)
+* Frontend forms use semantic HTML and ARIA attributes (aria-label, aria-busy, role="radiogroup"); theme styling and RTL layout depend on the active theme
 
 = WordPress Hooks & Filters =
 
@@ -224,7 +235,21 @@ Submit forms via REST API without page reload:
 
 `mksddn_fh_allowed_redirect_hosts` - Whitelist external domains for redirect URLs
 
+    add_filter('mksddn_fh_allowed_redirect_hosts', function($hosts) {
+        return array_merge($hosts, ['example.com', 'trusted-partner.com']);
+    });
+
 `mksddn_fh_max_html_template_size` - Maximum size in bytes for uploaded user reply HTML templates (default: 102400)
+
+`mksddn_fh_max_template_size` - Maximum Telegram custom template size in characters (default: 10000)
+
+`mksddn_forms_telegram_message` - Modify the Telegram message before sending
+
+    add_filter('mksddn_forms_telegram_message', function($message, $form_data, $form_title, $fields_config) {
+        return $message . "\n— Sent via site";
+    }, 10, 4);
+
+`mksddn_fh_turnstile_verify_url` - Override the Cloudflare Turnstile siteverify endpoint URL
 
 `mksddn_fh_trusted_origins_bypass` - Skip trusted origins validation for a request (default: false)
 
@@ -251,15 +276,10 @@ Submit forms via REST API without page reload:
 
 `mksddn_fh_client_ip` - Override client IP used for rate limiting and Turnstile (default: `REMOTE_ADDR`). Use this behind Cloudflare/a reverse proxy after you restore the real visitor IP; do not trust `X-Forwarded-For` from the client.
 
-    add_filter('mksddn_fh_allowed_redirect_hosts', function($hosts) {
-        // Allow specific external domains for redirects
-        return array_merge($hosts, ['example.com', 'trusted-partner.com']);
-    });
-
 **Actions:**
 
-`mksddn_forms_handler_log_security` - Fired when unauthorized fields are detected
-`mksddn_forms_handler_log_submission` - Fired when form submission is processed
+`mksddn_forms_handler_log_security` - Fired when unauthorized fields are detected (hook for custom logging; no built-in log storage)
+`mksddn_forms_handler_log_submission` - Fired when form submission is processed (hook for custom logging)
 
 == REST API ==
 
@@ -306,8 +326,8 @@ Global settings: **Forms → Spam Protection**. Per-form overrides: **Advanced**
 
 **Spam heuristics**
 * Global master switch + per-form mode: inherit / on / off
-* Detects common bot patterns: random Latin-only names (15+ chars), selecting too many options on a multi-select or checkbox group
-* Does not flag `array_of_objects`, file fields, or free-text values
+* Detects common bot patterns: Latin-only name-like strings (15+ chars) with low vowel ratio or long consonant runs; selecting too many options on a multi-select or checkbox group (threshold filterable, default 7)
+* Does not flag `array_of_objects`, file fields, or free-text values outside configured name fields
 * Blocked requests return `spam_detected` (HTTP 400)
 
 **Cloudflare Turnstile**
@@ -624,7 +644,7 @@ New feature: Template functions for custom forms integration. Bug fix: Improved 
 * Feature: Spam Protection settings page (Forms → Spam Protection) — global rate limit, heuristics master switch, Turnstile keys
 * Feature: Per-form Advanced options — Require Turnstile, spam heuristics (inherit / on / off)
 * Feature: Cloudflare Turnstile verification for REST and admin-post submissions
-* Feature: Built-in spam heuristics (random Latin names, excessive multi-select)
+* Feature: Built-in spam heuristics (gibberish Latin name detection, excessive multi-select)
 * Feature: Global rate limit across all forms per IP (default off)
 * Filter: `mksddn_fh_before_submit` — block submission before delivery channels run
 * Filter: `mksddn_fh_is_spam` — custom spam rules when heuristics are enabled
