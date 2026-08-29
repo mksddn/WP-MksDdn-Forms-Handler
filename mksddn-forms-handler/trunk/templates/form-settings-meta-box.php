@@ -399,15 +399,15 @@
                 </td>
             </tr>
             <tr>
-                <th scope="row">
-                    <label>
-                        <input type="checkbox" name="require_turnstile" id="require_turnstile" value="1" <?php checked($require_turnstile, '1'); ?> />
-                        <?php echo esc_html__( 'Require Cloudflare Turnstile', 'mksddn-forms-handler' ); ?>
-                    </label>
-                </th>
+                <th scope="row"><label for="require_turnstile"><?php echo esc_html__( 'Cloudflare Turnstile', 'mksddn-forms-handler' ); ?></label></th>
                 <td>
-                    <p class="description"><?php echo esc_html__( 'Requires Turnstile keys in Forms → Spam Protection. Adds widget to shortcode forms; custom REST forms must send cf-turnstile-response or mksddn_fh_turnstile_response.', 'mksddn-forms-handler' ); ?></p>
-                    <?php if ($require_turnstile === '1' && !\MksDdn\FormsHandler\SpamProtection::are_turnstile_keys_configured()) : ?>
+                    <select name="require_turnstile" id="require_turnstile" class="regular-text">
+                        <option value="inherit" <?php selected($require_turnstile, 'inherit'); ?>><?php echo esc_html__( 'Inherit global setting', 'mksddn-forms-handler' ); ?></option>
+                        <option value="on" <?php selected($require_turnstile, 'on'); ?>><?php echo esc_html__( 'On', 'mksddn-forms-handler' ); ?></option>
+                        <option value="off" <?php selected($require_turnstile, 'off'); ?>><?php echo esc_html__( 'Off', 'mksddn-forms-handler' ); ?></option>
+                    </select>
+                    <p class="description"><?php echo esc_html__( 'Requires Turnstile keys in Forms → Spam Protection. Shortcode forms render the widget automatically; custom REST forms must send cf-turnstile-response or mksddn_fh_turnstile_response.', 'mksddn-forms-handler' ); ?></p>
+                    <?php if (\MksDdn\FormsHandler\SpamProtection::is_turnstile_mode_enabled(['require_turnstile' => $require_turnstile]) && !\MksDdn\FormsHandler\SpamProtection::are_turnstile_keys_configured()) : ?>
                         <p class="description" style="color:#d63638;"><?php echo esc_html__( 'Turnstile will not be enforced until both site key and secret key are saved.', 'mksddn-forms-handler' ); ?></p>
                     <?php endif; ?>
                 </td>

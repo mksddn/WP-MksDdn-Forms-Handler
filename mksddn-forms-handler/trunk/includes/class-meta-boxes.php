@@ -119,7 +119,9 @@ class MetaBoxes {
             $trusted_origins_fallback_referer = '1';
         }
         $trusted_origins_admin_notice = $this->get_and_clear_trusted_origins_notice($post->ID);
-        $require_turnstile = get_post_meta($post->ID, '_require_turnstile', true);
+        $require_turnstile = SpamProtection::normalize_turnstile_mode(
+            (string) get_post_meta($post->ID, '_require_turnstile', true)
+        );
         $spam_heuristics = get_post_meta($post->ID, '_spam_heuristics', true);
         if ($spam_heuristics === '') {
             $spam_heuristics = 'inherit';
@@ -472,7 +474,13 @@ class MetaBoxes {
 
         $this->save_trusted_origins_settings($post_id);
 
-        update_post_meta($post_id, '_require_turnstile', isset($_POST['require_turnstile']) ? '1' : '0');
+        if (isset($_POST['require_turnstile'])) {
+            $require_turnstile = sanitize_key(wp_unslash($_POST['require_turnstile']));
+            if (!in_array($require_turnstile, ['inherit', 'on', 'off'], true)) {
+                $require_turnstile = 'inherit';
+            }
+            update_post_meta($post_id, '_require_turnstile', $require_turnstile);
+        }
 
         if (isset($_POST['spam_heuristics'])) {
             $spam_heuristics = sanitize_key(wp_unslash($_POST['spam_heuristics']));

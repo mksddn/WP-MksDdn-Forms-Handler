@@ -76,12 +76,60 @@ class SpamProtection {
     }
 
     /**
+     * Whether Turnstile is enabled globally by default
+     */
+    public static function is_global_turnstile_enabled(): bool {
+        return get_option('mksddn_fh_turnstile_enabled', '0') === '1';
+    }
+
+    /**
+     * Normalize stored Turnstile mode (supports legacy 0/1 values)
+     *
+     * @param string $mode Raw stored mode
+     * @return string inherit|on|off
+     */
+    public static function normalize_turnstile_mode(string $mode): string {
+        if ($mode === '1') {
+            return 'on';
+        }
+
+        if ($mode === '0' || $mode === '') {
+            return 'inherit';
+        }
+
+        if (in_array($mode, ['inherit', 'on', 'off'], true)) {
+            return $mode;
+        }
+
+        return 'inherit';
+    }
+
+    /**
+     * Whether Turnstile is enabled for a form (ignores key configuration)
+     *
+     * @param array $form_config Cached form configuration
+     */
+    public static function is_turnstile_mode_enabled(array $form_config): bool {
+        $mode = self::normalize_turnstile_mode((string) ($form_config['require_turnstile'] ?? 'inherit'));
+
+        if ($mode === 'on') {
+            return true;
+        }
+
+        if ($mode === 'off') {
+            return false;
+        }
+
+        return self::is_global_turnstile_enabled();
+    }
+
+    /**
      * Whether Turnstile is required for a form
      *
      * @param array $form_config Cached form configuration
      */
     public static function is_turnstile_required(array $form_config): bool {
-        if (($form_config['require_turnstile'] ?? '0') !== '1') {
+        if (!self::is_turnstile_mode_enabled($form_config)) {
             return false;
         }
 

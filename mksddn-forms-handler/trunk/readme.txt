@@ -203,7 +203,7 @@ Submit forms via REST API without page reload:
 * Capability checks
 * Rate limiting (1 request per 10 seconds per IP per form)
 * Optional global rate limit across all forms (Forms → Spam Protection)
-* Optional spam heuristics and Cloudflare Turnstile (per form + global keys)
+* Optional spam heuristics and Cloudflare Turnstile (global defaults + per-form inherit / on / off)
 * Optional trusted origins check (Origin/Referer) per form — off by default
 
 **Performance**
@@ -332,7 +332,8 @@ Global settings: **Forms → Spam Protection**. Per-form overrides: **Advanced**
 
 **Cloudflare Turnstile**
 * Configure both site key and secret key globally — captcha is not enforced until both are saved
-* Enable per form: **Require Cloudflare Turnstile** in Advanced settings
+* Global default: **Require Turnstile by default** on the Spam Protection page
+* Per-form mode in Advanced settings: inherit / on / off (legacy per-form checkbox values `1`/`0` map to on/inherit)
 * Shortcode forms render the widget automatically
 * Custom REST/AJAX forms must send `cf-turnstile-response` or `mksddn_fh_turnstile_response` in the request body
 * GET form meta includes `require_turnstile` and `turnstile_site_key` when enabled

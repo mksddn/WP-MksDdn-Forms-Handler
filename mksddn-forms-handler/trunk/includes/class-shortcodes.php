@@ -51,7 +51,11 @@ class Shortcodes {
         $success_message_text = get_post_meta($form->ID, '_success_message_text', true);
         $redirect_url = get_post_meta($form->ID, '_redirect_url', true);
         $form_custom_classes = get_post_meta($form->ID, '_form_custom_classes', true);
-        $require_turnstile = get_post_meta($form->ID, '_require_turnstile', true) === '1';
+        $require_turnstile = SpamProtection::is_turnstile_required([
+            'require_turnstile' => SpamProtection::normalize_turnstile_mode(
+                (string) get_post_meta($form->ID, '_require_turnstile', true)
+            ),
+        ]);
 
         // Set default success message if empty
         if (empty($success_message_text)) {
@@ -226,7 +230,7 @@ class Shortcodes {
                     </div>
                 <?php endforeach; ?>
 
-                <?php if ($require_turnstile && SpamProtection::are_turnstile_keys_configured()) : ?>
+                <?php if ($require_turnstile) : ?>
                     <div class="form-field mksddn-fh-turnstile-field">
                         <?php SpamProtection::render_turnstile_widget($form->post_name); ?>
                     </div>

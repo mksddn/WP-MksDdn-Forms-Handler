@@ -76,6 +76,11 @@ class SpamSettingsAdmin {
             isset($_POST['spam_heuristics_enabled']) ? '1' : '0'
         );
 
+        update_option(
+            'mksddn_fh_turnstile_enabled',
+            isset($_POST['turnstile_enabled']) ? '1' : '0'
+        );
+
         if (isset($_POST['turnstile_site_key'])) {
             update_option(
                 'mksddn_fh_turnstile_site_key',
@@ -118,6 +123,7 @@ class SpamSettingsAdmin {
         $global_rate_limit_max = (int) get_option('mksddn_fh_global_rate_limit_max', 20);
         $global_rate_limit_window = (int) get_option('mksddn_fh_global_rate_limit_window', 3600);
         $spam_heuristics_enabled = get_option('mksddn_fh_spam_heuristics_enabled', '0');
+        $turnstile_enabled = get_option('mksddn_fh_turnstile_enabled', '0');
         $turnstile_site_key = SpamProtection::get_turnstile_site_key();
         $turnstile_secret_key = SpamProtection::get_turnstile_secret_key();
         $turnstile_keys_incomplete = ($turnstile_site_key === '') !== ($turnstile_secret_key === '');
@@ -178,6 +184,16 @@ class SpamSettingsAdmin {
                 <h2><?php echo esc_html__('Cloudflare Turnstile', 'mksddn-forms-handler'); ?></h2>
                 <table class="form-table" role="presentation">
                     <tr>
+                        <th scope="row"><?php echo esc_html__('Require Turnstile by default', 'mksddn-forms-handler'); ?></th>
+                        <td>
+                            <label>
+                                <input type="checkbox" name="turnstile_enabled" value="1" <?php checked($turnstile_enabled, '1'); ?> />
+                                <?php echo esc_html__('Require captcha on all forms unless overridden in Advanced settings', 'mksddn-forms-handler'); ?>
+                            </label>
+                            <p class="description"><?php echo esc_html__('Forms can override this in Advanced settings (inherit / on / off). Both keys below must be saved for captcha to work.', 'mksddn-forms-handler'); ?></p>
+                        </td>
+                    </tr>
+                    <tr>
                         <th scope="row"><label for="turnstile_site_key"><?php echo esc_html__('Site key', 'mksddn-forms-handler'); ?></label></th>
                         <td>
                             <input type="text" class="regular-text code" id="turnstile_site_key" name="turnstile_site_key" value="<?php echo esc_attr($turnstile_site_key); ?>" autocomplete="off" />
@@ -187,7 +203,7 @@ class SpamSettingsAdmin {
                         <th scope="row"><label for="turnstile_secret_key"><?php echo esc_html__('Secret key', 'mksddn-forms-handler'); ?></label></th>
                         <td>
                             <input type="password" class="regular-text code" id="turnstile_secret_key" name="turnstile_secret_key" value="<?php echo esc_attr($turnstile_secret_key); ?>" autocomplete="new-password" />
-                            <p class="description"><?php echo esc_html__('Enable Turnstile per form in Advanced settings. For custom REST forms, send cf-turnstile-response or mksddn_fh_turnstile_response in the request body.', 'mksddn-forms-handler'); ?></p>
+                            <p class="description"><?php echo esc_html__('For custom REST forms, send cf-turnstile-response or mksddn_fh_turnstile_response in the request body.', 'mksddn-forms-handler'); ?></p>
                         </td>
                     </tr>
                 </table>

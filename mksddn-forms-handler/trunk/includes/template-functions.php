@@ -155,7 +155,10 @@ function mksddn_fh_form_requires_turnstile(string $form_slug): bool {
         return false;
     }
 
-    return get_post_meta($form->ID, '_require_turnstile', true) === '1'
-        && \MksDdn\FormsHandler\SpamProtection::are_turnstile_keys_configured();
+    return \MksDdn\FormsHandler\SpamProtection::is_turnstile_required([
+        'require_turnstile' => \MksDdn\FormsHandler\SpamProtection::normalize_turnstile_mode(
+            (string) get_post_meta($form->ID, '_require_turnstile', true)
+        ),
+    ]);
 }
 

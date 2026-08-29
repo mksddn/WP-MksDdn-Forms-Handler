@@ -464,8 +464,11 @@ class FormsHandler {
             'fields'     => $sanitized_fields,
         ];
 
-        $require_turnstile = get_post_meta($post->ID, '_require_turnstile', true) === '1'
-            && SpamProtection::are_turnstile_keys_configured();
+        $require_turnstile = SpamProtection::is_turnstile_required([
+            'require_turnstile' => SpamProtection::normalize_turnstile_mode(
+                (string) get_post_meta($post->ID, '_require_turnstile', true)
+            ),
+        ]);
         $data['require_turnstile'] = $require_turnstile;
         if ($require_turnstile) {
             $data['turnstile_site_key'] = SpamProtection::get_turnstile_site_key();
@@ -966,7 +969,7 @@ class FormsHandler {
                 $get_meta('_trusted_origins_mode') ?: 'off',
                 $get_meta('_trusted_origins_list')
             ),
-            'require_turnstile' => $get_meta('_require_turnstile') === '1' ? '1' : '0',
+            'require_turnstile' => SpamProtection::normalize_turnstile_mode($get_meta('_require_turnstile')),
             'spam_heuristics' => self::normalize_spam_heuristics_mode($get_meta('_spam_heuristics')),
         ];
 

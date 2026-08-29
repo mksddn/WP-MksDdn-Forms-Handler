@@ -20,6 +20,7 @@ delete_option('mksddn_fh_global_rate_limit_enabled');
 delete_option('mksddn_fh_global_rate_limit_max');
 delete_option('mksddn_fh_global_rate_limit_window');
 delete_option('mksddn_fh_spam_heuristics_enabled');
+delete_option('mksddn_fh_turnstile_enabled');
 delete_option('mksddn_fh_turnstile_site_key');
 delete_option('mksddn_fh_turnstile_secret_key');
 

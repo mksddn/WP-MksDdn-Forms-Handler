@@ -1578,6 +1578,30 @@ msgstr "Проверка captcha не пройдена. Попробуйте с�
 msgid "Require Cloudflare Turnstile"
 msgstr "Требовать Cloudflare Turnstile"
 
+#: templates/form-settings-meta-box.php:402
+msgid "Cloudflare Turnstile"
+msgstr "Cloudflare Turnstile"
+
+#: templates/form-settings-meta-box.php:409
+msgid "Requires Turnstile keys in Forms → Spam Protection. Shortcode forms render the widget automatically; custom REST forms must send cf-turnstile-response or mksddn_fh_turnstile_response."
+msgstr "Требуются ключи Turnstile в «Формы → Защита от спама». Шорткод-формы выводят виджет автоматически; для кастомных REST-форм передавайте cf-turnstile-response или mksddn_fh_turnstile_response."
+
+#: includes/class-spam-settings-admin.php:187
+msgid "Require Turnstile by default"
+msgstr "Требовать Turnstile по умолчанию"
+
+#: includes/class-spam-settings-admin.php:191
+msgid "Require captcha on all forms unless overridden in Advanced settings"
+msgstr "Требовать captcha на всех формах, если не переопределено в «Дополнительно»"
+
+#: includes/class-spam-settings-admin.php:193
+msgid "Forms can override this in Advanced settings (inherit / on / off). Both keys below must be saved for captcha to work."
+msgstr "Для каждой формы можно переопределить в «Дополнительно» (наследовать / вкл. / выкл.). Для работы captcha нужно сохранить оба ключа ниже."
+
+#: includes/class-spam-settings-admin.php:207
+msgid "For custom REST forms, send cf-turnstile-response or mksddn_fh_turnstile_response in the request body."
+msgstr "Для кастомных REST-форм передавайте cf-turnstile-response или mksddn_fh_turnstile_response в теле запроса."
+
 #: templates/form-settings-meta-box.php:419
 msgid "Inherit global setting"
 msgstr "Наследовать глобальную настройку"
@@ -1675,9 +1699,9 @@ msgstr "Site key"
 msgid "Secret key"
 msgstr "Secret key"
 
-#: includes/class-spam-settings-admin.php:190
-msgid "Enable Turnstile per form in Advanced settings. For custom REST forms, send cf-turnstile-response or mksddn_fh_turnstile_response in the request body."
-msgstr "Включайте Turnstile для каждой формы в «Дополнительно». Для кастомных REST-форм передавайте cf-turnstile-response или mksddn_fh_turnstile_response в теле запроса."
+#: includes/class-spam-settings-admin.php:207
+msgid "For custom REST forms, send cf-turnstile-response or mksddn_fh_turnstile_response in the request body."
+msgstr "Для кастомных REST-форм передавайте cf-turnstile-response или mksddn_fh_turnstile_response в теле запроса."
 
 #: includes/class-spam-settings-admin.php:195
 msgid "Save Settings"
