@@ -1582,3 +1582,11 @@ msgstr "Наследовать глобальную настройку"
 #: templates/form-settings-meta-box.php:420
 msgid "Detect bot patterns such as random Latin-only names and selecting all checkbox options at once."
 msgstr "Обнаруживать паттерны ботов: случайные латинские имена и выбор всех чекбоксов сразу."
+
+#: includes/class-spam-settings-admin.php:128
+msgid "Turnstile is not active until both the site key and the secret key are saved. Forms that require Turnstile will skip captcha until then."
+msgstr "Turnstile не активен, пока не сохранены и site key, и secret key. Формы с обязательной captcha будут пропускать проверку."
+
+#: templates/form-settings-meta-box.php:411
+msgid "Turnstile will not be enforced until both site key and secret key are saved."
+msgstr "Turnstile не будет проверяться, пока не сохранены и site key, и secret key."

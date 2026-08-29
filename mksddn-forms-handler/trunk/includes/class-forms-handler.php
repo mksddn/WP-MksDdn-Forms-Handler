@@ -281,6 +281,11 @@ class FormsHandler {
             return $origin_check;
         }
 
+        $per_form_rate = $this->enforce_per_form_rate_limit($slug);
+        if (is_wp_error($per_form_rate)) {
+            return $per_form_rate;
+        }
+
         $request_params = is_array($form_data) ? $form_data : [];
         if ($request->get_param('mksddn_fh_turnstile_response')) {
             $request_params['mksddn_fh_turnstile_response'] = $request->get_param('mksddn_fh_turnstile_response');
@@ -293,17 +298,6 @@ class FormsHandler {
         if (is_wp_error($spam_check)) {
             return $spam_check;
         }
-
-        // Simple rate limiting: 1 request per RATE_LIMIT_SECONDS per IP per form
-        $ip = SpamProtection::get_client_ip();
-        $rl_key = 'mksddn_fh_rate_' . md5($slug . '|' . $ip);
-        $last_ts = get_transient($rl_key);
-        if ($last_ts && (time() - (int)$last_ts) < self::RATE_LIMIT_SECONDS) {
-            return new \WP_Error('rate_limited', __( 'Too many requests. Please wait a few seconds.', 'mksddn-forms-handler' ), ['status' => 429]);
-        }
-
-        set_transient($rl_key, time(), 15);
-        SpamProtection::record_submission_attempt();
 
         if (!is_array($form_data)) {
             $form_data = [];
@@ -470,6 +464,13 @@ class FormsHandler {
             'fields'     => $sanitized_fields,
         ];
 
+        $require_turnstile = get_post_meta($post->ID, '_require_turnstile', true) === '1'
+            && SpamProtection::are_turnstile_keys_configured();
+        $data['require_turnstile'] = $require_turnstile;
+        if ($require_turnstile) {
+            $data['turnstile_site_key'] = SpamProtection::get_turnstile_site_key();
+        }
+
         return new \WP_REST_Response($data, 200);
     }
 
@@ -599,15 +600,13 @@ class FormsHandler {
 
         $origin_check = $this->validate_request_origin($form_config);
         if (is_wp_error($origin_check)) {
-            $error_data = $origin_check->get_error_data();
-            $error_status = isset($error_data['status']) ? (int) $error_data['status'] : 403;
-            if ($error_status < 100 || $error_status > 599) {
-                $error_status = 403;
-            }
-            wp_send_json_error([
-                'message' => $origin_check->get_error_message(),
-                'code'    => $origin_check->get_error_code(),
-            ], $error_status);
+            $this->send_json_submission_error($origin_check, 403);
+            return;
+        }
+
+        $per_form_rate = $this->enforce_per_form_rate_limit($form_id);
+        if (is_wp_error($per_form_rate)) {
+            $this->send_json_submission_error($per_form_rate, 429);
             return;
         }
 
@@ -617,28 +616,9 @@ class FormsHandler {
 
         $spam_check = SpamProtection::validate_pre_submission($form_config, $request_params, $form_id);
         if (is_wp_error($spam_check)) {
-            $error_data = $spam_check->get_error_data();
-            $error_status = isset($error_data['status']) ? (int) $error_data['status'] : 400;
-            if ($error_status < 100 || $error_status > 599) {
-                $error_status = 400;
-            }
-            wp_send_json_error([
-                'message' => $spam_check->get_error_message(),
-                'code'    => $spam_check->get_error_code(),
-            ], $error_status);
+            $this->send_json_submission_error($spam_check, 400);
             return;
         }
-
-        // Simple rate limiting per IP+form: 1 request per RATE_LIMIT_SECONDS
-        $ip = SpamProtection::get_client_ip();
-        $rl_key = 'mksddn_fh_rate_' . md5($form_id . '|' . $ip);
-        $last_ts = get_transient($rl_key);
-        if ($last_ts && (time() - (int)$last_ts) < self::RATE_LIMIT_SECONDS) {
-            wp_die( esc_html__( 'Too many requests. Please wait a few seconds.', 'mksddn-forms-handler' ) );
-        }
-
-        set_transient($rl_key, time(), 15);
-        SpamProtection::record_submission_attempt();
         
         // Check if allow_any_fields is enabled
         $allow_any_fields = get_post_meta($form_config['form_id'], '_allow_any_fields', true);
@@ -658,8 +638,7 @@ class FormsHandler {
         if ($allow_any_fields === '1') {
             // Accept all fields from POST
             foreach ($_POST as $field_name => $value) {
-                // Skip system fields
-                if (in_array($field_name, ['form_nonce', 'action', 'form_id', 'mksddn_fh_hp', '_wp_http_referer'], true)) {
+                if (SpamProtection::is_internal_field((string) $field_name)) {
                     continue;
                 }
                 $unslashed = wp_unslash($value); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
@@ -695,6 +674,8 @@ class FormsHandler {
                 $email_attachments = $files_result['attachments'];
             }
         }
+
+        $form_data = SpamProtection::strip_internal_fields($form_data);
 
         if (!$form_id || (!$form_data && empty($email_attachments))) {
             wp_die( esc_html__( 'Invalid form data', 'mksddn-forms-handler' ) );
@@ -2002,6 +1983,51 @@ class FormsHandler {
         }
 
         return $submission_id;
+    }
+
+    /**
+     * Per-form rate limit: 1 request per RATE_LIMIT_SECONDS per IP
+     *
+     * @param string $form_key Form slug or ID used in the rate-limit bucket
+     * @return \WP_Error|true
+     */
+    private function enforce_per_form_rate_limit(string $form_key): \WP_Error|true {
+        $ip = SpamProtection::get_client_ip();
+        $rl_key = 'mksddn_fh_rate_' . md5($form_key . '|' . $ip);
+        $last_ts = get_transient($rl_key);
+        if ($last_ts && (time() - (int) $last_ts) < self::RATE_LIMIT_SECONDS) {
+            return new \WP_Error(
+                'rate_limited',
+                __( 'Too many requests. Please wait a few seconds.', 'mksddn-forms-handler' ),
+                ['status' => 429]
+            );
+        }
+
+        set_transient($rl_key, time(), 15);
+
+        return true;
+    }
+
+    /**
+     * Send a JSON error for admin-post submissions
+     *
+     * @param \WP_Error $error          Error to send
+     * @param int       $default_status Fallback HTTP status
+     */
+    private function send_json_submission_error(\WP_Error $error, int $default_status): void {
+        $error_data = $error->get_error_data();
+        $error_status = isset($error_data['status']) ? (int) $error_data['status'] : $default_status;
+        if ($error_status < 100 || $error_status > 599) {
+            $error_status = $default_status;
+        }
+
+        wp_send_json_error(
+            [
+                'message' => $error->get_error_message(),
+                'code'    => $error->get_error_code(),
+            ],
+            $error_status
+        );
     }
     
     /**

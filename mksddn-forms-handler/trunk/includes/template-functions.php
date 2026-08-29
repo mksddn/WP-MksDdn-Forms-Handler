@@ -156,6 +156,6 @@ function mksddn_fh_form_requires_turnstile(string $form_slug): bool {
     }
 
     return get_post_meta($form->ID, '_require_turnstile', true) === '1'
-        && \MksDdn\FormsHandler\SpamProtection::get_turnstile_site_key() !== '';
+        && \MksDdn\FormsHandler\SpamProtection::are_turnstile_keys_configured();
 }
 

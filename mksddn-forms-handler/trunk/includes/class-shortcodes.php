@@ -226,7 +226,7 @@ class Shortcodes {
                     </div>
                 <?php endforeach; ?>
 
-                <?php if ($require_turnstile && SpamProtection::get_turnstile_site_key() !== '') : ?>
+                <?php if ($require_turnstile && SpamProtection::are_turnstile_keys_configured()) : ?>
                     <div class="form-field mksddn-fh-turnstile-field">
                         <?php SpamProtection::render_turnstile_widget($form->post_name); ?>
                     </div>

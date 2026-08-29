@@ -100,6 +100,8 @@ MksDdn Forms Handler is a powerful and flexible form processing plugin that allo
     │   ├── class-export-handler.php
     │   ├── class-security.php
     │   ├── class-utilities.php
+    │   ├── class-spam-protection.php
+    │   ├── class-spam-settings-admin.php
     │   ├── class-google-sheets-admin.php
     │   ├── class-assets.php
     │   └── template-functions.php
@@ -247,6 +249,8 @@ Submit forms via REST API without page reload:
 
 `mksddn_fh_spam_multi_select_threshold` - Minimum selected options count to treat as spam (default: 7)
 
+`mksddn_fh_client_ip` - Override client IP used for rate limiting and Turnstile (default: `REMOTE_ADDR`). Use this behind Cloudflare/a reverse proxy after you restore the real visitor IP; do not trust `X-Forwarded-For` from the client.
+
     add_filter('mksddn_fh_allowed_redirect_hosts', function($hosts) {
         // Allow specific external domains for redirects
         return array_merge($hosts, ['example.com', 'trusted-partner.com']);
@@ -273,7 +277,7 @@ Namespace: `mksddn-forms-handler/v1`
 = Get Single Form =
 * **Method**: GET
 * **Path**: `/wp-json/mksddn-forms-handler/v1/forms/{slug}`
-* **Response**: Includes `id`, `slug`, `title`, `submit_url`, `fields` (sanitized config)
+* **Response**: Includes `id`, `slug`, `title`, `submit_url`, `fields` (sanitized config), `require_turnstile`, and `turnstile_site_key` when Turnstile is required (never the secret key)
 
 = Submit Form =
 * **Method**: POST
@@ -302,16 +306,20 @@ Global settings: **Forms → Spam Protection**. Per-form overrides: **Advanced**
 
 **Spam heuristics**
 * Global master switch + per-form mode: inherit / on / off
-* Detects common bot patterns: random Latin-only names (15+ chars), selecting many checkbox options at once
+* Detects common bot patterns: random Latin-only names (15+ chars), selecting too many options on a multi-select or checkbox group
+* Does not flag `array_of_objects`, file fields, or free-text values
 * Blocked requests return `spam_detected` (HTTP 400)
 
 **Cloudflare Turnstile**
-* Configure site key and secret key globally
+* Configure both site key and secret key globally — captcha is not enforced until both are saved
 * Enable per form: **Require Cloudflare Turnstile** in Advanced settings
 * Shortcode forms render the widget automatically
 * Custom REST/AJAX forms must send `cf-turnstile-response` or `mksddn_fh_turnstile_response` in the request body
+* GET form meta includes `require_turnstile` and `turnstile_site_key` when enabled
 * Template helpers: `mksddn_fh_render_turnstile()`, `mksddn_fh_enqueue_turnstile()`, `mksddn_fh_form_requires_turnstile()`
 * Errors: `turnstile_required`, `turnstile_failed`, `turnstile_not_configured`
+* Rate limiting runs before Turnstile verification so failed captcha attempts cannot hammer Cloudflare
+* Behind a reverse proxy, restore the visitor IP (or use `mksddn_fh_client_ip`); `REMOTE_ADDR` alone may be the proxy IP
 
 = Trusted Origins (opt-in) =
 

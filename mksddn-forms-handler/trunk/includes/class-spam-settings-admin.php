@@ -86,7 +86,8 @@ class SpamSettingsAdmin {
         if (isset($_POST['turnstile_secret_key'])) {
             update_option(
                 'mksddn_fh_turnstile_secret_key',
-                sanitize_text_field(wp_unslash($_POST['turnstile_secret_key']))
+                sanitize_text_field(wp_unslash($_POST['turnstile_secret_key'])),
+                false
             );
         }
 
@@ -119,10 +120,14 @@ class SpamSettingsAdmin {
         $spam_heuristics_enabled = get_option('mksddn_fh_spam_heuristics_enabled', '0');
         $turnstile_site_key = SpamProtection::get_turnstile_site_key();
         $turnstile_secret_key = SpamProtection::get_turnstile_secret_key();
+        $turnstile_keys_incomplete = ($turnstile_site_key === '') !== ($turnstile_secret_key === '');
         ?>
         <div class="wrap">
             <h1><?php echo esc_html__('Spam Protection', 'mksddn-forms-handler'); ?></h1>
             <p><?php echo esc_html__('Global anti-spam settings for all forms. Per-form options are available in each form Advanced tab.', 'mksddn-forms-handler'); ?></p>
+            <?php if ($turnstile_keys_incomplete) : ?>
+                <div class="notice notice-warning"><p><?php echo esc_html__('Turnstile is not active until both the site key and the secret key are saved. Forms that require Turnstile will skip captcha until then.', 'mksddn-forms-handler'); ?></p></div>
+            <?php endif; ?>
 
             <form method="post" action="">
                 <?php wp_nonce_field('save_mksddn_fh_spam_settings', 'mksddn_fh_spam_settings_nonce'); ?>

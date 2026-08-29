@@ -407,6 +407,9 @@
                 </th>
                 <td>
                     <p class="description"><?php echo esc_html__( 'Requires Turnstile keys in Forms → Spam Protection. Adds widget to shortcode forms; custom REST forms must send cf-turnstile-response or mksddn_fh_turnstile_response.', 'mksddn-forms-handler' ); ?></p>
+                    <?php if ($require_turnstile === '1' && !\MksDdn\FormsHandler\SpamProtection::are_turnstile_keys_configured()) : ?>
+                        <p class="description" style="color:#d63638;"><?php echo esc_html__( 'Turnstile will not be enforced until both site key and secret key are saved.', 'mksddn-forms-handler' ); ?></p>
+                    <?php endif; ?>
                 </td>
             </tr>
             <tr>

@@ -29,13 +29,36 @@ class SpamProtection {
         'form_nonce',
         'action',
         'form_id',
+        '_wp_http_referer',
     ];
 
     /**
      * Get client IP address
+     *
+     * Uses REMOTE_ADDR only. Behind Cloudflare/a reverse proxy, restore the real
+     * visitor IP at the server (or via this filter) — do not trust X-Forwarded-For.
      */
     public static function get_client_ip(): string {
-        return sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'] ?? 'unknown'));
+        $ip = sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'] ?? 'unknown'));
+
+        /**
+         * Filter detected client IP used for rate limiting and Turnstile.
+         *
+         * @param string $ip Sanitized REMOTE_ADDR (or "unknown")
+         */
+        $filtered = apply_filters('mksddn_fh_client_ip', $ip);
+        if (!is_string($filtered) || $filtered === '') {
+            return $ip;
+        }
+
+        return sanitize_text_field($filtered);
+    }
+
+    /**
+     * Whether a POST/JSON key is an internal plugin field
+     */
+    public static function is_internal_field(string $name): bool {
+        return in_array($name, self::INTERNAL_FIELDS, true);
     }
 
     /**
@@ -62,7 +85,14 @@ class SpamProtection {
             return false;
         }
 
-        return self::get_turnstile_secret_key() !== '';
+        return self::are_turnstile_keys_configured();
+    }
+
+    /**
+     * Whether both Turnstile site key and secret key are saved
+     */
+    public static function are_turnstile_keys_configured(): bool {
+        return self::get_turnstile_site_key() !== '' && self::get_turnstile_secret_key() !== '';
     }
 
     /**
@@ -141,6 +171,9 @@ class SpamProtection {
             return $rate_check;
         }
 
+        // Count this attempt before outbound Turnstile verification.
+        self::record_submission_attempt();
+
         if (self::is_turnstile_required($form_config)) {
             $token = self::extract_turnstile_token($params);
             if ($token === '') {
@@ -171,7 +204,7 @@ class SpamProtection {
     }
 
     /**
-     * Record a successful pre-check submission attempt (global rate limit counter)
+     * Record a submission attempt for the global rate limit counter
      */
     public static function record_submission_attempt(): void {
         if (!self::is_global_rate_limit_enabled()) {
@@ -191,7 +224,13 @@ class SpamProtection {
         $now = time();
         $timestamps = array_values(array_filter(
             $timestamps,
-            static fn($timestamp): bool => is_int($timestamp) && ($now - $timestamp) < $window
+            static function ($timestamp) use ($now, $window): bool {
+                if (!is_numeric($timestamp)) {
+                    return false;
+                }
+                $timestamp = (int) $timestamp;
+                return $timestamp > 0 && ($now - $timestamp) < $window;
+            }
         ));
 
         $timestamps[] = $now;
@@ -261,7 +300,13 @@ class SpamProtection {
         $now = time();
         $timestamps = array_filter(
             $timestamps,
-            static fn($timestamp): bool => is_int($timestamp) && ($now - $timestamp) < $window
+            static function ($timestamp) use ($now, $window): bool {
+                if (!is_numeric($timestamp)) {
+                    return false;
+                }
+                $timestamp = (int) $timestamp;
+                return $timestamp > 0 && ($now - $timestamp) < $window;
+            }
         );
 
         if (count($timestamps) >= $max) {
@@ -403,37 +448,32 @@ class SpamProtection {
     }
 
     /**
-     * Detect submissions where too many checkbox/select options are selected at once
+     * Detect submissions that select too many options on a multi-select/checkbox field
      *
      * @param array $form_data   Submission data
      * @param array $form_config Form configuration
      */
     private static function has_excessive_multi_select(array $form_data, array $form_config): bool {
         $threshold = (int) apply_filters('mksddn_fh_spam_multi_select_threshold', 7, $form_config);
+        if ($threshold < 2) {
+            $threshold = 2;
+        }
 
         foreach ($form_data as $key => $value) {
-            if (is_array($value)) {
-                if (count($value) >= $threshold) {
-                    return true;
-                }
-                continue;
-            }
-
-            if (!is_string($value) || strlen($value) < 120) {
-                continue;
-            }
-
-            if (self::count_multi_select_parts($value) >= $threshold) {
-                return true;
-            }
-
             $field_config = self::find_field_config((string) $key, $form_config);
-            if ($field_config !== null && self::field_has_many_options($field_config)) {
-                $selected = self::count_selected_options($value, $field_config);
-                $total = count($field_config['options'] ?? []);
-                if ($total >= $threshold && $selected >= $threshold) {
-                    return true;
-                }
+            if ($field_config === null || !self::is_multi_option_field($field_config)) {
+                continue;
+            }
+
+            $options = $field_config['options'] ?? [];
+            $total = is_array($options) ? count($options) : 0;
+            if ($total < $threshold) {
+                continue;
+            }
+
+            $selected = self::count_selected_options($value, $field_config);
+            if ($selected >= $threshold || $selected >= $total) {
+                return true;
             }
         }
 
@@ -488,11 +528,74 @@ class SpamProtection {
     }
 
     /**
-     * Count comma-separated selection parts
+     * Whether the field is a multi-select or a checkbox group with options
+     *
+     * @param array $field_config Field configuration
      */
-    private static function count_multi_select_parts(string $value): int {
-        $parts = array_filter(array_map('trim', explode(',', $value)));
-        return count($parts);
+    private static function is_multi_option_field(array $field_config): bool {
+        $type = (string) ($field_config['type'] ?? '');
+
+        if ($type === 'select') {
+            $multiple = $field_config['multiple'] ?? false;
+            return $multiple === true || $multiple === '1' || $multiple === 1;
+        }
+
+        if ($type === 'checkbox') {
+            $options = $field_config['options'] ?? [];
+            return is_array($options) && count($options) >= 2;
+        }
+
+        return false;
+    }
+
+    /**
+     * Count selected options for a configured multi-option field
+     *
+     * @param mixed $value        Submitted value
+     * @param array $field_config Field configuration
+     */
+    private static function count_selected_options($value, array $field_config): int {
+        $options = $field_config['options'] ?? [];
+        if (!is_array($options) || $options === []) {
+            return 0;
+        }
+
+        $option_values = [];
+        foreach ($options as $option) {
+            $option_value = is_array($option) ? (string) ($option['value'] ?? $option['label'] ?? '') : (string) $option;
+            if ($option_value !== '') {
+                $option_values[] = $option_value;
+            }
+        }
+
+        if ($option_values === []) {
+            return 0;
+        }
+
+        $submitted = [];
+        if (is_array($value)) {
+            foreach ($value as $item) {
+                if (is_scalar($item) && (string) $item !== '') {
+                    $submitted[] = (string) $item;
+                }
+            }
+        } elseif (is_string($value) && $value !== '') {
+            if (in_array($value, $option_values, true)) {
+                return 1;
+            }
+            $submitted = array_values(array_filter(array_map('trim', explode(',', $value)), static fn($part): bool => $part !== ''));
+        } else {
+            return 0;
+        }
+
+        $selected = 0;
+        foreach ($submitted as $item) {
+            if (in_array($item, $option_values, true)) {
+                $selected++;
+            }
+        }
+
+        return $selected;
     }
 
     /**
@@ -515,39 +618,6 @@ class SpamProtection {
         }
 
         return null;
-    }
-
-    /**
-     * Whether field config defines many options
-     *
-     * @param array $field_config Field configuration
-     */
-    private static function field_has_many_options(array $field_config): bool {
-        $options = $field_config['options'] ?? [];
-        return is_array($options) && count($options) >= 5;
-    }
-
-    /**
-     * Count selected options for a configured multi-option field
-     *
-     * @param string $value        Submitted value
-     * @param array  $field_config Field configuration
-     */
-    private static function count_selected_options(string $value, array $field_config): int {
-        $options = $field_config['options'] ?? [];
-        if (!is_array($options) || $options === []) {
-            return self::count_multi_select_parts($value);
-        }
-
-        $selected = 0;
-        foreach ($options as $option) {
-            $option_value = is_array($option) ? (string) ($option['value'] ?? $option['label'] ?? '') : (string) $option;
-            if ($option_value !== '' && str_contains($value, $option_value)) {
-                $selected++;
-            }
-        }
-
-        return $selected;
     }
 
     /**
@@ -576,11 +646,12 @@ class SpamProtection {
      * @param string $form_slug Optional form slug for data attribute
      */
     public static function render_turnstile_widget(string $form_slug = ''): void {
-        $site_key = self::get_turnstile_site_key();
-        if ($site_key === '') {
-            echo '<!-- MksDdn Forms Handler: Turnstile site key is not configured -->';
+        if (!self::are_turnstile_keys_configured()) {
+            echo '<!-- MksDdn Forms Handler: Turnstile keys are not configured -->';
             return;
         }
+
+        $site_key = self::get_turnstile_site_key();
 
         self::enqueue_turnstile_script();
 
