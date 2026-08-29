@@ -7,40 +7,45 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-06-05T06:44:21+00:00\n"
-"PO-Revision-Date: 2026-06-05 09:00+0000\n"
+"POT-Creation-Date: 2026-08-29T07:53:28+00:00\n"
+"PO-Revision-Date: 2026-08-29 07:54+0000\n"
 "Language: ru_RU\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #: includes/class-security.php:86
 msgid "Creating submissions manually is not allowed"
 msgstr "Ручное создание заявок запрещено"
 
 #: includes/class-security.php:102
-msgid "Editing submissions is not allowed. Submissions can only be created automatically when forms are submitted."
-msgstr "Редактирование заявок запрещено. Заявки создаются только автоматически при отправке форм."
+msgid ""
+"Editing submissions is not allowed. Submissions can only be created "
+"automatically when forms are submitted."
+msgstr ""
+"Редактирование заявок запрещено. Заявки создаются только автоматически при "
+"отправке форм."
 
 #: includes/class-security.php:105
-msgid "Creating submissions manually is not allowed. Submissions are created automatically when forms are submitted."
-msgstr "Ручное создание заявок запрещено. Заявки создаются автоматически при отправке форм."
+msgid ""
+"Creating submissions manually is not allowed. Submissions are created "
+"automatically when forms are submitted."
+msgstr ""
+"Ручное создание заявок запрещено. Заявки создаются автоматически при "
+"отправке форм."
 
-#: includes/class-assets.php:77
-#: includes/class-export-handler.php:341
+#: includes/class-assets.php:77 includes/class-export-handler.php:341
 #: includes/class-export-handler.php:351
 msgid "Export by Date"
 msgstr "Экспорт по дате"
 
-#: includes/class-forms-handler.php:69
-#: includes/class-forms-handler.php:1285
+#: includes/class-forms-handler.php:69 includes/class-forms-handler.php:1288
 msgid "Invalid form fields configuration"
 msgstr "Неверная конфигурация полей формы"
 
 #. translators: %s: field name
 #. translators: %s: field label
-#: includes/class-forms-handler.php:100
-#: includes/class-forms-handler.php:129
-#: includes/class-forms-handler.php:1338
-#: includes/class-forms-handler.php:1367
+#: includes/class-forms-handler.php:100 includes/class-forms-handler.php:129
+#: includes/class-forms-handler.php:1341 includes/class-forms-handler.php:1370
 #, php-format
 msgid "Field '%s' is required"
 msgstr "Поле «%s» обязательно для заполнения"
@@ -69,20 +74,18 @@ msgstr "Файл слишком большой для поля «%1$s» (мак�
 msgid "File type not allowed for field '%s'"
 msgstr "Тип файла не разрешен для поля «%s»"
 
-#: includes/class-forms-handler.php:271
-#: includes/class-forms-handler.php:592
-#: includes/class-spam-protection.php:382
-#: includes/class-spam-protection.php:390
-#: includes/class-spam-protection.php:406
+#: includes/class-forms-handler.php:271 includes/class-forms-handler.php:595
+#: includes/class-spam-protection.php:430
+#: includes/class-spam-protection.php:438
+#: includes/class-spam-protection.php:454
 msgid "Spam detected"
 msgstr "Обнаружен спам"
 
-#: includes/class-forms-handler.php:2001
+#: includes/class-forms-handler.php:2004
 msgid "Too many requests. Please wait a few seconds."
 msgstr "Слишком много запросов. Пожалуйста, подождите несколько секунд."
 
-#: includes/class-forms-handler.php:307
-#: includes/class-forms-handler.php:681
+#: includes/class-forms-handler.php:307 includes/class-forms-handler.php:684
 msgid "Invalid form data"
 msgstr "Неверные данные формы"
 
@@ -98,256 +101,261 @@ msgstr "Данные формы слишком большие"
 msgid "Invalid slug"
 msgstr "Неверный слаг"
 
-#: includes/class-forms-handler.php:441
-#: includes/class-forms-handler.php:903
+#: includes/class-forms-handler.php:441 includes/class-forms-handler.php:906
 #: includes/class-shortcodes.php:44
 msgid "Form not found"
 msgstr "Форма не найдена"
 
-#: includes/class-forms-handler.php:581
+#: includes/class-forms-handler.php:584
 msgid "Security check failed. Please refresh the page and try again."
-msgstr "Проверка безопасности не пройдена. Пожалуйста, обновите страницу и попробуйте снова."
+msgstr ""
+"Проверка безопасности не пройдена. Пожалуйста, обновите страницу и "
+"попробуйте снова."
 
 #. translators: %s: field names
-#: includes/class-forms-handler.php:717
-#: includes/class-forms-handler.php:1267
+#: includes/class-forms-handler.php:720 includes/class-forms-handler.php:1270
 #, php-format
 msgid "Unauthorized fields detected: %s"
 msgstr "Обнаружены неавторизованные поля: %s"
 
-#: includes/class-forms-handler.php:869
+#: includes/class-forms-handler.php:872
 msgid "Failed to deliver form submission"
 msgstr "Не удалось доставить отправку формы"
 
-#: includes/class-forms-handler.php:879
+#: includes/class-forms-handler.php:882
 msgid "Form submitted successfully"
 msgstr "Форма успешно отправлена"
 
-#: includes/class-forms-handler.php:975
+#: includes/class-forms-handler.php:978
 msgid "Form is not configured correctly"
 msgstr "Форма настроена неверно"
 
-#: includes/class-forms-handler.php:1207
-#: includes/class-forms-handler.php:1280
+#: includes/class-forms-handler.php:1210 includes/class-forms-handler.php:1283
 msgid "Form fields configuration is missing"
 msgstr "Конфигурация полей формы отсутствует"
 
-#: includes/class-forms-handler.php:1290
+#: includes/class-forms-handler.php:1293
 msgid "No fields configured for this form"
 msgstr "Для этой формы не настроены поля"
 
-#: includes/class-forms-handler.php:1295
+#: includes/class-forms-handler.php:1298
 msgid "No form data provided"
 msgstr "Данные формы не переданы"
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1328
+#: includes/class-forms-handler.php:1331
 #, php-format
-msgid "Field '%s' must be a single value, not an array. Use 'array_of_objects' type for arrays."
-msgstr "Поле «%s» должно быть одним значением, а не массивом. Для массивов используйте тип array_of_objects."
+msgid ""
+"Field '%s' must be a single value, not an array. Use 'array_of_objects' type "
+"for arrays."
+msgstr ""
+"Поле «%s» должно быть одним значением, а не массивом. Для массивов "
+"используйте тип array_of_objects."
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1335
+#: includes/class-forms-handler.php:1338
 #, php-format
 msgid "Field '%s' is required for agreement"
 msgstr "Поле «%s» обязательно для согласия"
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1346
+#: includes/class-forms-handler.php:1349
 #, php-format
 msgid "Field '%s' must be a single email address"
 msgstr "Поле «%s» должно содержать один email"
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1350
+#: includes/class-forms-handler.php:1353
 #, php-format
 msgid "Field '%s' must contain a valid email address"
 msgstr "Поле «%s» должно содержать корректный email"
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1362
+#: includes/class-forms-handler.php:1365
 #, php-format
 msgid "Field '%s' contains invalid file URL"
 msgstr "Поле «%s» содержит некорректный URL файла"
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1375
+#: includes/class-forms-handler.php:1378
 #, php-format
 msgid "Field '%s' must be a single URL"
 msgstr "Поле «%s» должно содержать один URL"
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1380
+#: includes/class-forms-handler.php:1383
 #, php-format
 msgid "Field '%s' must contain a valid URL"
 msgstr "Поле «%s» должно содержать корректный URL"
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1389
+#: includes/class-forms-handler.php:1392
 #, php-format
 msgid "Field '%s' must be a single number"
 msgstr "Поле «%s» должно быть одним числом"
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1393
+#: includes/class-forms-handler.php:1396
 #, php-format
 msgid "Field '%s' must be a number"
 msgstr "Поле «%s» должно быть числом"
 
 #. translators: 1: field label, 2: min value
-#: includes/class-forms-handler.php:1398
+#: includes/class-forms-handler.php:1401
 #, php-format
 msgid "Field '%1$s' must be greater than or equal to %2$s"
 msgstr "Поле «%1$s» должно быть не меньше %2$s"
 
 #. translators: 1: field label, 2: max value
-#: includes/class-forms-handler.php:1402
+#: includes/class-forms-handler.php:1405
 #, php-format
 msgid "Field '%1$s' must be less than or equal to %2$s"
 msgstr "Поле «%1$s» должно быть не больше %2$s"
 
 #. translators: 1: field label, 2: step value
-#: includes/class-forms-handler.php:1409
+#: includes/class-forms-handler.php:1412
 #, php-format
 msgid "Field '%1$s' must follow step %2$s"
 msgstr "Поле «%1$s» должно соответствовать шагу %2$s"
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1429
+#: includes/class-forms-handler.php:1432
 #, php-format
 msgid "Field '%s' must be a single phone number"
 msgstr "Поле «%s» должно содержать один номер телефона"
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1433
+#: includes/class-forms-handler.php:1436
 #, php-format
 msgid "Field '%s' must be a valid phone number"
 msgstr "Поле «%s» должно содержать корректный номер телефона"
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1443
+#: includes/class-forms-handler.php:1446
 #, php-format
 msgid "Field '%s' must be a single date value"
 msgstr "Поле «%s» должно содержать одну дату"
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1449
+#: includes/class-forms-handler.php:1452
 #, php-format
 msgid "Field '%s' must be a valid date (YYYY-MM-DD)"
 msgstr "Поле «%s» должно содержать корректную дату (ГГГГ-ММ-ДД)"
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1455
+#: includes/class-forms-handler.php:1458
 #, php-format
 msgid "Field '%s' must be a single time value"
 msgstr "Поле «%s» должно содержать одно время"
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1461
+#: includes/class-forms-handler.php:1464
 #, php-format
 msgid "Field '%s' must be a valid time (HH:MM)"
 msgstr "Поле «%s» должно содержать корректное время (ЧЧ:ММ)"
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1467
+#: includes/class-forms-handler.php:1470
 #, php-format
 msgid "Field '%s' must be a single datetime value"
 msgstr "Поле «%s» должно содержать одну дату и время"
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1474
+#: includes/class-forms-handler.php:1477
 #, php-format
 msgid "Field '%s' must be a valid datetime (YYYY-MM-DDTHH:MM)"
 msgstr "Поле «%s» должно содержать корректные дату и время (ГГГГ-ММ-ДДTЧЧ:ММ)"
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1486
-#: includes/class-forms-handler.php:1491
+#: includes/class-forms-handler.php:1489 includes/class-forms-handler.php:1494
 #, php-format
 msgid "Field '%s' contains an invalid value"
 msgstr "Поле «%s» содержит недопустимое значение"
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1503
-#: includes/class-forms-handler.php:1508
+#: includes/class-forms-handler.php:1506 includes/class-forms-handler.php:1511
 #, php-format
 msgid "Field '%s' is too long (maximum 10,000 characters)"
 msgstr "Поле «%s» слишком длинное (максимум 10 000 символов)"
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1531
+#: includes/class-forms-handler.php:1534
 #, php-format
 msgid "Field '%s' is required and must contain at least one item"
 msgstr "Поле «%s» обязательно и должно содержать хотя бы один элемент"
 
 #. translators: 1: field label, 2: item index
-#: includes/class-forms-handler.php:1551
+#: includes/class-forms-handler.php:1554
 #, php-format
 msgid "Field '%1$s' item #%2$d must be an object"
 msgstr "Элемент #%2$d поля «%1$s» должен быть объектом"
 
 #. translators: 1: nested field label, 2: field label, 3: item index
-#: includes/class-forms-handler.php:1564
+#: includes/class-forms-handler.php:1567
 #, php-format
 msgid "Field '%1$s' in '%2$s' item #%3$d is required"
 msgstr "Поле «%1$s» в элементе #%3$d поля «%2$s» обязательно"
 
 #. translators: 1: nested field label, 2: field label, 3: item index
-#: includes/class-forms-handler.php:1578
+#: includes/class-forms-handler.php:1581
 #, php-format
 msgid "Field '%1$s' in '%2$s' item #%3$d must be a valid email"
-msgstr "Поле «%1$s» в элементе #%3$d поля «%2$s» должно содержать корректный email"
+msgstr ""
+"Поле «%1$s» в элементе #%3$d поля «%2$s» должно содержать корректный email"
 
 #. translators: 1: nested field label, 2: field label, 3: item index
-#: includes/class-forms-handler.php:1585
+#: includes/class-forms-handler.php:1588
 #, php-format
 msgid "Field '%1$s' in '%2$s' item #%3$d must be a number"
 msgstr "Поле «%1$s» в элементе #%3$d поля «%2$s» должно быть числом"
 
 #. translators: 1: nested field label, 2: field label, 3: item index, 4: min value
-#: includes/class-forms-handler.php:1589
+#: includes/class-forms-handler.php:1592
 #, php-format
 msgid "Field '%1$s' in '%2$s' item #%3$d must be greater than or equal to %4$s"
 msgstr "Поле «%1$s» в элементе #%3$d поля «%2$s» должно быть не меньше %4$s"
 
 #. translators: 1: nested field label, 2: field label, 3: item index, 4: max value
-#: includes/class-forms-handler.php:1592
+#: includes/class-forms-handler.php:1595
 #, php-format
 msgid "Field '%1$s' in '%2$s' item #%3$d must be less than or equal to %4$s"
 msgstr "Поле «%1$s» в элементе #%3$d поля «%2$s» должно быть не больше %4$s"
 
 #. translators: 1: nested field label, 2: field label, 3: item index
-#: includes/class-forms-handler.php:1604
+#: includes/class-forms-handler.php:1607
 #, php-format
 msgid "Field '%1$s' in '%2$s' item #%3$d must be a valid phone number"
-msgstr "Поле «%1$s» в элементе #%3$d поля «%2$s» должно содержать корректный номер телефона"
+msgstr ""
+"Поле «%1$s» в элементе #%3$d поля «%2$s» должно содержать корректный номер "
+"телефона"
 
 #. translators: 1: nested field label, 2: field label, 3: item index
-#: includes/class-forms-handler.php:1612
+#: includes/class-forms-handler.php:1615
 #, php-format
 msgid "Field '%1$s' in '%2$s' item #%3$d must be a valid URL"
-msgstr "Поле «%1$s» в элементе #%3$d поля «%2$s» должно содержать корректный URL"
+msgstr ""
+"Поле «%1$s» в элементе #%3$d поля «%2$s» должно содержать корректный URL"
 
-#: includes/class-forms-handler.php:1655
+#: includes/class-forms-handler.php:1658
 msgid "Failed to send email"
 msgstr "Не удалось отправить email"
 
 #. translators: %s: form title
-#: includes/class-forms-handler.php:1752
+#: includes/class-forms-handler.php:1755
 #, php-format
 msgid "Form Data: %s"
 msgstr "Данные формы: %s"
 
-#: includes/class-forms-handler.php:1754
+#: includes/class-forms-handler.php:1757
 msgid "Field"
 msgstr "Поле"
 
-#: includes/class-forms-handler.php:1754
+#: includes/class-forms-handler.php:1757
 msgid "Value"
 msgstr "Значение"
 
 #. translators: %s: date and time
-#: includes/class-forms-handler.php:1783
+#: includes/class-forms-handler.php:1786
 #, php-format
 msgid "Sent: %s"
 msgstr "Отправлено: %s"
@@ -361,19 +369,15 @@ msgstr "URL страницы"
 msgid "Error: form ID or slug not specified"
 msgstr "Ошибка: не указан ID или slug формы"
 
-#: includes/class-meta-boxes.php:173
-#: includes/class-shortcodes.php:58
+#: includes/class-meta-boxes.php:175 includes/class-shortcodes.php:62
 #: includes/template-functions.php:104
 msgid "Thank you! Your message has been sent successfully."
 msgstr "Спасибо! Ваше сообщение успешно отправлено."
 
 #. translators: %s: field name
-#: includes/class-shortcodes.php:97
-#: includes/class-shortcodes.php:123
-#: includes/class-shortcodes.php:137
-#: includes/class-shortcodes.php:159
-#: includes/class-shortcodes.php:194
-#: includes/class-shortcodes.php:217
+#: includes/class-shortcodes.php:101 includes/class-shortcodes.php:127
+#: includes/class-shortcodes.php:141 includes/class-shortcodes.php:163
+#: includes/class-shortcodes.php:198 includes/class-shortcodes.php:221
 #: templates/custom-form-examples.php:134
 #: templates/custom-form-examples.php:142
 #: templates/custom-form-examples.php:163
@@ -381,75 +385,60 @@ msgstr "Спасибо! Ваше сообщение успешно отправ�
 msgid "%s (required)"
 msgstr "%s (обязательно)"
 
-#: includes/class-meta-boxes.php:160
-#: includes/class-shortcodes.php:236
-#: includes/class-shortcodes.php:255
-#: includes/template-functions.php:103
+#: includes/class-meta-boxes.php:162 includes/class-shortcodes.php:240
+#: includes/class-shortcodes.php:259 includes/template-functions.php:103
 msgid "Send"
 msgstr "Отправить"
 
-#: includes/class-shortcodes.php:254
-#: includes/template-functions.php:102
+#: includes/class-shortcodes.php:258 includes/template-functions.php:102
 msgid "Sending..."
 msgstr "Отправка..."
 
-#: includes/class-shortcodes.php:258
-#: includes/template-functions.php:105
+#: includes/class-shortcodes.php:262 includes/template-functions.php:105
 msgid "Error"
 msgstr "Ошибка"
 
-#: includes/class-shortcodes.php:259
-#: includes/template-functions.php:106
+#: includes/class-shortcodes.php:263 includes/template-functions.php:106
 msgid "An error occurred while sending the form"
 msgstr "Произошла ошибка при отправке формы"
 
-#: includes/class-shortcodes.php:260
-#: includes/template-functions.php:107
+#: includes/class-shortcodes.php:264 includes/template-functions.php:107
 msgid "Unauthorized fields:"
 msgstr "Неавторизованные поля:"
 
-#: includes/class-shortcodes.php:261
-#: includes/template-functions.php:108
+#: includes/class-shortcodes.php:265 includes/template-functions.php:108
 msgid "Allowed fields:"
 msgstr "Разрешенные поля:"
 
-#: includes/class-shortcodes.php:262
-#: includes/template-functions.php:109
+#: includes/class-shortcodes.php:266 includes/template-functions.php:109
 msgid "Delivery Status:"
 msgstr "Статус доставки:"
 
-#: includes/class-shortcodes.php:263
-#: includes/template-functions.php:110
+#: includes/class-shortcodes.php:267 includes/template-functions.php:110
 msgid "Email: Sent successfully"
 msgstr "Email: Отправлено успешно"
 
-#: includes/class-shortcodes.php:264
-#: includes/template-functions.php:111
+#: includes/class-shortcodes.php:268 includes/template-functions.php:111
 msgid "Email:"
 msgstr "Email:"
 
-#: includes/class-shortcodes.php:265
-#: includes/template-functions.php:112
+#: includes/class-shortcodes.php:269 includes/template-functions.php:112
 msgid "Telegram: Sent successfully"
 msgstr "Telegram: Отправлено успешно"
 
-#: includes/class-shortcodes.php:266
-#: includes/template-functions.php:113
+#: includes/class-shortcodes.php:270 includes/template-functions.php:113
 msgid "Telegram:"
 msgstr "Telegram:"
 
-#: includes/class-shortcodes.php:267
-#: includes/template-functions.php:114
+#: includes/class-shortcodes.php:271 includes/template-functions.php:114
 msgid "Google Sheets: Data saved"
 msgstr "Google Таблицы: Данные сохранены"
 
-#: includes/class-shortcodes.php:268
-#: includes/template-functions.php:115
+#: includes/class-shortcodes.php:272 includes/template-functions.php:115
 msgid "Google Sheets:"
 msgstr "Google Таблицы:"
 
-#: includes/class-shortcodes.php:269
-#: includes/template-functions.php:116
+#: includes/class-shortcodes.php:273 includes/template-functions.php:116
 msgid "Failed"
 msgstr "Не удалось"
 
@@ -461,18 +450,15 @@ msgstr "Получатели"
 msgid "Email"
 msgstr "Email"
 
-#: includes/class-admin-columns.php:48
-#: templates/form-settings-meta-box.php:7
+#: includes/class-admin-columns.php:48 templates/form-settings-meta-box.php:7
 msgid "Telegram"
 msgstr "Telegram"
 
-#: includes/class-admin-columns.php:49
-#: templates/form-settings-meta-box.php:8
+#: includes/class-admin-columns.php:49 templates/form-settings-meta-box.php:8
 msgid "Google Sheets"
 msgstr "Google Таблицы"
 
-#: includes/class-admin-columns.php:50
-#: templates/form-settings-meta-box.php:9
+#: includes/class-admin-columns.php:50 templates/form-settings-meta-box.php:9
 msgid "Admin Storage"
 msgstr "Хранилище админки"
 
@@ -480,23 +466,18 @@ msgstr "Хранилище админки"
 msgid "Shortcode"
 msgstr "Шорткод"
 
-#: includes/class-admin-columns.php:52
-#: includes/class-admin-columns.php:88
+#: includes/class-admin-columns.php:52 includes/class-admin-columns.php:88
 #: includes/class-export-handler.php:379
 msgid "Export"
 msgstr "Экспорт"
 
-#: includes/class-admin-columns.php:70
-#: includes/class-admin-columns.php:74
-#: includes/class-admin-columns.php:78
-#: includes/class-admin-columns.php:82
+#: includes/class-admin-columns.php:70 includes/class-admin-columns.php:74
+#: includes/class-admin-columns.php:78 includes/class-admin-columns.php:82
 msgid "✓ Enabled"
 msgstr "✓ Включено"
 
-#: includes/class-admin-columns.php:70
-#: includes/class-admin-columns.php:74
-#: includes/class-admin-columns.php:78
-#: includes/class-admin-columns.php:82
+#: includes/class-admin-columns.php:70 includes/class-admin-columns.php:74
+#: includes/class-admin-columns.php:78 includes/class-admin-columns.php:82
 msgid "✗ Disabled"
 msgstr "✗ Выключено"
 
@@ -504,8 +485,7 @@ msgstr "✗ Выключено"
 msgid "No submissions"
 msgstr "Нет отправок"
 
-#: includes/class-admin-columns.php:179
-#: includes/class-post-types.php:66
+#: includes/class-admin-columns.php:179 includes/class-post-types.php:66
 msgid "Form"
 msgstr "Форма"
 
@@ -539,11 +519,9 @@ msgstr "%d элементов"
 msgid "No data"
 msgstr "Нет данных"
 
-#: includes/class-admin-columns.php:263
-#: includes/class-meta-boxes.php:346
-#: includes/class-meta-boxes.php:347
-#: includes/class-meta-boxes.php:349
-#: includes/class-meta-boxes.php:350
+#: includes/class-admin-columns.php:263 includes/class-meta-boxes.php:348
+#: includes/class-meta-boxes.php:349 includes/class-meta-boxes.php:351
+#: includes/class-meta-boxes.php:352
 msgid "Unknown"
 msgstr "Неизвестно"
 
@@ -556,7 +534,7 @@ msgstr "Настройки Google Sheets"
 #: includes/class-export-handler.php:63
 #: includes/class-google-sheets-admin.php:132
 #: includes/class-google-sheets-admin.php:161
-#: includes/class-spam-settings-admin.php:107
+#: includes/class-spam-settings-admin.php:112
 msgid "Access denied"
 msgstr "Доступ запрещен"
 
@@ -582,10 +560,10 @@ msgstr "❌ Ошибка подключения к Google Таблицам: %s"
 
 #: includes/class-google-sheets-admin.php:352
 msgid "Optionally specify tab name (defaults to the first tab)"
-msgstr "При необходимости укажите название вкладки (по умолчанию — первая вкладка)"
+msgstr ""
+"При необходимости укажите название вкладки (по умолчанию — первая вкладка)"
 
-#: includes/class-export-handler.php:49
-#: includes/class-export-handler.php:50
+#: includes/class-export-handler.php:49 includes/class-export-handler.php:50
 #: includes/class-export-handler.php:319
 msgid "Export Submissions"
 msgstr "Экспорт обращений"
@@ -642,29 +620,28 @@ msgstr "Данные отправки"
 msgid "Submission Info"
 msgstr "Информация об отправке"
 
-#: includes/class-meta-boxes.php:205
+#: includes/class-meta-boxes.php:207
 msgid "Error: Invalid JSON in Fields Configuration! Check syntax."
 msgstr "Ошибка: неверный JSON в конфигурации полей! Проверьте синтаксис."
 
-#: includes/class-meta-boxes.php:221
+#: includes/class-meta-boxes.php:223
 msgid "No data available"
 msgstr "Данные недоступны"
 
 #: handlers/class-telegram-handler.php:87
-#: handlers/class-template-parser.php:227
-#: includes/class-meta-boxes.php:346
+#: handlers/class-template-parser.php:227 includes/class-meta-boxes.php:348
 msgid "Form:"
 msgstr "Форма:"
 
-#: includes/class-meta-boxes.php:348
+#: includes/class-meta-boxes.php:350
 msgid "Date:"
 msgstr "Дата:"
 
-#: includes/class-meta-boxes.php:349
+#: includes/class-meta-boxes.php:351
 msgid "IP Address:"
 msgstr "IP-адрес:"
 
-#: includes/class-meta-boxes.php:350
+#: includes/class-meta-boxes.php:352
 msgid "User Agent:"
 msgstr "User Agent:"
 
@@ -672,8 +649,7 @@ msgstr "User Agent:"
 msgid "New message from website"
 msgstr "Новое сообщение с сайта"
 
-#: includes/class-google-sheets-admin.php:347
-#: includes/class-post-types.php:65
+#: includes/class-google-sheets-admin.php:347 includes/class-post-types.php:65
 #: includes/class-post-types.php:67
 msgid "Forms"
 msgstr "Формы"
@@ -775,8 +751,12 @@ msgid "Fields Configuration"
 msgstr "Конфигурация полей"
 
 #: templates/form-settings-meta-box.php:22
-msgid "JSON configuration of form fields. Example: [{\"name\": \"name\", \"label\": \"Name\", \"type\": \"text\", \"required\": true}]"
-msgstr "JSON-конфигурация полей формы. Пример: [{\"name\": \"name\", \"label\": \"Имя\", \"type\": \"text\", \"required\": true}]"
+msgid ""
+"JSON configuration of form fields. Example: [{\"name\": \"name\", \"label\": "
+"\"Name\", \"type\": \"text\", \"required\": true}]"
+msgstr ""
+"JSON-конфигурация полей формы. Пример: [{\"name\": \"name\", \"label\": "
+"\"Имя\", \"type\": \"text\", \"required\": true}]"
 
 #. translators: Note about regex patterns in JSON
 #: templates/form-settings-meta-box.php:23
@@ -785,8 +765,12 @@ msgstr "О паттернах:"
 
 #. translators: Note about regex patterns in JSON
 #: templates/form-settings-meta-box.php:23
-msgid "For regex patterns, use double backslashes in JSON (e.g., \"pattern\": \"^\\\\+?\\\\d{7,15}$\")"
-msgstr "Для regex-паттернов используйте двойные обратные слеши в JSON (например, \"pattern\": \"^\\\\+?\\\\d{7,15}$\")"
+msgid ""
+"For regex patterns, use double backslashes in JSON (e.g., \"pattern\": \"^\\"
+"\\+?\\\\d{7,15}$\")"
+msgstr ""
+"Для regex-паттернов используйте двойные обратные слеши в JSON (например, "
+"\"pattern\": \"^\\\\+?\\\\d{7,15}$\")"
 
 #: templates/form-settings-meta-box.php:37
 msgid "Send to Email"
@@ -832,13 +816,14 @@ msgstr "Отправлять письмо-подтверждение польз�
 msgid "User email field"
 msgstr "Email-поле пользователя"
 
-#: includes/class-assets.php:83
-#: templates/form-settings-meta-box.php:83
+#: includes/class-assets.php:83 templates/form-settings-meta-box.php:83
 msgid "— Select field —"
 msgstr "— Выберите поле —"
 
 #: templates/form-settings-meta-box.php:91
-msgid "No email fields found in Fields Configuration. Add a field with type \"email\"."
+msgid ""
+"No email fields found in Fields Configuration. Add a field with type "
+"\"email\"."
 msgstr "В конфигурации полей нет email-полей. Добавьте поле с типом \"email\"."
 
 #: templates/form-settings-meta-box.php:96
@@ -846,8 +831,11 @@ msgid "Reply email subject"
 msgstr "Тема ответного письма"
 
 #: templates/form-settings-meta-box.php:99
-msgid "Supports placeholders: {form_title}, {field:name}, {datetime}, {page_url}"
-msgstr "Поддерживаются плейсхолдеры: {form_title}, {field:name}, {datetime}, {page_url}"
+msgid ""
+"Supports placeholders: {form_title}, {field:name}, {datetime}, {page_url}"
+msgstr ""
+"Поддерживаются плейсхолдеры: {form_title}, {field:name}, {datetime}, "
+"{page_url}"
 
 #: templates/form-settings-meta-box.php:103
 msgid "Reply content type"
@@ -892,27 +880,35 @@ msgstr "Сохранённый шаблон: %1$s (%2$s КБ)"
 msgid "No HTML template stored. Upload a file and click Update to save."
 msgstr "HTML-шаблон не сохранён. Загрузите файл и нажмите «Обновить»."
 
-#: includes/class-meta-boxes.php:611
-msgid "HTML template is required when HTML file reply type is selected. Upload a file and save the form."
+#: includes/class-meta-boxes.php:619
+msgid ""
+"HTML template is required when HTML file reply type is selected. Upload a "
+"file and save the form."
 msgstr "Для типа «HTML-файл» нужен шаблон. Загрузите файл и сохраните форму."
 
 #. translators: 1: file name, 2: file size in KB
-#: includes/class-meta-boxes.php:855
+#: includes/class-meta-boxes.php:863
 #, php-format
-msgid "HTML template saved: %1$s (%2$s KB). It will be used for auto-reply emails."
-msgstr "HTML-шаблон сохранён: %1$s (%2$s КБ). Будет использоваться для автоответов."
+msgid ""
+"HTML template saved: %1$s (%2$s KB). It will be used for auto-reply emails."
+msgstr ""
+"HTML-шаблон сохранён: %1$s (%2$s КБ). Будет использоваться для автоответов."
 
-#: includes/class-meta-boxes.php:934
+#: includes/class-meta-boxes.php:942
 msgid "HTML template upload was interrupted. Please try again."
 msgstr "Загрузка HTML-шаблона прервана. Попробуйте снова."
 
-#: includes/class-meta-boxes.php:938
+#: includes/class-meta-boxes.php:946
 msgid "Server could not store the uploaded HTML template file."
 msgstr "Сервер не смог сохранить загруженный HTML-файл."
 
-#: includes/class-meta-boxes.php:576
-msgid "Selected user email field is not valid. Choose an email field from the form configuration."
-msgstr "Выбранное email-поле недействительно. Укажите email-поле из конфигурации формы."
+#: includes/class-meta-boxes.php:584
+msgid ""
+"Selected user email field is not valid. Choose an email field from the form "
+"configuration."
+msgstr ""
+"Выбранное email-поле недействительно. Укажите email-поле из конфигурации "
+"формы."
 
 #: templates/form-settings-meta-box.php:154
 msgid "uploaded file"
@@ -928,27 +924,24 @@ msgstr "Удалить текущий HTML-шаблон"
 msgid "Upload an HTML file with placeholders. Max size: %d KB."
 msgstr "Загрузите HTML-файл с плейсхолдерами. Максимальный размер: %d КБ."
 
-#: includes/class-meta-boxes.php:779
-#: includes/class-meta-boxes.php:940
+#: includes/class-meta-boxes.php:787 includes/class-meta-boxes.php:948
 msgid "Failed to upload HTML template file."
 msgstr "Не удалось загрузить HTML-файл шаблона."
 
-#: includes/class-meta-boxes.php:789
-#: includes/class-meta-boxes.php:830
-#: includes/class-meta-boxes.php:932
+#: includes/class-meta-boxes.php:797 includes/class-meta-boxes.php:838
+#: includes/class-meta-boxes.php:940
 msgid "HTML template file exceeds maximum allowed size."
 msgstr "HTML-файл шаблона превышает допустимый размер."
 
-#: includes/class-meta-boxes.php:800
+#: includes/class-meta-boxes.php:808
 msgid "Only .html and .htm files are allowed for email templates."
 msgstr "Для email-шаблонов разрешены только файлы .html и .htm."
 
-#: includes/class-meta-boxes.php:810
-#: includes/class-meta-boxes.php:821
+#: includes/class-meta-boxes.php:818 includes/class-meta-boxes.php:829
 msgid "Could not read uploaded HTML template file."
 msgstr "Не удалось прочитать загруженный HTML-файл шаблона."
 
-#: includes/class-meta-boxes.php:839
+#: includes/class-meta-boxes.php:847
 msgid "HTML template must not contain PHP code."
 msgstr "HTML-шаблон не должен содержать PHP-код."
 
@@ -957,31 +950,33 @@ msgid "Hello,"
 msgstr "Здравствуйте,"
 
 #: handlers/class-template-parser.php:193
-msgid "Thank you for your message. We have received your submission and will get back to you soon."
-msgstr "Спасибо за ваше сообщение. Мы получили вашу заявку и скоро свяжемся с вами."
+msgid ""
+"Thank you for your message. We have received your submission and will get "
+"back to you soon."
+msgstr ""
+"Спасибо за ваше сообщение. Мы получили вашу заявку и скоро свяжемся с вами."
 
-#: includes/class-forms-handler.php:1670
+#: includes/class-forms-handler.php:1673
 msgid "User reply email field is not configured"
 msgstr "Email-поле для автоответа не настроено"
 
-#: includes/class-forms-handler.php:1678
+#: includes/class-forms-handler.php:1681
 msgid "User email address is missing from submission"
 msgstr "Email пользователя отсутствует в заявке"
 
-#: includes/class-forms-handler.php:1687
+#: includes/class-forms-handler.php:1690
 msgid "User email address is invalid"
 msgstr "Email пользователя недействителен"
 
-#: includes/class-forms-handler.php:1698
+#: includes/class-forms-handler.php:1701
 msgid "HTML reply template is not configured"
 msgstr "HTML-шаблон ответа не настроен"
 
-#: includes/class-forms-handler.php:1711
-#: includes/class-meta-boxes.php:144
+#: includes/class-forms-handler.php:1714 includes/class-meta-boxes.php:146
 msgid "Thank you for contacting us"
 msgstr "Спасибо, что связались с нами"
 
-#: includes/class-forms-handler.php:1739
+#: includes/class-forms-handler.php:1742
 msgid "Failed to send user reply email"
 msgstr "Не удалось отправить автоответ пользователю"
 
@@ -999,7 +994,8 @@ msgstr "Токен бота Telegram"
 
 #: templates/form-settings-meta-box.php:208
 msgid "Your Telegram bot token (e.g., 123456789:ABCdefGHIjklMNOpqrsTUVwxyz)"
-msgstr "Токен вашего бота Telegram (например, 123456789:ABCdefGHIjklMNOpqrsTUVwxyz)"
+msgstr ""
+"Токен вашего бота Telegram (например, 123456789:ABCdefGHIjklMNOpqrsTUVwxyz)"
 
 #: templates/form-settings-meta-box.php:212
 msgid "Telegram Chat IDs"
@@ -1007,7 +1003,8 @@ msgstr "ID чатов Telegram"
 
 #: templates/form-settings-meta-box.php:215
 msgid "Chat IDs separated by commas (e.g., -1001234567890, -1009876543210)"
-msgstr "ID чатов, разделенные запятыми (например, -1001234567890, -1009876543210)"
+msgstr ""
+"ID чатов, разделенные запятыми (например, -1001234567890, -1009876543210)"
 
 #: templates/form-settings-meta-box.php:258
 msgid "Send to Google Sheets"
@@ -1023,16 +1020,24 @@ msgid "Spreadsheet ID"
 msgstr "ID таблицы"
 
 #: templates/form-settings-meta-box.php:269
-msgid "Google Sheets spreadsheet ID (from URL: docs.google.com/spreadsheets/d/SPREADSHEET_ID)"
-msgstr "ID таблицы Google Sheets (из URL: docs.google.com/spreadsheets/d/SPREADSHEET_ID)"
+msgid ""
+"Google Sheets spreadsheet ID (from URL: docs.google.com/spreadsheets/d/"
+"SPREADSHEET_ID)"
+msgstr ""
+"ID таблицы Google Sheets (из URL: docs.google.com/spreadsheets/d/"
+"SPREADSHEET_ID)"
 
 #: templates/form-settings-meta-box.php:273
 msgid "Tab Name"
 msgstr "Название вкладки"
 
 #: templates/form-settings-meta-box.php:276
-msgid "Tab name as shown in Google Sheets (optional). If empty, data is appended to the first tab."
-msgstr "Название вкладки, как в Google Sheets (необязательно). Если пусто, данные добавляются на первую вкладку."
+msgid ""
+"Tab name as shown in Google Sheets (optional). If empty, data is appended to "
+"the first tab."
+msgstr ""
+"Название вкладки, как в Google Sheets (необязательно). Если пусто, данные "
+"добавляются на первую вкладку."
 
 #: templates/form-settings-meta-box.php:289
 msgid "Save submissions to admin panel"
@@ -1040,7 +1045,8 @@ msgstr "Сохранять отправки в админ-панели"
 
 #: templates/form-settings-meta-box.php:293
 msgid "Enable saving form submissions to admin panel for viewing and export"
-msgstr "Включить сохранение отправок формы в админ-панели для просмотра и экспорта"
+msgstr ""
+"Включить сохранение отправок формы в админ-панели для просмотра и экспорта"
 
 #: templates/form-settings-meta-box.php:303
 msgid "Submit Button Text"
@@ -1048,39 +1054,59 @@ msgstr "Текст кнопки отправки"
 
 #: templates/form-settings-meta-box.php:306
 msgid "Custom text for the submit button. Leave empty to use default \"Send\""
-msgstr "Пользовательский текст для кнопки отправки. Оставьте пустым для использования значения по умолчанию \"Отправить\""
+msgstr ""
+"Пользовательский текст для кнопки отправки. Оставьте пустым для "
+"использования значения по умолчанию \"Отправить\""
 
 #: templates/form-settings-meta-box.php:310
 msgid "Custom HTML/Text After Button"
 msgstr "Пользовательский HTML/текст после кнопки"
 
 #: templates/form-settings-meta-box.php:313
-msgid "Custom HTML or text to display after the submit button (e.g., privacy policy notice)"
-msgstr "Пользовательский HTML или текст для отображения после кнопки отправки (например, уведомление о политике конфиденциальности)"
+msgid ""
+"Custom HTML or text to display after the submit button (e.g., privacy policy "
+"notice)"
+msgstr ""
+"Пользовательский HTML или текст для отображения после кнопки отправки "
+"(например, уведомление о политике конфиденциальности)"
 
 #: templates/form-settings-meta-box.php:317
 msgid "Success Message Text"
 msgstr "Текст сообщения об успехе"
 
 #: templates/form-settings-meta-box.php:320
-msgid "Custom text to display after successful form submission. Leave empty to use default message."
-msgstr "Пользовательский текст для отображения после успешной отправки формы. Оставьте пустым для использования сообщения по умолчанию."
+msgid ""
+"Custom text to display after successful form submission. Leave empty to use "
+"default message."
+msgstr ""
+"Пользовательский текст для отображения после успешной отправки формы. "
+"Оставьте пустым для использования сообщения по умолчанию."
 
 #: templates/form-settings-meta-box.php:324
 msgid "Custom CSS Classes"
 msgstr "Пользовательские CSS классы"
 
 #: templates/form-settings-meta-box.php:327
-msgid "Additional CSS classes to add to the form element. Separate multiple classes with spaces."
-msgstr "Дополнительные CSS классы для добавления к элементу формы. Разделяйте несколько классов пробелами."
+msgid ""
+"Additional CSS classes to add to the form element. Separate multiple classes "
+"with spaces."
+msgstr ""
+"Дополнительные CSS классы для добавления к элементу формы. Разделяйте "
+"несколько классов пробелами."
 
 #: templates/form-settings-meta-box.php:331
 msgid "Redirect URL After Submission"
 msgstr "URL для редиректа после отправки"
 
 #: templates/form-settings-meta-box.php:334
-msgid "URL or relative path to redirect to after successful form submission (e.g., https://example.com/page or /thank-you). Leave empty to show success message without redirect."
-msgstr "URL или относительный путь для перенаправления после успешной отправки формы (например, https://example.com/page или /thank-you). Оставьте пустым, чтобы показать сообщение об успехе без редиректа."
+msgid ""
+"URL or relative path to redirect to after successful form submission (e.g., "
+"https://example.com/page or /thank-you). Leave empty to show success message "
+"without redirect."
+msgstr ""
+"URL или относительный путь для перенаправления после успешной отправки формы "
+"(например, https://example.com/page или /thank-you). Оставьте пустым, чтобы "
+"показать сообщение об успехе без редиректа."
 
 #: templates/form-settings-meta-box.php:347
 msgid "Accept any fields from frontend"
@@ -1091,8 +1117,16 @@ msgid "Warning:"
 msgstr "Предупреждение:"
 
 #: templates/form-settings-meta-box.php:353
-msgid "When enabled, the form will accept ANY field names from frontend submissions without validation against Fields Configuration. Use this for custom forms where you control field names in templates. All fields will still be sanitized but type validation will be skipped."
-msgstr "При включении форма будет принимать ЛЮБЫЕ имена полей из отправок с фронтенда без проверки по конфигурации полей. Используйте это для пользовательских форм, где вы контролируете имена полей в шаблонах. Все поля все равно будут санитизированы, но проверка типов будет пропущена."
+msgid ""
+"When enabled, the form will accept ANY field names from frontend submissions "
+"without validation against Fields Configuration. Use this for custom forms "
+"where you control field names in templates. All fields will still be "
+"sanitized but type validation will be skipped."
+msgstr ""
+"При включении форма будет принимать ЛЮБЫЕ имена полей из отправок с "
+"фронтенда без проверки по конфигурации полей. Используйте это для "
+"пользовательских форм, где вы контролируете имена полей в шаблонах. Все поля "
+"все равно будут санитизированы, но проверка типов будет пропущена."
 
 #: handlers/class-telegram-handler.php:34
 msgid "Telegram bot token or chat IDs not configured"
@@ -1202,17 +1236,19 @@ msgstr "Примечание:"
 
 #: templates/form-settings-meta-box.php:244
 msgid "You can use HTML tags supported by Telegram (b, i, u, s, code, pre, a)."
-msgstr "Вы можете использовать HTML теги, поддерживаемые Telegram (b, i, u, s, code, pre, a)."
+msgstr ""
+"Вы можете использовать HTML теги, поддерживаемые Telegram (b, i, u, s, code, "
+"pre, a)."
 
 #: handlers/class-template-parser.php:252
 msgid "Page URL:"
 msgstr "URL страницы:"
 
-#: includes/class-meta-boxes.php:167
+#: includes/class-meta-boxes.php:169
 msgid "By clicking the button, you agree to the"
 msgstr "Нажимая кнопку, вы соглашаетесь с"
 
-#: includes/class-meta-boxes.php:167
+#: includes/class-meta-boxes.php:169
 msgid "privacy policy"
 msgstr "политикой конфиденциальности"
 
@@ -1236,239 +1272,6 @@ msgstr "Это поле обязательно для заполнения."
 msgid "Please enter a valid email address."
 msgstr "Пожалуйста, введите корректный email адрес."
 
-#: includes/class-google-sheets-admin.php:205
-#~ msgid "✅ Google Sheets authentication successful! You can now use Google Sheets integration in your forms."
-#~ msgstr "✅ Аутентификация Google Таблиц успешна! Теперь вы можете использовать интеграцию с Google Таблицами в своих формах."
-
-#: includes/class-google-sheets-admin.php:211
-#~ msgid "❌ Authentication failed. Please try again."
-#~ msgstr "❌ Ошибка аутентификации. Пожалуйста, попробуйте снова."
-
-#: includes/class-google-sheets-admin.php:217
-#~ msgid "Settings saved successfully!"
-#~ msgstr "Настройки сохранены успешно!"
-
-#: includes/class-google-sheets-admin.php:223
-#~ msgid "✅ Google Sheets authentication has been revoked. You can now re-authenticate with different credentials."
-#~ msgstr "✅ Аутентификация Google Таблиц отозвана. Теперь вы можете пройти аутентификацию с другими учетными данными."
-
-#: includes/class-google-sheets-admin.php:229
-#~ msgid "🗑️ All Google Sheets settings have been cleared. You can start fresh setup."
-#~ msgstr "🗑️ Все настройки Google Таблиц очищены. Вы можете начать настройку заново."
-
-#: includes/class-google-sheets-admin.php:234
-#~ msgid "Step 1: Google Cloud Console Setup"
-#~ msgstr "Шаг 1: Настройка Google Cloud Console"
-
-#: includes/class-google-sheets-admin.php:236
-#: includes/class-google-sheets-admin.php:347
-#~ msgid "Go to"
-#~ msgstr "Перейдите на"
-
-#: includes/class-google-sheets-admin.php:236
-#~ msgid "Google Cloud Console"
-#~ msgstr "Google Cloud Console"
-
-#: includes/class-google-sheets-admin.php:237
-#~ msgid "Create a new project or select existing one"
-#~ msgstr "Создайте новый проект или выберите существующий"
-
-#: includes/class-google-sheets-admin.php:238
-#~ msgid "Enable Google Sheets API:"
-#~ msgstr "Включите Google Sheets API:"
-
-#: includes/class-google-sheets-admin.php:240
-#~ msgid "Go to \"APIs &amp; Services\" → \"Library\""
-#~ msgstr "Перейдите в \"APIs &amp; Services\" → \"Library\""
-
-#: includes/class-google-sheets-admin.php:241
-#~ msgid "Search for \"Google Sheets API\""
-#~ msgstr "Найдите \"Google Sheets API\""
-
-#: includes/class-google-sheets-admin.php:242
-#~ msgid "Click \"Enable\""
-#~ msgstr "Нажмите \"Enable\""
-
-#: includes/class-google-sheets-admin.php:245
-#~ msgid "Create OAuth 2.0 credentials:"
-#~ msgstr "Создайте учетные данные OAuth 2.0:"
-
-#: includes/class-google-sheets-admin.php:247
-#~ msgid "Go to \"APIs &amp; Services\" → \"Credentials\""
-#~ msgstr "Перейдите в \"APIs &amp; Services\" → \"Credentials\""
-
-#: includes/class-google-sheets-admin.php:248
-#~ msgid "Click \"Create Credentials\" → \"OAuth 2.0 Client IDs\""
-#~ msgstr "Нажмите \"Create Credentials\" → \"OAuth 2.0 Client IDs\""
-
-#: includes/class-google-sheets-admin.php:249
-#~ msgid "Choose \"Web application\""
-#~ msgstr "Выберите \"Web application\""
-
-#: includes/class-google-sheets-admin.php:250
-#~ msgid "Add authorized redirect URI:"
-#~ msgstr "Добавьте авторизованный URI перенаправления:"
-
-#: includes/class-google-sheets-admin.php:251
-#~ msgid "Important:"
-#~ msgstr "Важно:"
-
-#: includes/class-google-sheets-admin.php:251
-#~ msgid "Make sure this exact URL is added to your Google Cloud Console OAuth credentials"
-#~ msgstr "Убедитесь, что этот точный URL добавлен в учетные данные OAuth вашей Google Cloud Console"
-
-#: includes/class-google-sheets-admin.php:252
-#~ msgid "Save Client ID and Client Secret"
-#~ msgstr "Сохраните Client ID и Client Secret"
-
-#: includes/class-google-sheets-admin.php:259
-#~ msgid "Step 2: Enter Credentials"
-#~ msgstr "Шаг 2: Введите учетные данные"
-
-#: includes/class-google-sheets-admin.php:265
-#~ msgid "Client ID"
-#~ msgstr "Client ID"
-
-#: includes/class-google-sheets-admin.php:269
-#~ msgid "OAuth 2.0 Client ID from Google Cloud Console"
-#~ msgstr "OAuth 2.0 Client ID из Google Cloud Console"
-
-#: includes/class-google-sheets-admin.php:273
-#~ msgid "Client Secret"
-#~ msgstr "Client Secret"
-
-#: includes/class-google-sheets-admin.php:277
-#~ msgid "OAuth 2.0 Client Secret from Google Cloud Console"
-#~ msgstr "OAuth 2.0 Client Secret из Google Cloud Console"
-
-#: includes/class-google-sheets-admin.php:283
-#~ msgid "Save Credentials"
-#~ msgstr "Сохранить учетные данные"
-
-#: includes/class-google-sheets-admin.php:289
-#~ msgid "Step 3: Authorize Access"
-#~ msgstr "Шаг 3: Авторизуйте доступ"
-
-#: includes/class-google-sheets-admin.php:292
-#~ msgid "✅ Authenticated! Google Sheets integration is ready to use."
-#~ msgstr "✅ Аутентифицирован! Интеграция с Google Таблицами готова к использованию."
-
-#: includes/class-google-sheets-admin.php:293
-#~ msgid "Refresh Token:"
-#~ msgstr "Refresh Token:"
-
-#: includes/class-google-sheets-admin.php:297
-#~ msgid "🔐 Authentication Management"
-#~ msgstr "🔐 Управление аутентификацией"
-
-#: includes/class-google-sheets-admin.php:298
-#~ msgid "If you need to switch to a different Google account or re-authenticate:"
-#~ msgstr "Если вам нужно переключиться на другой аккаунт Google или пройти аутентификацию заново:"
-
-#: includes/class-google-sheets-admin.php:301
-#~ msgid "Are you sure you want to revoke Google Sheets authentication? This will disconnect the current integration."
-#~ msgstr "Вы уверены, что хотите отозвать аутентификацию Google Таблиц? Это отключит текущую интеграцию."
-
-#: includes/class-google-sheets-admin.php:302
-#~ msgid "🚫 Revoke Authentication"
-#~ msgstr "🚫 Отозвать аутентификацию"
-
-#: includes/class-google-sheets-admin.php:306
-#~ msgid "This will remove the current authentication. You'll need to re-authenticate to use Google Sheets integration again."
-#~ msgstr "Это удалит текущую аутентификацию. Вам нужно будет пройти аутентификацию снова, чтобы использовать интеграцию с Google Таблицами."
-
-#: includes/class-google-sheets-admin.php:310
-#~ msgid "Click the button below to authorize access to Google Sheets:"
-#~ msgstr "Нажмите кнопку ниже, чтобы авторизовать доступ к Google Таблицам:"
-
-#: includes/class-google-sheets-admin.php:312
-#~ msgid "🔐 Authorize Google Sheets Access"
-#~ msgstr "🔐 Авторизовать доступ к Google Таблицам"
-
-#: includes/class-google-sheets-admin.php:316
-#~ msgid "⚠️ Please save your Client ID and Client Secret first."
-#~ msgstr "⚠️ Сначала сохраните свой Client ID и Client Secret."
-
-#: includes/class-google-sheets-admin.php:323
-#~ msgid "Step 4: Test Connection"
-#~ msgstr "Шаг 4: Тестирование подключения"
-
-#: includes/class-google-sheets-admin.php:324
-#~ msgid "Test your Google Sheets connection:"
-#~ msgstr "Протестируйте подключение Google Таблиц:"
-
-#: includes/class-google-sheets-admin.php:331
-#~ msgid "Enter a spreadsheet ID to test the connection"
-#~ msgstr "Введите ID таблицы для тестирования подключения"
-
-#: includes/class-google-sheets-admin.php:336
-#~ msgid "Test Google Sheets Connection"
-#~ msgstr "Протестировать подключение Google Таблиц"
-
-#: includes/class-google-sheets-admin.php:344
-#~ msgid "Usage"
-#~ msgstr "Использование"
-
-#: includes/class-google-sheets-admin.php:345
-#~ msgid "Once configured, you can enable Google Sheets integration in your forms:"
-#~ msgstr "После настройки вы можете включить интеграцию с Google Таблицами в своих формах:"
-
-#: includes/class-google-sheets-admin.php:347
-#~ msgid "Add New"
-#~ msgstr "Добавить"
-
-#: includes/class-google-sheets-admin.php:347
-#~ msgid "or edit existing form"
-#~ msgstr "или отредактируйте существующую форму"
-
-#: includes/class-google-sheets-admin.php:348
-#~ msgid "In the"
-#~ msgstr "В"
-
-#: includes/class-google-sheets-admin.php:348
-#~ msgid "Google Sheets Integration"
-#~ msgstr "Интеграция с Google Таблицами"
-
-#: includes/class-google-sheets-admin.php:348
-#~ msgid "section:"
-#~ msgstr "раздел:"
-
-#: includes/class-google-sheets-admin.php:350
-#~ msgid "Check \"Send to Google Sheets\""
-#~ msgstr "Установите флажок \"Отправлять в Google Таблицы\""
-
-#: includes/class-google-sheets-admin.php:351
-#~ msgid "Enter your Spreadsheet ID (from URL: docs.google.com/spreadsheets/d/SPREADSHEET_ID)"
-#~ msgstr "Введите ID вашей таблицы (из URL: docs.google.com/spreadsheets/d/SPREADSHEET_ID)"
-
-#: includes/class-google-sheets-admin.php:354
-#~ msgid "Save the form"
-#~ msgstr "Сохраните форму"
-
-#: includes/class-google-sheets-admin.php:360
-#~ msgid "⚠️ Clear All Settings"
-#~ msgstr "⚠️ Очистить все настройки"
-
-#: includes/class-google-sheets-admin.php:361
-#~ msgid "If you want to completely remove all Google Sheets settings and start over:"
-#~ msgstr "Если вы хотите полностью удалить все настройки Google Таблиц и начать заново:"
-
-#: includes/class-google-sheets-admin.php:364
-#~ msgid "⚠️ WARNING: This will permanently delete ALL Google Sheets settings including Client ID, Client Secret, and Refresh Token. This action cannot be undone. Are you absolutely sure?"
-#~ msgstr "⚠️ ПРЕДУПРЕЖДЕНИЕ: Это навсегда удалит ВСЕ настройки Google Таблиц, включая Client ID, Client Secret и Refresh Token. Это действие невозможно отменить. Вы абсолютно уверены?"
-
-#: includes/class-google-sheets-admin.php:365
-#~ msgid "🗑️ Clear All Google Sheets Settings"
-#~ msgstr "🗑️ Очистить все настройки Google Таблиц"
-
-#: includes/class-google-sheets-admin.php:369
-#~ msgid "Use this when:"
-#~ msgstr "Используйте это, когда:"
-
-#: includes/class-google-sheets-admin.php:369
-#~ msgid "You want to switch to different Google account, fix OAuth issues, or start fresh setup."
-#~ msgstr "Вы хотите переключиться на другой аккаунт Google, исправить проблемы с OAuth или начать настройку заново."
-
 #. Plugin Name of the plugin
 #: mksddn-forms-handler.php
 msgid "MksDdn Forms Handler"
@@ -1481,7 +1284,11 @@ msgstr ""
 
 #. Description of the plugin
 #: mksddn-forms-handler.php
-msgid "Advanced form processing system with REST API support, Telegram notifications, and Google Sheets integration. Create and manage forms with multiple delivery methods including email, Telegram, Google Sheets, and admin storage."
+msgid ""
+"Advanced form processing system with REST API support, Telegram "
+"notifications, and Google Sheets integration. Create and manage forms with "
+"multiple delivery methods including email, Telegram, Google Sheets, and "
+"admin storage."
 msgstr ""
 
 #. Author of the plugin
@@ -1494,23 +1301,26 @@ msgstr ""
 msgid "https://github.com/mksddn"
 msgstr ""
 
-#: includes/class-forms-handler.php:2107
-#: includes/class-forms-handler.php:2121
+#: includes/class-forms-handler.php:2110 includes/class-forms-handler.php:2124
 msgid "Form submission from this origin is not allowed."
 msgstr "Отправка формы с этого источника не разрешена."
 
 #. translators: %s: external domain
-#: includes/class-meta-boxes.php:525
+#: includes/class-meta-boxes.php:533
 #, php-format
-msgid "External redirect URLs are not allowed (%s). Use relative URLs or add domain to whitelist."
-msgstr "Внешние URL перенаправления не разрешены (%s). Используйте относительные URL или добавьте домен в белый список."
+msgid ""
+"External redirect URLs are not allowed (%s). Use relative URLs or add domain "
+"to whitelist."
+msgstr ""
+"Внешние URL перенаправления не разрешены (%s). Используйте относительные URL "
+"или добавьте домен в белый список."
 
-#: includes/class-meta-boxes.php:651
+#: includes/class-meta-boxes.php:659
 msgid "Allowlist mode requires at least one valid origin."
 msgstr "Режим белого списка требует хотя бы один валидный origin."
 
 #. translators: %s: comma-separated invalid origin strings
-#: includes/class-meta-boxes.php:659
+#: includes/class-meta-boxes.php:667
 #, php-format
 msgid "Some trusted origins were skipped because they are invalid: %s"
 msgstr "Некоторые доверенные origin пропущены из-за неверного формата: %s"
@@ -1532,59 +1342,71 @@ msgid "Allowlist"
 msgstr "Белый список"
 
 #: templates/form-settings-meta-box.php:378
-msgid "Optional extra layer: restrict submissions by Origin/Referer. Disabled by default for existing forms."
-msgstr "Дополнительная защита: ограничение отправок по Origin/Referer. По умолчанию выключено для существующих форм."
+msgid ""
+"Optional extra layer: restrict submissions by Origin/Referer. Disabled by "
+"default for existing forms."
+msgstr ""
+"Дополнительная защита: ограничение отправок по Origin/Referer. По умолчанию "
+"выключено для существующих форм."
 
 #: templates/form-settings-meta-box.php:382
 msgid "Allowed origins"
 msgstr "Разрешенные origin"
 
 #: templates/form-settings-meta-box.php:386
-msgid "One origin per line. Use scheme + host only, e.g. https://www.example.com or https://app.example.com:8443"
-msgstr "Один origin на строку. Только схема и хост, например https://www.example.com или https://app.example.com:8443"
+msgid ""
+"One origin per line. Use scheme + host only, e.g. https://www.example.com or "
+"https://app.example.com:8443"
+msgstr ""
+"Один origin на строку. Только схема и хост, например https://www.example.com "
+"или https://app.example.com:8443"
 
 #: templates/form-settings-meta-box.php:394
 msgid "Fallback to Referer when Origin is missing"
 msgstr "Использовать Referer, если Origin отсутствует"
 
 #: templates/form-settings-meta-box.php:398
-msgid "Recommended for browser form posts. Disable for strict API-only clients that must send Origin."
-msgstr "Рекомендуется для отправки форм из браузера. Отключите для строгих API-клиентов, которые должны передавать Origin."
+msgid ""
+"Recommended for browser form posts. Disable for strict API-only clients that "
+"must send Origin."
+msgstr ""
+"Рекомендуется для отправки форм из браузера. Отключите для строгих API-"
+"клиентов, которые должны передавать Origin."
 
 #: includes/class-spam-settings-admin.php:31
 #: includes/class-spam-settings-admin.php:32
-#: includes/class-spam-settings-admin.php:126
+#: includes/class-spam-settings-admin.php:132
 msgid "Spam Protection"
 msgstr "Защита от спама"
 
-#: includes/class-shortcodes.php:270
-#: includes/class-spam-protection.php:182
+#: includes/class-shortcodes.php:274 includes/class-spam-protection.php:230
 #: includes/template-functions.php:117
 msgid "Captcha verification is required."
 msgstr "Требуется проверка captcha."
 
-#: includes/class-spam-protection.php:315
+#: includes/class-spam-protection.php:363
 msgid "Too many form submissions. Please try again later."
 msgstr "Слишком много отправок форм. Попробуйте позже."
 
-#: includes/class-shortcodes.php:271
-#: includes/class-spam-protection.php:354
-#: includes/class-spam-protection.php:363
-#: includes/template-functions.php:118
+#: includes/class-shortcodes.php:275 includes/class-spam-protection.php:402
+#: includes/class-spam-protection.php:411 includes/template-functions.php:118
 msgid "Captcha verification failed. Please try again."
 msgstr "Проверка captcha не пройдена. Попробуйте снова."
 
-#: templates/form-settings-meta-box.php:405
-msgid "Require Cloudflare Turnstile"
-msgstr "Требовать Cloudflare Turnstile"
-
+#: includes/class-spam-settings-admin.php:184
 #: templates/form-settings-meta-box.php:402
 msgid "Cloudflare Turnstile"
 msgstr "Cloudflare Turnstile"
 
 #: templates/form-settings-meta-box.php:409
-msgid "Requires Turnstile keys in Forms → Spam Protection. Shortcode forms render the widget automatically; custom REST forms must send cf-turnstile-response or mksddn_fh_turnstile_response."
-msgstr "Требуются ключи Turnstile в «Формы → Защита от спама». Шорткод-формы выводят виджет автоматически; для кастомных REST-форм передавайте cf-turnstile-response или mksddn_fh_turnstile_response."
+msgid ""
+"Requires Turnstile keys in Forms → Spam Protection. Shortcode forms render "
+"the widget automatically; custom REST forms must send cf-turnstile-response "
+"or mksddn_fh_turnstile_response."
+msgstr ""
+"Требуются ключи Turnstile в «Формы → Защита от спама». Шорткод-формы выводят "
+"виджет автоматически; для кастомных REST-форм передавайте cf-turnstile-"
+"response или mksddn_fh_turnstile_response."
 
 #: includes/class-spam-settings-admin.php:187
 msgid "Require Turnstile by default"
@@ -1592,129 +1414,153 @@ msgstr "Требовать Turnstile по умолчанию"
 
 #: includes/class-spam-settings-admin.php:191
 msgid "Require captcha on all forms unless overridden in Advanced settings"
-msgstr "Требовать captcha на всех формах, если не переопределено в «Дополнительно»"
+msgstr ""
+"Требовать captcha на всех формах, если не переопределено в «Дополнительно»"
 
 #: includes/class-spam-settings-admin.php:193
-msgid "Forms can override this in Advanced settings (inherit / on / off). Both keys below must be saved for captcha to work."
-msgstr "Для каждой формы можно переопределить в «Дополнительно» (наследовать / вкл. / выкл.). Для работы captcha нужно сохранить оба ключа ниже."
+msgid ""
+"Forms can override this in Advanced settings (inherit / on / off). Both keys "
+"below must be saved for captcha to work."
+msgstr ""
+"Для каждой формы можно переопределить в «Дополнительно» (наследовать / "
+"вкл. / выкл.). Для работы captcha нужно сохранить оба ключа ниже."
 
-#: includes/class-spam-settings-admin.php:207
-msgid "For custom REST forms, send cf-turnstile-response or mksddn_fh_turnstile_response in the request body."
-msgstr "Для кастомных REST-форм передавайте cf-turnstile-response или mksddn_fh_turnstile_response в теле запроса."
+#: includes/class-spam-settings-admin.php:206
+msgid ""
+"For custom REST forms, send cf-turnstile-response or "
+"mksddn_fh_turnstile_response in the request body."
+msgstr ""
+"Для кастомных REST-форм передавайте cf-turnstile-response или "
+"mksddn_fh_turnstile_response в теле запроса."
 
+#: templates/form-settings-meta-box.php:405
 #: templates/form-settings-meta-box.php:419
 msgid "Inherit global setting"
 msgstr "Наследовать глобальную настройку"
 
 #: templates/form-settings-meta-box.php:423
-msgid "Detect bot patterns such as random Latin-only names and selecting all checkbox options at once."
-msgstr "Обнаруживать паттерны ботов: случайные латинские имена и выбор всех чекбоксов сразу."
+msgid ""
+"Detect bot patterns such as random Latin-only names and selecting all "
+"checkbox options at once."
+msgstr ""
+"Обнаруживать паттерны ботов: случайные латинские имена и выбор всех "
+"чекбоксов сразу."
 
-#: includes/class-spam-settings-admin.php:129
-msgid "Turnstile is not active until both the site key and the secret key are saved. Forms that require Turnstile will skip captcha until then."
-msgstr "Turnstile не активен, пока не сохранены и site key, и secret key. Формы с обязательной captcha будут пропускать проверку."
+#: includes/class-spam-settings-admin.php:135
+msgid ""
+"Turnstile is not active until both the site key and the secret key are "
+"saved. Forms that require Turnstile will skip captcha until then."
+msgstr ""
+"Turnstile не активен, пока не сохранены и site key, и secret key. Формы с "
+"обязательной captcha будут пропускать проверку."
 
 #: templates/form-settings-meta-box.php:411
-msgid "Turnstile will not be enforced until both site key and secret key are saved."
-msgstr "Turnstile не будет проверяться, пока не сохранены и site key, и secret key."
+msgid ""
+"Turnstile will not be enforced until both site key and secret key are saved."
+msgstr ""
+"Turnstile не будет проверяться, пока не сохранены и site key, и secret key."
 
-#: includes/class-spam-protection.php:272
+#: includes/class-spam-protection.php:320
 msgid "Submission blocked."
 msgstr "Отправка заблокирована."
 
-#: includes/class-spam-protection.php:334
+#: includes/class-spam-protection.php:382
 msgid "Captcha is not configured."
 msgstr "Captcha не настроена."
 
-#: includes/class-spam-settings-admin.php:113
+#: includes/class-spam-settings-admin.php:118
 msgid "Settings saved."
 msgstr "Настройки сохранены."
 
-#: includes/class-spam-settings-admin.php:127
-msgid "Global anti-spam settings for all forms. Per-form options are available in each form Advanced tab."
-msgstr "Глобальные настройки антиспама для всех форм. Параметры для отдельных форм доступны на вкладке «Дополнительно»."
+#: includes/class-spam-settings-admin.php:133
+msgid ""
+"Global anti-spam settings for all forms. Per-form options are available in "
+"each form Advanced tab."
+msgstr ""
+"Глобальные настройки антиспама для всех форм. Параметры для отдельных форм "
+"доступны на вкладке «Дополнительно»."
 
-#: includes/class-spam-settings-admin.php:135
+#: includes/class-spam-settings-admin.php:141
 msgid "Global rate limit"
 msgstr "Глобальный лимит частоты"
 
-#: includes/class-spam-settings-admin.php:138
+#: includes/class-spam-settings-admin.php:144
 msgid "Enable global rate limit"
 msgstr "Включить глобальный лимит частоты"
 
-#: includes/class-spam-settings-admin.php:142
+#: includes/class-spam-settings-admin.php:148
 msgid "Limit total submissions per IP across all forms"
 msgstr "Ограничить общее число отправок с одного IP для всех форм"
 
-#: includes/class-spam-settings-admin.php:144
-msgid "Works in addition to the existing per-form limit (1 request per 10 seconds)."
-msgstr "Работает дополнительно к существующему лимиту для каждой формы (1 запрос за 10 секунд)."
+#: includes/class-spam-settings-admin.php:150
+msgid ""
+"Works in addition to the existing per-form limit (1 request per 10 seconds)."
+msgstr ""
+"Работает дополнительно к существующему лимиту для каждой формы (1 запрос за "
+"10 секунд)."
 
-#: includes/class-spam-settings-admin.php:148
+#: includes/class-spam-settings-admin.php:154
 msgid "Max submissions"
 msgstr "Макс. отправок"
 
-#: includes/class-spam-settings-admin.php:151
+#: includes/class-spam-settings-admin.php:157
 msgid "Maximum submissions per IP within the time window."
 msgstr "Максимальное число отправок с одного IP за указанный интервал."
 
-#: includes/class-spam-settings-admin.php:155
+#: includes/class-spam-settings-admin.php:161
 msgid "Time window (seconds)"
 msgstr "Интервал (секунды)"
 
-#: includes/class-spam-settings-admin.php:158
+#: includes/class-spam-settings-admin.php:164
 msgid "Default: 3600 (1 hour)."
 msgstr "По умолчанию: 3600 (1 час)."
 
-#: includes/class-spam-settings-admin.php:163
+#: includes/class-spam-settings-admin.php:169
 #: templates/form-settings-meta-box.php:416
 msgid "Spam heuristics"
 msgstr "Эвристики спама"
 
-#: includes/class-spam-settings-admin.php:166
+#: includes/class-spam-settings-admin.php:172
 msgid "Enable heuristics globally"
 msgstr "Включить эвристики глобально"
 
-#: includes/class-spam-settings-admin.php:170
+#: includes/class-spam-settings-admin.php:176
 msgid "Detect bot patterns (random Latin names, all checkbox options selected)"
-msgstr "Обнаруживать паттерны ботов (случайные латинские имена, выбор всех чекбоксов)"
-
-#: includes/class-spam-settings-admin.php:172
-msgid "Forms can override this in Advanced settings (inherit / on / off)."
-msgstr "Для каждой формы можно переопределить в «Дополнительно» (наследовать / вкл. / выкл.)."
-
-#: includes/class-spam-settings-admin.php:173
-msgid "Heuristic-based: may rarely misfire on unusual legitimate input. Disable per form if this happens."
-msgstr "На основе эвристик: редко может срабатывать на нестандартный, но легитимный ввод. Отключите для формы при необходимости."
+msgstr ""
+"Обнаруживать паттерны ботов (случайные латинские имена, выбор всех чекбоксов)"
 
 #: includes/class-spam-settings-admin.php:178
-msgid "Cloudflare Turnstile"
-msgstr "Cloudflare Turnstile"
+msgid "Forms can override this in Advanced settings (inherit / on / off)."
+msgstr ""
+"Для каждой формы можно переопределить в «Дополнительно» (наследовать / "
+"вкл. / выкл.)."
 
-#: includes/class-spam-settings-admin.php:181
+#: includes/class-spam-settings-admin.php:179
+msgid ""
+"Heuristic-based: may rarely misfire on unusual legitimate input. Disable per "
+"form if this happens."
+msgstr ""
+"На основе эвристик: редко может срабатывать на нестандартный, но легитимный "
+"ввод. Отключите для формы при необходимости."
+
+#: includes/class-spam-settings-admin.php:197
 msgid "Site key"
 msgstr "Site key"
 
-#: includes/class-spam-settings-admin.php:187
+#: includes/class-spam-settings-admin.php:203
 msgid "Secret key"
 msgstr "Secret key"
 
-#: includes/class-spam-settings-admin.php:207
-msgid "For custom REST forms, send cf-turnstile-response or mksddn_fh_turnstile_response in the request body."
-msgstr "Для кастомных REST-форм передавайте cf-turnstile-response или mksddn_fh_turnstile_response в теле запроса."
-
-#: includes/class-spam-settings-admin.php:195
+#: includes/class-spam-settings-admin.php:211
 msgid "Save Settings"
 msgstr "Сохранить настройки"
 
-#: templates/form-settings-meta-box.php:409
-msgid "Requires Turnstile keys in Forms → Spam Protection. Adds widget to shortcode forms; custom REST forms must send cf-turnstile-response or mksddn_fh_turnstile_response."
-msgstr "Требуются ключи Turnstile в Формы → Защита от спама. Добавляет виджет в шорткод-формы; кастомные REST-формы должны передавать cf-turnstile-response или mksddn_fh_turnstile_response."
-
+#: templates/form-settings-meta-box.php:406
 #: templates/form-settings-meta-box.php:420
 msgid "On"
 msgstr "Вкл."
 
+#: templates/form-settings-meta-box.php:407
 #: templates/form-settings-meta-box.php:421
 msgid "Off"
 msgstr "Выкл."

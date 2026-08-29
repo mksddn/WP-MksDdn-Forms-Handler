@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-29T07:22:54+00:00\n"
+"POT-Creation-Date: 2026-08-29T07:53:28+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: mksddn-forms-handler\n"
@@ -80,7 +80,7 @@ msgstr ""
 
 #: handlers/class-telegram-handler.php:87
 #: handlers/class-template-parser.php:227
-#: includes/class-meta-boxes.php:346
+#: includes/class-meta-boxes.php:348
 msgid "Form:"
 msgstr ""
 
@@ -197,10 +197,10 @@ msgid "No data"
 msgstr ""
 
 #: includes/class-admin-columns.php:263
-#: includes/class-meta-boxes.php:346
-#: includes/class-meta-boxes.php:347
+#: includes/class-meta-boxes.php:348
 #: includes/class-meta-boxes.php:349
-#: includes/class-meta-boxes.php:350
+#: includes/class-meta-boxes.php:351
+#: includes/class-meta-boxes.php:352
 msgid "Unknown"
 msgstr ""
 
@@ -244,7 +244,7 @@ msgstr ""
 #: includes/class-export-handler.php:63
 #: includes/class-google-sheets-admin.php:132
 #: includes/class-google-sheets-admin.php:161
-#: includes/class-spam-settings-admin.php:107
+#: includes/class-spam-settings-admin.php:112
 msgid "Access denied"
 msgstr ""
 
@@ -295,7 +295,7 @@ msgid "Cancel"
 msgstr ""
 
 #: includes/class-forms-handler.php:69
-#: includes/class-forms-handler.php:1285
+#: includes/class-forms-handler.php:1288
 msgid "Invalid form fields configuration"
 msgstr ""
 
@@ -303,8 +303,8 @@ msgstr ""
 #. translators: %s: field label
 #: includes/class-forms-handler.php:100
 #: includes/class-forms-handler.php:129
-#: includes/class-forms-handler.php:1338
-#: includes/class-forms-handler.php:1367
+#: includes/class-forms-handler.php:1341
+#: includes/class-forms-handler.php:1370
 #, php-format
 msgid "Field '%s' is required"
 msgstr ""
@@ -334,15 +334,15 @@ msgid "File type not allowed for field '%s'"
 msgstr ""
 
 #: includes/class-forms-handler.php:271
-#: includes/class-forms-handler.php:592
-#: includes/class-spam-protection.php:382
-#: includes/class-spam-protection.php:390
-#: includes/class-spam-protection.php:406
+#: includes/class-forms-handler.php:595
+#: includes/class-spam-protection.php:430
+#: includes/class-spam-protection.php:438
+#: includes/class-spam-protection.php:454
 msgid "Spam detected"
 msgstr ""
 
 #: includes/class-forms-handler.php:307
-#: includes/class-forms-handler.php:681
+#: includes/class-forms-handler.php:684
 msgid "Invalid form data"
 msgstr ""
 
@@ -359,290 +359,290 @@ msgid "Invalid slug"
 msgstr ""
 
 #: includes/class-forms-handler.php:441
-#: includes/class-forms-handler.php:903
+#: includes/class-forms-handler.php:906
 #: includes/class-shortcodes.php:44
 msgid "Form not found"
 msgstr ""
 
-#: includes/class-forms-handler.php:581
+#: includes/class-forms-handler.php:584
 msgid "Security check failed. Please refresh the page and try again."
 msgstr ""
 
 #. translators: %s: field names
-#: includes/class-forms-handler.php:717
-#: includes/class-forms-handler.php:1267
+#: includes/class-forms-handler.php:720
+#: includes/class-forms-handler.php:1270
 #, php-format
 msgid "Unauthorized fields detected: %s"
 msgstr ""
 
-#: includes/class-forms-handler.php:869
+#: includes/class-forms-handler.php:872
 msgid "Failed to deliver form submission"
 msgstr ""
 
-#: includes/class-forms-handler.php:879
+#: includes/class-forms-handler.php:882
 msgid "Form submitted successfully"
 msgstr ""
 
-#: includes/class-forms-handler.php:975
+#: includes/class-forms-handler.php:978
 msgid "Form is not configured correctly"
 msgstr ""
 
-#: includes/class-forms-handler.php:1207
-#: includes/class-forms-handler.php:1280
+#: includes/class-forms-handler.php:1210
+#: includes/class-forms-handler.php:1283
 msgid "Form fields configuration is missing"
 msgstr ""
 
-#: includes/class-forms-handler.php:1290
+#: includes/class-forms-handler.php:1293
 msgid "No fields configured for this form"
 msgstr ""
 
-#: includes/class-forms-handler.php:1295
+#: includes/class-forms-handler.php:1298
 msgid "No form data provided"
 msgstr ""
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1328
+#: includes/class-forms-handler.php:1331
 #, php-format
 msgid "Field '%s' must be a single value, not an array. Use 'array_of_objects' type for arrays."
 msgstr ""
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1335
+#: includes/class-forms-handler.php:1338
 #, php-format
 msgid "Field '%s' is required for agreement"
 msgstr ""
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1346
+#: includes/class-forms-handler.php:1349
 #, php-format
 msgid "Field '%s' must be a single email address"
 msgstr ""
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1350
+#: includes/class-forms-handler.php:1353
 #, php-format
 msgid "Field '%s' must contain a valid email address"
 msgstr ""
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1362
+#: includes/class-forms-handler.php:1365
 #, php-format
 msgid "Field '%s' contains invalid file URL"
 msgstr ""
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1375
+#: includes/class-forms-handler.php:1378
 #, php-format
 msgid "Field '%s' must be a single URL"
 msgstr ""
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1380
+#: includes/class-forms-handler.php:1383
 #, php-format
 msgid "Field '%s' must contain a valid URL"
 msgstr ""
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1389
+#: includes/class-forms-handler.php:1392
 #, php-format
 msgid "Field '%s' must be a single number"
 msgstr ""
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1393
+#: includes/class-forms-handler.php:1396
 #, php-format
 msgid "Field '%s' must be a number"
 msgstr ""
 
 #. translators: 1: field label, 2: min value
-#: includes/class-forms-handler.php:1398
+#: includes/class-forms-handler.php:1401
 #, php-format
 msgid "Field '%1$s' must be greater than or equal to %2$s"
 msgstr ""
 
 #. translators: 1: field label, 2: max value
-#: includes/class-forms-handler.php:1402
+#: includes/class-forms-handler.php:1405
 #, php-format
 msgid "Field '%1$s' must be less than or equal to %2$s"
 msgstr ""
 
 #. translators: 1: field label, 2: step value
-#: includes/class-forms-handler.php:1409
+#: includes/class-forms-handler.php:1412
 #, php-format
 msgid "Field '%1$s' must follow step %2$s"
 msgstr ""
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1429
+#: includes/class-forms-handler.php:1432
 #, php-format
 msgid "Field '%s' must be a single phone number"
 msgstr ""
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1433
+#: includes/class-forms-handler.php:1436
 #, php-format
 msgid "Field '%s' must be a valid phone number"
 msgstr ""
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1443
+#: includes/class-forms-handler.php:1446
 #, php-format
 msgid "Field '%s' must be a single date value"
 msgstr ""
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1449
+#: includes/class-forms-handler.php:1452
 #, php-format
 msgid "Field '%s' must be a valid date (YYYY-MM-DD)"
 msgstr ""
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1455
+#: includes/class-forms-handler.php:1458
 #, php-format
 msgid "Field '%s' must be a single time value"
 msgstr ""
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1461
+#: includes/class-forms-handler.php:1464
 #, php-format
 msgid "Field '%s' must be a valid time (HH:MM)"
 msgstr ""
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1467
+#: includes/class-forms-handler.php:1470
 #, php-format
 msgid "Field '%s' must be a single datetime value"
 msgstr ""
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1474
+#: includes/class-forms-handler.php:1477
 #, php-format
 msgid "Field '%s' must be a valid datetime (YYYY-MM-DDTHH:MM)"
 msgstr ""
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1486
-#: includes/class-forms-handler.php:1491
+#: includes/class-forms-handler.php:1489
+#: includes/class-forms-handler.php:1494
 #, php-format
 msgid "Field '%s' contains an invalid value"
 msgstr ""
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1503
-#: includes/class-forms-handler.php:1508
+#: includes/class-forms-handler.php:1506
+#: includes/class-forms-handler.php:1511
 #, php-format
 msgid "Field '%s' is too long (maximum 10,000 characters)"
 msgstr ""
 
 #. translators: %s: field label
-#: includes/class-forms-handler.php:1531
+#: includes/class-forms-handler.php:1534
 #, php-format
 msgid "Field '%s' is required and must contain at least one item"
 msgstr ""
 
 #. translators: 1: field label, 2: item index
-#: includes/class-forms-handler.php:1551
+#: includes/class-forms-handler.php:1554
 #, php-format
 msgid "Field '%1$s' item #%2$d must be an object"
 msgstr ""
 
 #. translators: 1: nested field label, 2: field label, 3: item index
-#: includes/class-forms-handler.php:1564
+#: includes/class-forms-handler.php:1567
 #, php-format
 msgid "Field '%1$s' in '%2$s' item #%3$d is required"
 msgstr ""
 
 #. translators: 1: nested field label, 2: field label, 3: item index
-#: includes/class-forms-handler.php:1578
+#: includes/class-forms-handler.php:1581
 #, php-format
 msgid "Field '%1$s' in '%2$s' item #%3$d must be a valid email"
 msgstr ""
 
 #. translators: 1: nested field label, 2: field label, 3: item index
-#: includes/class-forms-handler.php:1585
+#: includes/class-forms-handler.php:1588
 #, php-format
 msgid "Field '%1$s' in '%2$s' item #%3$d must be a number"
 msgstr ""
 
 #. translators: 1: nested field label, 2: field label, 3: item index, 4: min value
-#: includes/class-forms-handler.php:1589
+#: includes/class-forms-handler.php:1592
 #, php-format
 msgid "Field '%1$s' in '%2$s' item #%3$d must be greater than or equal to %4$s"
 msgstr ""
 
 #. translators: 1: nested field label, 2: field label, 3: item index, 4: max value
-#: includes/class-forms-handler.php:1592
+#: includes/class-forms-handler.php:1595
 #, php-format
 msgid "Field '%1$s' in '%2$s' item #%3$d must be less than or equal to %4$s"
 msgstr ""
 
 #. translators: 1: nested field label, 2: field label, 3: item index
-#: includes/class-forms-handler.php:1604
+#: includes/class-forms-handler.php:1607
 #, php-format
 msgid "Field '%1$s' in '%2$s' item #%3$d must be a valid phone number"
 msgstr ""
 
 #. translators: 1: nested field label, 2: field label, 3: item index
-#: includes/class-forms-handler.php:1612
+#: includes/class-forms-handler.php:1615
 #, php-format
 msgid "Field '%1$s' in '%2$s' item #%3$d must be a valid URL"
 msgstr ""
 
-#: includes/class-forms-handler.php:1655
+#: includes/class-forms-handler.php:1658
 msgid "Failed to send email"
 msgstr ""
 
-#: includes/class-forms-handler.php:1670
+#: includes/class-forms-handler.php:1673
 msgid "User reply email field is not configured"
 msgstr ""
 
-#: includes/class-forms-handler.php:1678
+#: includes/class-forms-handler.php:1681
 msgid "User email address is missing from submission"
 msgstr ""
 
-#: includes/class-forms-handler.php:1687
+#: includes/class-forms-handler.php:1690
 msgid "User email address is invalid"
 msgstr ""
 
-#: includes/class-forms-handler.php:1698
+#: includes/class-forms-handler.php:1701
 msgid "HTML reply template is not configured"
 msgstr ""
 
-#: includes/class-forms-handler.php:1711
-#: includes/class-meta-boxes.php:144
+#: includes/class-forms-handler.php:1714
+#: includes/class-meta-boxes.php:146
 msgid "Thank you for contacting us"
 msgstr ""
 
-#: includes/class-forms-handler.php:1739
+#: includes/class-forms-handler.php:1742
 msgid "Failed to send user reply email"
 msgstr ""
 
 #. translators: %s: form title
-#: includes/class-forms-handler.php:1752
+#: includes/class-forms-handler.php:1755
 #, php-format
 msgid "Form Data: %s"
 msgstr ""
 
-#: includes/class-forms-handler.php:1754
+#: includes/class-forms-handler.php:1757
 msgid "Field"
 msgstr ""
 
-#: includes/class-forms-handler.php:1754
+#: includes/class-forms-handler.php:1757
 msgid "Value"
 msgstr ""
 
 #. translators: %s: date and time
-#: includes/class-forms-handler.php:1783
+#: includes/class-forms-handler.php:1786
 #, php-format
 msgid "Sent: %s"
 msgstr ""
 
-#: includes/class-forms-handler.php:2001
+#: includes/class-forms-handler.php:2004
 msgid "Too many requests. Please wait a few seconds."
 msgstr ""
 
-#: includes/class-forms-handler.php:2107
-#: includes/class-forms-handler.php:2121
+#: includes/class-forms-handler.php:2110
+#: includes/class-forms-handler.php:2124
 msgid "Form submission from this origin is not allowed."
 msgstr ""
 
@@ -931,106 +931,106 @@ msgstr ""
 msgid "Submission Info"
 msgstr ""
 
-#: includes/class-meta-boxes.php:160
-#: includes/class-shortcodes.php:236
-#: includes/class-shortcodes.php:255
+#: includes/class-meta-boxes.php:162
+#: includes/class-shortcodes.php:240
+#: includes/class-shortcodes.php:259
 #: includes/template-functions.php:103
 msgid "Send"
 msgstr ""
 
-#: includes/class-meta-boxes.php:167
+#: includes/class-meta-boxes.php:169
 msgid "By clicking the button, you agree to the"
 msgstr ""
 
-#: includes/class-meta-boxes.php:167
+#: includes/class-meta-boxes.php:169
 msgid "privacy policy"
 msgstr ""
 
-#: includes/class-meta-boxes.php:173
-#: includes/class-shortcodes.php:58
+#: includes/class-meta-boxes.php:175
+#: includes/class-shortcodes.php:62
 #: includes/template-functions.php:104
 msgid "Thank you! Your message has been sent successfully."
 msgstr ""
 
-#: includes/class-meta-boxes.php:205
+#: includes/class-meta-boxes.php:207
 msgid "Error: Invalid JSON in Fields Configuration! Check syntax."
 msgstr ""
 
-#: includes/class-meta-boxes.php:221
+#: includes/class-meta-boxes.php:223
 msgid "No data available"
 msgstr ""
 
-#: includes/class-meta-boxes.php:348
+#: includes/class-meta-boxes.php:350
 msgid "Date:"
 msgstr ""
 
-#: includes/class-meta-boxes.php:349
+#: includes/class-meta-boxes.php:351
 msgid "IP Address:"
 msgstr ""
 
-#: includes/class-meta-boxes.php:350
+#: includes/class-meta-boxes.php:352
 msgid "User Agent:"
 msgstr ""
 
 #. translators: %s: external domain
-#: includes/class-meta-boxes.php:525
+#: includes/class-meta-boxes.php:533
 #, php-format
 msgid "External redirect URLs are not allowed (%s). Use relative URLs or add domain to whitelist."
 msgstr ""
 
-#: includes/class-meta-boxes.php:576
+#: includes/class-meta-boxes.php:584
 msgid "Selected user email field is not valid. Choose an email field from the form configuration."
 msgstr ""
 
-#: includes/class-meta-boxes.php:611
+#: includes/class-meta-boxes.php:619
 msgid "HTML template is required when HTML file reply type is selected. Upload a file and save the form."
 msgstr ""
 
-#: includes/class-meta-boxes.php:651
+#: includes/class-meta-boxes.php:659
 msgid "Allowlist mode requires at least one valid origin."
 msgstr ""
 
 #. translators: %s: comma-separated invalid origin strings
-#: includes/class-meta-boxes.php:659
+#: includes/class-meta-boxes.php:667
 #, php-format
 msgid "Some trusted origins were skipped because they are invalid: %s"
 msgstr ""
 
-#: includes/class-meta-boxes.php:779
-#: includes/class-meta-boxes.php:940
+#: includes/class-meta-boxes.php:787
+#: includes/class-meta-boxes.php:948
 msgid "Failed to upload HTML template file."
 msgstr ""
 
-#: includes/class-meta-boxes.php:789
-#: includes/class-meta-boxes.php:830
-#: includes/class-meta-boxes.php:932
+#: includes/class-meta-boxes.php:797
+#: includes/class-meta-boxes.php:838
+#: includes/class-meta-boxes.php:940
 msgid "HTML template file exceeds maximum allowed size."
 msgstr ""
 
-#: includes/class-meta-boxes.php:800
+#: includes/class-meta-boxes.php:808
 msgid "Only .html and .htm files are allowed for email templates."
 msgstr ""
 
-#: includes/class-meta-boxes.php:810
-#: includes/class-meta-boxes.php:821
+#: includes/class-meta-boxes.php:818
+#: includes/class-meta-boxes.php:829
 msgid "Could not read uploaded HTML template file."
 msgstr ""
 
-#: includes/class-meta-boxes.php:839
+#: includes/class-meta-boxes.php:847
 msgid "HTML template must not contain PHP code."
 msgstr ""
 
 #. translators: 1: file name, 2: file size in KB
-#: includes/class-meta-boxes.php:855
+#: includes/class-meta-boxes.php:863
 #, php-format
 msgid "HTML template saved: %1$s (%2$s KB). It will be used for auto-reply emails."
 msgstr ""
 
-#: includes/class-meta-boxes.php:934
+#: includes/class-meta-boxes.php:942
 msgid "HTML template upload was interrupted. Please try again."
 msgstr ""
 
-#: includes/class-meta-boxes.php:938
+#: includes/class-meta-boxes.php:946
 msgid "Server could not store the uploaded HTML template file."
 msgstr ""
 
@@ -1127,12 +1127,12 @@ msgid "Error: form ID or slug not specified"
 msgstr ""
 
 #. translators: %s: field name
-#: includes/class-shortcodes.php:97
-#: includes/class-shortcodes.php:123
-#: includes/class-shortcodes.php:137
-#: includes/class-shortcodes.php:159
-#: includes/class-shortcodes.php:194
-#: includes/class-shortcodes.php:217
+#: includes/class-shortcodes.php:101
+#: includes/class-shortcodes.php:127
+#: includes/class-shortcodes.php:141
+#: includes/class-shortcodes.php:163
+#: includes/class-shortcodes.php:198
+#: includes/class-shortcodes.php:221
 #: templates/custom-form-examples.php:134
 #: templates/custom-form-examples.php:142
 #: templates/custom-form-examples.php:163
@@ -1140,184 +1140,197 @@ msgstr ""
 msgid "%s (required)"
 msgstr ""
 
-#: includes/class-shortcodes.php:254
+#: includes/class-shortcodes.php:258
 #: includes/template-functions.php:102
 msgid "Sending..."
 msgstr ""
 
-#: includes/class-shortcodes.php:258
+#: includes/class-shortcodes.php:262
 #: includes/template-functions.php:105
 msgid "Error"
 msgstr ""
 
-#: includes/class-shortcodes.php:259
+#: includes/class-shortcodes.php:263
 #: includes/template-functions.php:106
 msgid "An error occurred while sending the form"
 msgstr ""
 
-#: includes/class-shortcodes.php:260
+#: includes/class-shortcodes.php:264
 #: includes/template-functions.php:107
 msgid "Unauthorized fields:"
 msgstr ""
 
-#: includes/class-shortcodes.php:261
+#: includes/class-shortcodes.php:265
 #: includes/template-functions.php:108
 msgid "Allowed fields:"
 msgstr ""
 
-#: includes/class-shortcodes.php:262
+#: includes/class-shortcodes.php:266
 #: includes/template-functions.php:109
 msgid "Delivery Status:"
 msgstr ""
 
-#: includes/class-shortcodes.php:263
+#: includes/class-shortcodes.php:267
 #: includes/template-functions.php:110
 msgid "Email: Sent successfully"
 msgstr ""
 
-#: includes/class-shortcodes.php:264
+#: includes/class-shortcodes.php:268
 #: includes/template-functions.php:111
 msgid "Email:"
 msgstr ""
 
-#: includes/class-shortcodes.php:265
+#: includes/class-shortcodes.php:269
 #: includes/template-functions.php:112
 msgid "Telegram: Sent successfully"
 msgstr ""
 
-#: includes/class-shortcodes.php:266
+#: includes/class-shortcodes.php:270
 #: includes/template-functions.php:113
 msgid "Telegram:"
 msgstr ""
 
-#: includes/class-shortcodes.php:267
+#: includes/class-shortcodes.php:271
 #: includes/template-functions.php:114
 msgid "Google Sheets: Data saved"
 msgstr ""
 
-#: includes/class-shortcodes.php:268
+#: includes/class-shortcodes.php:272
 #: includes/template-functions.php:115
 msgid "Google Sheets:"
 msgstr ""
 
-#: includes/class-shortcodes.php:269
+#: includes/class-shortcodes.php:273
 #: includes/template-functions.php:116
 msgid "Failed"
 msgstr ""
 
-#: includes/class-shortcodes.php:270
-#: includes/class-spam-protection.php:182
+#: includes/class-shortcodes.php:274
+#: includes/class-spam-protection.php:230
 #: includes/template-functions.php:117
 msgid "Captcha verification is required."
 msgstr ""
 
-#: includes/class-shortcodes.php:271
-#: includes/class-spam-protection.php:354
-#: includes/class-spam-protection.php:363
+#: includes/class-shortcodes.php:275
+#: includes/class-spam-protection.php:402
+#: includes/class-spam-protection.php:411
 #: includes/template-functions.php:118
 msgid "Captcha verification failed. Please try again."
 msgstr ""
 
-#: includes/class-spam-protection.php:272
+#: includes/class-spam-protection.php:320
 msgid "Submission blocked."
 msgstr ""
 
-#: includes/class-spam-protection.php:315
+#: includes/class-spam-protection.php:363
 msgid "Too many form submissions. Please try again later."
 msgstr ""
 
-#: includes/class-spam-protection.php:334
+#: includes/class-spam-protection.php:382
 msgid "Captcha is not configured."
 msgstr ""
 
 #: includes/class-spam-settings-admin.php:31
 #: includes/class-spam-settings-admin.php:32
-#: includes/class-spam-settings-admin.php:126
+#: includes/class-spam-settings-admin.php:132
 msgid "Spam Protection"
 msgstr ""
 
-#: includes/class-spam-settings-admin.php:113
+#: includes/class-spam-settings-admin.php:118
 msgid "Settings saved."
 msgstr ""
 
-#: includes/class-spam-settings-admin.php:127
+#: includes/class-spam-settings-admin.php:133
 msgid "Global anti-spam settings for all forms. Per-form options are available in each form Advanced tab."
 msgstr ""
 
-#: includes/class-spam-settings-admin.php:129
+#: includes/class-spam-settings-admin.php:135
 msgid "Turnstile is not active until both the site key and the secret key are saved. Forms that require Turnstile will skip captcha until then."
 msgstr ""
 
-#: includes/class-spam-settings-admin.php:135
+#: includes/class-spam-settings-admin.php:141
 msgid "Global rate limit"
 msgstr ""
 
-#: includes/class-spam-settings-admin.php:138
+#: includes/class-spam-settings-admin.php:144
 msgid "Enable global rate limit"
 msgstr ""
 
-#: includes/class-spam-settings-admin.php:142
+#: includes/class-spam-settings-admin.php:148
 msgid "Limit total submissions per IP across all forms"
 msgstr ""
 
-#: includes/class-spam-settings-admin.php:144
+#: includes/class-spam-settings-admin.php:150
 msgid "Works in addition to the existing per-form limit (1 request per 10 seconds)."
 msgstr ""
 
-#: includes/class-spam-settings-admin.php:148
+#: includes/class-spam-settings-admin.php:154
 msgid "Max submissions"
 msgstr ""
 
-#: includes/class-spam-settings-admin.php:151
+#: includes/class-spam-settings-admin.php:157
 msgid "Maximum submissions per IP within the time window."
 msgstr ""
 
-#: includes/class-spam-settings-admin.php:155
+#: includes/class-spam-settings-admin.php:161
 msgid "Time window (seconds)"
 msgstr ""
 
-#: includes/class-spam-settings-admin.php:158
+#: includes/class-spam-settings-admin.php:164
 msgid "Default: 3600 (1 hour)."
 msgstr ""
 
-#: includes/class-spam-settings-admin.php:163
+#: includes/class-spam-settings-admin.php:169
 #: templates/form-settings-meta-box.php:416
 msgid "Spam heuristics"
 msgstr ""
 
-#: includes/class-spam-settings-admin.php:166
+#: includes/class-spam-settings-admin.php:172
 msgid "Enable heuristics globally"
 msgstr ""
 
-#: includes/class-spam-settings-admin.php:170
+#: includes/class-spam-settings-admin.php:176
 msgid "Detect bot patterns (random Latin names, all checkbox options selected)"
 msgstr ""
 
-#: includes/class-spam-settings-admin.php:172
+#: includes/class-spam-settings-admin.php:178
 msgid "Forms can override this in Advanced settings (inherit / on / off)."
 msgstr ""
 
-#: includes/class-spam-settings-admin.php:173
+#: includes/class-spam-settings-admin.php:179
 msgid "Heuristic-based: may rarely misfire on unusual legitimate input. Disable per form if this happens."
 msgstr ""
 
-#: includes/class-spam-settings-admin.php:178
+#: includes/class-spam-settings-admin.php:184
+#: templates/form-settings-meta-box.php:402
 msgid "Cloudflare Turnstile"
 msgstr ""
 
-#: includes/class-spam-settings-admin.php:181
+#: includes/class-spam-settings-admin.php:187
+msgid "Require Turnstile by default"
+msgstr ""
+
+#: includes/class-spam-settings-admin.php:191
+msgid "Require captcha on all forms unless overridden in Advanced settings"
+msgstr ""
+
+#: includes/class-spam-settings-admin.php:193
+msgid "Forms can override this in Advanced settings (inherit / on / off). Both keys below must be saved for captcha to work."
+msgstr ""
+
+#: includes/class-spam-settings-admin.php:197
 msgid "Site key"
 msgstr ""
 
-#: includes/class-spam-settings-admin.php:187
+#: includes/class-spam-settings-admin.php:203
 msgid "Secret key"
 msgstr ""
 
-#: includes/class-spam-settings-admin.php:190
-msgid "Enable Turnstile per form in Advanced settings. For custom REST forms, send cf-turnstile-response or mksddn_fh_turnstile_response in the request body."
+#: includes/class-spam-settings-admin.php:206
+msgid "For custom REST forms, send cf-turnstile-response or mksddn_fh_turnstile_response in the request body."
 msgstr ""
 
-#: includes/class-spam-settings-admin.php:195
+#: includes/class-spam-settings-admin.php:211
 msgid "Save Settings"
 msgstr ""
 
@@ -1670,27 +1683,26 @@ msgid "Recommended for browser form posts. Disable for strict API-only clients t
 msgstr ""
 
 #: templates/form-settings-meta-box.php:405
-msgid "Require Cloudflare Turnstile"
-msgstr ""
-
-#: templates/form-settings-meta-box.php:409
-msgid "Requires Turnstile keys in Forms → Spam Protection. Adds widget to shortcode forms; custom REST forms must send cf-turnstile-response or mksddn_fh_turnstile_response."
-msgstr ""
-
-#: templates/form-settings-meta-box.php:411
-msgid "Turnstile will not be enforced until both site key and secret key are saved."
-msgstr ""
-
 #: templates/form-settings-meta-box.php:419
 msgid "Inherit global setting"
 msgstr ""
 
+#: templates/form-settings-meta-box.php:406
 #: templates/form-settings-meta-box.php:420
 msgid "On"
 msgstr ""
 
+#: templates/form-settings-meta-box.php:407
 #: templates/form-settings-meta-box.php:421
 msgid "Off"
+msgstr ""
+
+#: templates/form-settings-meta-box.php:409
+msgid "Requires Turnstile keys in Forms → Spam Protection. Shortcode forms render the widget automatically; custom REST forms must send cf-turnstile-response or mksddn_fh_turnstile_response."
+msgstr ""
+
+#: templates/form-settings-meta-box.php:411
+msgid "Turnstile will not be enforced until both site key and secret key are saved."
 msgstr ""
 
 #: templates/form-settings-meta-box.php:423
