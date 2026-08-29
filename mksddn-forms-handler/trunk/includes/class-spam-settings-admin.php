@@ -170,6 +170,7 @@ class SpamSettingsAdmin {
                                 <?php echo esc_html__('Detect bot patterns (random Latin names, all checkbox options selected)', 'mksddn-forms-handler'); ?>
                             </label>
                             <p class="description"><?php echo esc_html__('Forms can override this in Advanced settings (inherit / on / off).', 'mksddn-forms-handler'); ?></p>
+                            <p class="description"><?php echo esc_html__('Heuristic-based: may rarely misfire on unusual legitimate input. Disable per form if this happens.', 'mksddn-forms-handler'); ?></p>
                         </td>
                     </tr>
                 </table>

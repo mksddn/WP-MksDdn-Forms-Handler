@@ -517,14 +517,27 @@ class SpamProtection {
 
     /**
      * Check if a value looks like a bot-generated name
+     *
+     * Long Latin-only strings alone are not enough — real transliterated names
+     * and merged full names can be 15+ letters. Random bot strings additionally
+     * tend to be vowel-starved or contain long consonant runs, so both signals
+     * are required to reduce false positives on legitimate submissions.
      */
     private static function is_gibberish_name(string $value): bool {
         $value = trim($value);
-        if ($value === '') {
+        if ($value === '' || !preg_match('/^[A-Za-z]{15,}$/', $value)) {
             return false;
         }
 
-        return (bool) preg_match('/^[A-Za-z]{15,}$/', $value);
+        $length = strlen($value);
+        $vowel_count = preg_match_all('/[aeiouAEIOU]/', $value);
+        $vowel_ratio = $vowel_count / $length;
+
+        if ($vowel_ratio < 0.15) {
+            return true;
+        }
+
+        return (bool) preg_match('/[b-df-hj-np-tv-xz]{6,}/i', $value);
     }
 
     /**
