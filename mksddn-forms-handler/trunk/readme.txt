@@ -2,7 +2,7 @@
 Contributors: mksddn
 Tags: forms, telegram, google-sheets, rest-api, form-handler
 Requires at least: 5.3
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 8.0
 Stable tag: 2.7.0
 License: GPLv2 or later
@@ -33,7 +33,7 @@ MksDdn Forms Handler is a powerful and flexible form processing plugin that allo
 
 = Technical Features =
 
-* WordPress 5.3+ compatible (tested up to 6.9)
+* WordPress 5.3+ compatible (tested up to 7.1)
 * PHP 8.0+ required
 * GPL v2+ licensed
 * Clean, maintainable code

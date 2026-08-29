@@ -5,6 +5,7 @@
  * Description: Advanced form processing system with REST API support, Telegram notifications, and Google Sheets integration. Create and manage forms with multiple delivery methods including email, Telegram, Google Sheets, and admin storage.
  * Version: 2.7.0
  * Requires at least: 5.3
+ * Tested up to: 7.1
  * Requires PHP: 8.0
  * Author: mksddn
  * Author URI: https://github.com/mksddn
