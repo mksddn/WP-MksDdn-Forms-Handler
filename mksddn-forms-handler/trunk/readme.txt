@@ -4,7 +4,7 @@ Tags: forms, telegram, google-sheets, rest-api, form-handler
 Requires at least: 5.3
 Tested up to: 7.0
 Requires PHP: 8.0
-Stable tag: 2.6.0
+Stable tag: 2.7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -61,6 +61,8 @@ MksDdn Forms Handler is a powerful and flexible form processing plugin that allo
 * `AdminColumns` - admin interface customization
 * `ExportHandler` - CSV export with filtering
 * `Security` - rate limiting and security checks
+* `SpamProtection` - global rate limit, heuristics, Turnstile verification
+* `SpamSettingsAdmin` - global spam protection settings page
 * `Utilities` - helper functions and form creation utilities
 * `GoogleSheetsAdmin` - Google Sheets settings page and OAuth
 * `Assets` - asset registration and conditional enqueuing
@@ -186,6 +188,8 @@ Submit forms via REST API without page reload:
 * Nonce verification (CSRF protection)
 * Capability checks
 * Rate limiting (1 request per 10 seconds per IP per form)
+* Optional global rate limit across all forms (Forms → Spam Protection)
+* Optional spam heuristics and Cloudflare Turnstile (per form + global keys)
 * Optional trusted origins check (Origin/Referer) per form — off by default
 
 **Performance**
@@ -230,6 +234,19 @@ Submit forms via REST API without page reload:
         return $bypass;
     }, 10, 3);
 
+`mksddn_fh_before_submit` - Block or allow submission after validation, before delivery
+
+    add_filter('mksddn_fh_before_submit', function($allowed, $form_data, $form_config) {
+        if (isset($form_data['email']) && str_contains($form_data['email'], 'spam.example')) {
+            return new WP_Error('blocked', 'Blocked');
+        }
+        return $allowed;
+    }, 10, 3);
+
+`mksddn_fh_is_spam` - Custom spam decision when built-in heuristics are enabled (default: false)
+
+`mksddn_fh_spam_multi_select_threshold` - Minimum selected options count to treat as spam (default: 7)
+
     add_filter('mksddn_fh_allowed_redirect_hosts', function($hosts) {
         // Allow specific external domains for redirects
         return array_merge($hosts, ['example.com', 'trusted-partner.com']);
@@ -270,7 +287,31 @@ Namespace: `mksddn-forms-handler/v1`
 * Required fields, email, URL, number (min/max/step), tel (pattern), date, time, datetime-local are validated
 * Maximum 50 fields; total payload size ≤ 100 KB
 * Rate limiting: 1 request per 10 seconds per IP per form
+* Optional global rate limit (all forms combined) — configure under Forms → Spam Protection
 * Optional trusted origins check per form (see below); disabled by default (`off`)
+
+= Spam Protection (opt-in) =
+
+Global settings: **Forms → Spam Protection**. Per-form overrides: **Advanced** tab on each form.
+
+**Global rate limit**
+* Off by default for backward compatibility
+* Limits total submissions per IP across all forms within a time window (default: 20 per hour)
+* Works together with the per-form 10-second limit
+* Blocked requests return `global_rate_limited` (HTTP 429)
+
+**Spam heuristics**
+* Global master switch + per-form mode: inherit / on / off
+* Detects common bot patterns: random Latin-only names (15+ chars), selecting many checkbox options at once
+* Blocked requests return `spam_detected` (HTTP 400)
+
+**Cloudflare Turnstile**
+* Configure site key and secret key globally
+* Enable per form: **Require Cloudflare Turnstile** in Advanced settings
+* Shortcode forms render the widget automatically
+* Custom REST/AJAX forms must send `cf-turnstile-response` or `mksddn_fh_turnstile_response` in the request body
+* Template helpers: `mksddn_fh_render_turnstile()`, `mksddn_fh_enqueue_turnstile()`, `mksddn_fh_form_requires_turnstile()`
+* Errors: `turnstile_required`, `turnstile_failed`, `turnstile_not_configured`
 
 = Trusted Origins (opt-in) =
 
@@ -518,6 +559,9 @@ The `array_of_objects` type allows you to define arrays with nested field valida
 
 == Upgrade Notice ==
 
+= 2.7.0 =
+New feature: Spam Protection — optional global rate limit, bot heuristics, and Cloudflare Turnstile. All opt-in by default; enable under Forms → Spam Protection and per-form Advanced settings. Recommended update if your forms receive bot spam.
+
 = 2.6.0 =
 New feature: Trusted origins — optional per-form Origin/Referer protection in Advanced settings. Opt-in only; default is off, so existing forms keep working unchanged.
 
@@ -567,6 +611,19 @@ Security update: Fixed URL escaping in template examples. Recommended update for
 New feature: Template functions for custom forms integration. Bug fix: Improved Telegram message formatting. Fully backward compatible.
 
 == Changelog ==
+
+= 2.7.0 =
+* Feature: Spam Protection settings page (Forms → Spam Protection) — global rate limit, heuristics master switch, Turnstile keys
+* Feature: Per-form Advanced options — Require Turnstile, spam heuristics (inherit / on / off)
+* Feature: Cloudflare Turnstile verification for REST and admin-post submissions
+* Feature: Built-in spam heuristics (random Latin names, excessive multi-select)
+* Feature: Global rate limit across all forms per IP (default off)
+* Filter: `mksddn_fh_before_submit` — block submission before delivery channels run
+* Filter: `mksddn_fh_is_spam` — custom spam rules when heuristics are enabled
+* Filter: `mksddn_fh_spam_multi_select_threshold` — adjust multi-select spam threshold
+* Helpers: `mksddn_fh_render_turnstile()`, `mksddn_fh_enqueue_turnstile()`, `mksddn_fh_form_requires_turnstile()`
+* Improved: Internal fields (honeypot, Turnstile token) stripped before field validation
+* Compatibility: All spam features are opt-in; existing forms behave unchanged after update
 
 = 2.6.0 =
 * Feature: Trusted origins — optional per-form Origin/Referer allowlist (`off` | `same_site` | `allowlist`) in Advanced settings

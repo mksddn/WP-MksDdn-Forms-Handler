@@ -16,6 +16,13 @@ delete_option('mksddn_fh_google_sheets_client_id');
 delete_option('mksddn_fh_google_sheets_client_secret');
 delete_option('mksddn_fh_google_sheets_refresh_token');
 
+delete_option('mksddn_fh_global_rate_limit_enabled');
+delete_option('mksddn_fh_global_rate_limit_max');
+delete_option('mksddn_fh_global_rate_limit_window');
+delete_option('mksddn_fh_spam_heuristics_enabled');
+delete_option('mksddn_fh_turnstile_site_key');
+delete_option('mksddn_fh_turnstile_secret_key');
+
 // Cleanup of transients created by this plugin (best-effort via API)
 $mksddn_fh_user_id = get_current_user_id();
 if ($mksddn_fh_user_id) {

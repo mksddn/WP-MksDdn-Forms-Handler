@@ -51,6 +51,7 @@ class Shortcodes {
         $success_message_text = get_post_meta($form->ID, '_success_message_text', true);
         $redirect_url = get_post_meta($form->ID, '_redirect_url', true);
         $form_custom_classes = get_post_meta($form->ID, '_form_custom_classes', true);
+        $require_turnstile = get_post_meta($form->ID, '_require_turnstile', true) === '1';
 
         // Set default success message if empty
         if (empty($success_message_text)) {
@@ -224,6 +225,12 @@ class Shortcodes {
                         <?php endif; ?>
                     </div>
                 <?php endforeach; ?>
+
+                <?php if ($require_turnstile && SpamProtection::get_turnstile_site_key() !== '') : ?>
+                    <div class="form-field mksddn-fh-turnstile-field">
+                        <?php SpamProtection::render_turnstile_widget($form->post_name); ?>
+                    </div>
+                <?php endif; ?>
                 
                 <div class="form-submit">
                     <button type="submit" class="submit-button"><?php echo esc_html($submit_button_text ?: __( 'Send', 'mksddn-forms-handler' )); ?></button>
@@ -260,6 +267,8 @@ class Shortcodes {
                 'google_sheets_data_saved' => __( 'Google Sheets: Data saved', 'mksddn-forms-handler' ),
                 'google_sheets_label' => __( 'Google Sheets:', 'mksddn-forms-handler' ),
                 'failed' => __( 'Failed', 'mksddn-forms-handler' ),
+                'turnstile_required' => __( 'Captcha verification is required.', 'mksddn-forms-handler' ),
+                'turnstile_failed' => __( 'Captcha verification failed. Please try again.', 'mksddn-forms-handler' ),
             ]
         );
         ?>

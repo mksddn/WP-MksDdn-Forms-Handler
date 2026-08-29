@@ -114,7 +114,48 @@ function mksddn_fh_enqueue_form_script(): void {
             'google_sheets_data_saved' => __('Google Sheets: Data saved', 'mksddn-forms-handler'),
             'google_sheets_label' => __('Google Sheets:', 'mksddn-forms-handler'),
             'failed' => __('Failed', 'mksddn-forms-handler'),
+            'turnstile_required' => __('Captcha verification is required.', 'mksddn-forms-handler'),
+            'turnstile_failed' => __('Captcha verification failed. Please try again.', 'mksddn-forms-handler'),
         ]
     );
+}
+
+/**
+ * Render Cloudflare Turnstile widget for a form
+ *
+ * @param string $form_slug Form slug
+ * @return void
+ */
+function mksddn_fh_render_turnstile(string $form_slug = ''): void {
+    \MksDdn\FormsHandler\SpamProtection::render_turnstile_widget($form_slug);
+}
+
+/**
+ * Enqueue Cloudflare Turnstile script
+ *
+ * @return void
+ */
+function mksddn_fh_enqueue_turnstile(): void {
+    \MksDdn\FormsHandler\SpamProtection::enqueue_turnstile_script();
+}
+
+/**
+ * Whether Turnstile is required for a form
+ *
+ * @param string $form_slug Form slug or ID
+ * @return bool
+ */
+function mksddn_fh_form_requires_turnstile(string $form_slug): bool {
+    $form = get_page_by_path($form_slug, OBJECT, 'mksddn_fh_forms');
+    if (!$form) {
+        $form = get_post($form_slug);
+    }
+
+    if (!$form || $form->post_type !== 'mksddn_fh_forms') {
+        return false;
+    }
+
+    return get_post_meta($form->ID, '_require_turnstile', true) === '1'
+        && \MksDdn\FormsHandler\SpamProtection::get_turnstile_site_key() !== '';
 }
 

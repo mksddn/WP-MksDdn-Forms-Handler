@@ -271,14 +271,6 @@ class FormsHandler {
             return new \WP_Error('spam_detected', __( 'Spam detected', 'mksddn-forms-handler' ), ['status' => 400]);
         }
 
-        // Simple rate limiting: 1 request per RATE_LIMIT_SECONDS per IP per form
-        $ip = sanitize_text_field( wp_unslash($_SERVER['REMOTE_ADDR'] ?? 'unknown') );
-        $rl_key = 'mksddn_fh_rate_' . md5($slug . '|' . $ip);
-        $last_ts = get_transient($rl_key);
-        if ($last_ts && (time() - (int)$last_ts) < self::RATE_LIMIT_SECONDS) {
-            return new \WP_Error('rate_limited', __( 'Too many requests. Please wait a few seconds.', 'mksddn-forms-handler' ), ['status' => 429]);
-        }
-
         $form_config_early = $this->get_form_config($slug);
         if (is_wp_error($form_config_early)) {
             return $form_config_early;
@@ -289,9 +281,35 @@ class FormsHandler {
             return $origin_check;
         }
 
-        set_transient($rl_key, time(), 15);
+        $request_params = is_array($form_data) ? $form_data : [];
+        if ($request->get_param('mksddn_fh_turnstile_response')) {
+            $request_params['mksddn_fh_turnstile_response'] = $request->get_param('mksddn_fh_turnstile_response');
+        }
+        if ($request->get_param('cf-turnstile-response')) {
+            $request_params['cf-turnstile-response'] = $request->get_param('cf-turnstile-response');
+        }
 
-        if (!$form_data && empty($file_params)) {
+        $spam_check = SpamProtection::validate_pre_submission($form_config_early, $request_params, $slug);
+        if (is_wp_error($spam_check)) {
+            return $spam_check;
+        }
+
+        // Simple rate limiting: 1 request per RATE_LIMIT_SECONDS per IP per form
+        $ip = SpamProtection::get_client_ip();
+        $rl_key = 'mksddn_fh_rate_' . md5($slug . '|' . $ip);
+        $last_ts = get_transient($rl_key);
+        if ($last_ts && (time() - (int)$last_ts) < self::RATE_LIMIT_SECONDS) {
+            return new \WP_Error('rate_limited', __( 'Too many requests. Please wait a few seconds.', 'mksddn-forms-handler' ), ['status' => 429]);
+        }
+
+        set_transient($rl_key, time(), 15);
+        SpamProtection::record_submission_attempt();
+
+        if (!is_array($form_data)) {
+            $form_data = [];
+        }
+
+        if ($form_data === [] && empty($file_params)) {
             return new \WP_Error('invalid_data', __( 'Invalid form data', 'mksddn-forms-handler' ), ['status' => 400]);
         }
 
@@ -323,6 +341,10 @@ class FormsHandler {
                 foreach ($files_result['data_updates'] as $k => $v) { $form_data[$k] = $v; }
             }
             if (!empty($files_result['attachments'])) { $email_attachments = $files_result['attachments']; }
+        }
+
+        if (is_array($form_data)) {
+            $form_data = SpamProtection::strip_internal_fields($form_data);
         }
 
         $result = $this->process_form_submission($slug, $form_data, $email_attachments);
@@ -569,14 +591,6 @@ class FormsHandler {
             wp_die( esc_html__( 'Spam detected', 'mksddn-forms-handler' ) );
         }
 
-        // Simple rate limiting per IP+form: 1 request per RATE_LIMIT_SECONDS
-        $ip = sanitize_text_field( wp_unslash($_SERVER['REMOTE_ADDR'] ?? 'unknown') );
-        $rl_key = 'mksddn_fh_rate_' . md5($form_id . '|' . $ip);
-        $last_ts = get_transient($rl_key);
-        if ($last_ts && (time() - (int)$last_ts) < self::RATE_LIMIT_SECONDS) {
-            wp_die( esc_html__( 'Too many requests. Please wait a few seconds.', 'mksddn-forms-handler' ) );
-        }
-
         // Build form data using whitelist from form configuration
         $form_config = $this->get_form_config($form_id);
         if (is_wp_error($form_config)) {
@@ -597,7 +611,34 @@ class FormsHandler {
             return;
         }
 
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- nonce verified above; values sanitized in submission pipeline
+        $raw_post = wp_unslash($_POST);
+        $request_params = is_array($raw_post) ? $raw_post : [];
+
+        $spam_check = SpamProtection::validate_pre_submission($form_config, $request_params, $form_id);
+        if (is_wp_error($spam_check)) {
+            $error_data = $spam_check->get_error_data();
+            $error_status = isset($error_data['status']) ? (int) $error_data['status'] : 400;
+            if ($error_status < 100 || $error_status > 599) {
+                $error_status = 400;
+            }
+            wp_send_json_error([
+                'message' => $spam_check->get_error_message(),
+                'code'    => $spam_check->get_error_code(),
+            ], $error_status);
+            return;
+        }
+
+        // Simple rate limiting per IP+form: 1 request per RATE_LIMIT_SECONDS
+        $ip = SpamProtection::get_client_ip();
+        $rl_key = 'mksddn_fh_rate_' . md5($form_id . '|' . $ip);
+        $last_ts = get_transient($rl_key);
+        if ($last_ts && (time() - (int)$last_ts) < self::RATE_LIMIT_SECONDS) {
+            wp_die( esc_html__( 'Too many requests. Please wait a few seconds.', 'mksddn-forms-handler' ) );
+        }
+
         set_transient($rl_key, time(), 15);
+        SpamProtection::record_submission_attempt();
         
         // Check if allow_any_fields is enabled
         $allow_any_fields = get_post_meta($form_config['form_id'], '_allow_any_fields', true);
@@ -712,6 +753,11 @@ class FormsHandler {
             if (is_wp_error($validation_result)) {
                 return $validation_result;
             }
+        }
+
+        $before_submit = SpamProtection::apply_before_submit_filter($filtered_form_data, $form_config);
+        if (is_wp_error($before_submit)) {
+            return $before_submit;
         }
 
         // Add page URL to submission data for notifications
@@ -939,6 +985,8 @@ class FormsHandler {
                 $get_meta('_trusted_origins_mode') ?: 'off',
                 $get_meta('_trusted_origins_list')
             ),
+            'require_turnstile' => $get_meta('_require_turnstile') === '1' ? '1' : '0',
+            'spam_heuristics' => self::normalize_spam_heuristics_mode($get_meta('_spam_heuristics')),
         ];
 
         // Validate email configuration only if email is enabled
@@ -1956,6 +2004,20 @@ class FormsHandler {
         return $submission_id;
     }
     
+    /**
+     * Normalize spam heuristics mode from post meta
+     *
+     * @param string $mode Raw stored mode
+     * @return string inherit|on|off
+     */
+    private static function normalize_spam_heuristics_mode(string $mode): string {
+        if (!in_array($mode, ['inherit', 'on', 'off'], true)) {
+            return 'inherit';
+        }
+
+        return $mode;
+    }
+
     /**
      * Build normalized allowlist origins from cached form config values
      *
