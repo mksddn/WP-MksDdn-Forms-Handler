@@ -350,8 +350,9 @@ NOTES:
 2. All forms need honeypot field (mksddn_fh_hp) for spam protection
 3. For POST forms, nonce and hidden fields are added via mksddn_fh_form_fields()
 4. For AJAX forms, only honeypot field is required (no nonce needed for REST API)
-5. Make sure form slug matches the slug in WordPress admin (e.g., 'contact-form')
-6. File uploads via AJAX must use FormData, not JSON
-7. The plugin will validate all fields according to configuration in admin
+5. If the form requires Turnstile, render the widget (`mksddn_fh_render_turnstile()`) and send `cf-turnstile-response` or `mksddn_fh_turnstile_response`. Check GET `/forms/{slug}` for `require_turnstile` and `turnstile_site_key`.
+6. Make sure form slug matches the slug in WordPress admin (e.g., 'contact-form')
+7. File uploads via AJAX must use FormData, not JSON
+8. The plugin will validate all fields according to configuration in admin
 -->
 

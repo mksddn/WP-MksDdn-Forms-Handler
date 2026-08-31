@@ -59,6 +59,10 @@ class Assets {
             $should_enqueue = true;
         }
 
+        if ( strpos( $screen_id, 'mksddn_fh_forms_page_mksddn-fh-spam-settings' ) !== false ) {
+            $should_enqueue = true;
+        }
+
         if ( $should_enqueue ) {
             wp_enqueue_style( 'mksddn-fh-admin' );
             wp_enqueue_script( 'mksddn-fh-admin' );

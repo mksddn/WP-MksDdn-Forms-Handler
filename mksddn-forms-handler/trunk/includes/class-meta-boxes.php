@@ -119,6 +119,13 @@ class MetaBoxes {
             $trusted_origins_fallback_referer = '1';
         }
         $trusted_origins_admin_notice = $this->get_and_clear_trusted_origins_notice($post->ID);
+        $require_turnstile = SpamProtection::normalize_turnstile_mode(
+            (string) get_post_meta($post->ID, '_require_turnstile', true)
+        );
+        $spam_heuristics = get_post_meta($post->ID, '_spam_heuristics', true);
+        if ($spam_heuristics === '') {
+            $spam_heuristics = 'inherit';
+        }
         $submit_button_text = get_post_meta($post->ID, '_submit_button_text', true);
         $custom_html_after_button = get_post_meta($post->ID, '_custom_html_after_button', true);
         $success_message_text = get_post_meta($post->ID, '_success_message_text', true);
@@ -466,6 +473,22 @@ class MetaBoxes {
         }
 
         $this->save_trusted_origins_settings($post_id);
+
+        if (isset($_POST['require_turnstile'])) {
+            $require_turnstile = sanitize_key(wp_unslash($_POST['require_turnstile']));
+            if (!in_array($require_turnstile, ['inherit', 'on', 'off'], true)) {
+                $require_turnstile = 'inherit';
+            }
+            update_post_meta($post_id, '_require_turnstile', $require_turnstile);
+        }
+
+        if (isset($_POST['spam_heuristics'])) {
+            $spam_heuristics = sanitize_key(wp_unslash($_POST['spam_heuristics']));
+            if (!in_array($spam_heuristics, ['inherit', 'on', 'off'], true)) {
+                $spam_heuristics = 'inherit';
+            }
+            update_post_meta($post_id, '_spam_heuristics', $spam_heuristics);
+        }
 
         if (isset($_POST['submit_button_text'])) {
             update_post_meta($post_id, '_submit_button_text', sanitize_text_field( wp_unslash($_POST['submit_button_text']) ));

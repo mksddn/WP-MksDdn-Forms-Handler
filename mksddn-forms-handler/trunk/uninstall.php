@@ -16,6 +16,14 @@ delete_option('mksddn_fh_google_sheets_client_id');
 delete_option('mksddn_fh_google_sheets_client_secret');
 delete_option('mksddn_fh_google_sheets_refresh_token');
 
+delete_option('mksddn_fh_global_rate_limit_enabled');
+delete_option('mksddn_fh_global_rate_limit_max');
+delete_option('mksddn_fh_global_rate_limit_window');
+delete_option('mksddn_fh_spam_heuristics_enabled');
+delete_option('mksddn_fh_turnstile_enabled');
+delete_option('mksddn_fh_turnstile_site_key');
+delete_option('mksddn_fh_turnstile_secret_key');
+
 // Cleanup of transients created by this plugin (best-effort via API)
 $mksddn_fh_user_id = get_current_user_id();
 if ($mksddn_fh_user_id) {
@@ -23,7 +31,7 @@ if ($mksddn_fh_user_id) {
     delete_transient('mksddn_fh_fields_config_json_value_' . $mksddn_fh_user_id);
 }
 
-// Intentionally keep CPT data (mksddn_fh_forms, mksddn_fh_form_submissions) to avoid data loss
+// Intentionally keep CPT data (mksddn_fh_forms, mksddn_fh_submits) to avoid data loss
 // If in the future a data deletion option is introduced, handle it here conditionally.
 
 

@@ -2,9 +2,9 @@
 Contributors: mksddn
 Tags: forms, telegram, google-sheets, rest-api, form-handler
 Requires at least: 5.3
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 8.0
-Stable tag: 2.6.0
+Stable tag: 2.7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -33,291 +33,21 @@ MksDdn Forms Handler is a powerful and flexible form processing plugin that allo
 
 = Technical Features =
 
-* WordPress 5.3+ compatible (tested up to 6.9)
+* WordPress 5.3+ compatible (tested up to 7.1)
 * PHP 8.0+ required
 * GPL v2+ licensed
 * Clean, maintainable code
 * Proper error handling
-* Comprehensive logging
+* Extensible logging via WordPress action hooks
+
+Developer documentation, REST API reference, field types, and external services are in the FAQ section below.
 
 == Installation ==
 
 1. Upload the plugin files to the `/wp-content/plugins/mksddn-forms-handler` directory, or install the plugin through the WordPress plugins screen directly.
 2. Activate the plugin through the 'Plugins' screen in WordPress
-3. Use the Forms menu to create and manage your forms
+3. Use the **Forms** and **Submissions** admin menus to create forms and review submissions
 4. Use the shortcode `[mksddn_fh_form id="form_id"]` or `[mksddn_fh_form slug="form-slug"]` to display forms on your pages
-
-== For Developers ==
-
-= Architecture =
-
-**Component-based structure** following SOLID principles with clear separation of concerns:
-
-**Core Components (includes/)**
-* `PostTypes` - custom post types registration (`mksddn_fh_forms`, `mksddn_fh_submits`)
-* `MetaBoxes` - form settings and submission data management
-* `FormsHandler` - main processing logic with REST API support
-* `Shortcodes` - form rendering with AJAX functionality
-* `AdminColumns` - admin interface customization
-* `ExportHandler` - CSV export with filtering
-* `Security` - rate limiting and security checks
-* `Utilities` - helper functions and form creation utilities
-* `GoogleSheetsAdmin` - Google Sheets settings page and OAuth
-* `Assets` - asset registration and conditional enqueuing
-* `Template Functions` - global functions for PHP template integration
-
-**Handlers (handlers/)**
-* `TelegramHandler` - Telegram Bot API integration
-* `GoogleSheetsHandler` - Google Sheets API integration
-* `TemplateParser` - placeholder parsing for Telegram and user reply emails
-
-**Assets (assets/)**
-* `css/` - Admin and frontend styles
-* `js/` - Admin and form scripts
-* `images/` - Plugin images
-
-= Technology Stack =
-
-* WordPress 5.3+ - core platform
-* PHP 8.0+ - server-side logic
-* jQuery - client-side form handling
-* REST API - form submission API
-* Google Sheets API - spreadsheet integration
-* Telegram Bot API - notifications
-
-= File Structure =
-
-    mksddn-forms-handler/
-    ├── mksddn-forms-handler.php     # Main plugin file
-    ├── includes/                     # Core components
-    │   ├── class-post-types.php
-    │   ├── class-meta-boxes.php
-    │   ├── class-forms-handler.php
-    │   ├── class-shortcodes.php
-    │   ├── class-admin-columns.php
-    │   ├── class-export-handler.php
-    │   ├── class-security.php
-    │   ├── class-utilities.php
-    │   ├── class-google-sheets-admin.php
-    │   ├── class-assets.php
-    │   └── template-functions.php
-    ├── handlers/                     # External service handlers
-    │   ├── class-telegram-handler.php
-    │   ├── class-google-sheets-handler.php
-    │   └── class-template-parser.php
-    ├── templates/                    # Template files
-    │   ├── form-settings-meta-box.php
-    │   └── custom-form-examples.php
-    ├── assets/                       # Static resources
-    │   ├── css/
-    │   ├── js/
-    │   └── images/
-    ├── languages/                    # Translations
-    └── uninstall.php                # Cleanup script
-
-= Integration Methods =
-
-**1. Shortcode (Standard)**
-
-    [mksddn_fh_form slug="contact-form"]
-
-Plugin automatically generates HTML form based on configuration.
-
-**2. PHP Templates (Custom Forms)**
-Integrate pre-built forms in theme templates:
-
-    <form method="post" action="<?php echo mksddn_fh_get_form_action(); ?>">
-        <?php mksddn_fh_form_fields('contact-form'); ?>
-        <!-- Your custom fields -->
-        <input type="text" name="name" required>
-        <input type="email" name="email" required>
-        <button type="submit">Send</button>
-    </form>
-
-**Available Functions:**
-* `mksddn_fh_get_form_action()` - get form action URL
-* `mksddn_fh_form_fields($slug)` - output hidden fields (nonce, form_id, honeypot)
-* `mksddn_fh_get_form_config($slug)` - get form configuration
-* `mksddn_fh_get_rest_endpoint($slug)` - get REST API endpoint for AJAX
-* `mksddn_fh_form_has_files($slug)` - check for file fields
-* `mksddn_fh_enqueue_form_script()` - enqueue AJAX script
-
-**Accept Any Fields (Advanced):**
-For custom forms where you control field names in templates, enable "Accept any fields from frontend" in form settings to skip field validation. This allows submitting ANY field names without defining them in Fields Configuration. All fields are still sanitized but type validation is skipped.
-
-See `/templates/custom-form-examples.php` for detailed examples.
-
-**User Reply Email (Email Settings tab):**
-Optional auto-reply to the user who submitted the form. Configure in the form Email Settings tab:
-
-* `_send_user_reply` — enable/disable auto-reply (`0` / `1`)
-* `_user_reply_email_field` — field name from Fields Configuration (`type: email`)
-* `_user_reply_type` — `text` (template with placeholders) or `html` (uploaded HTML file)
-* `_user_reply_subject` — reply subject with placeholders
-* `_user_reply_message` — text template body
-* `_user_reply_html_template` — HTML file content stored in post meta
-
-Placeholders: `{form_title}`, `{date}`, `{time}`, `{datetime}`, `{page_url}`, `{field:field_name}`, `{field_label:field_name}`.
-
-HTML template upload: `.html`/`.htm` only, max 100 KB (filter `mksddn_fh_max_html_template_size`). PHP code and script tags in templates are rejected.
-
-User reply can be the only enabled delivery channel — a successful auto-reply counts as a successful form submission. Auto-reply failure alone does not block submission when another channel succeeds; result is reported in `delivery_results.user_reply_email`.
-
-**3. REST API (AJAX)**
-Submit forms via REST API without page reload:
-
-    fetch('<?php echo mksddn_fh_get_rest_endpoint("contact-form"); ?>', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-    });
-
-= Development Standards =
-
-**Coding**
-* WordPress Coding Standards compliance
-* SOLID principles
-* DRY (Don't Repeat Yourself)
-* KISS (Keep It Simple)
-
-**Security**
-* Input validation for all data
-* Output sanitization
-* Nonce verification (CSRF protection)
-* Capability checks
-* Rate limiting (1 request per 10 seconds per IP per form)
-* Optional trusted origins check (Origin/Referer) per form — off by default
-
-**Performance**
-* Minimal database queries
-* Data caching
-* Lazy loading of resources
-* Conditional script enqueuing
-
-**Compatibility**
-* WordPress 5.3+ minimum
-* PHP 8.0+ minimum
-* Multisite support
-* RTL support
-* Accessibility standards (WCAG)
-
-= WordPress Hooks & Filters =
-
-**Filters:**
-
-`mksddn_fh_allowed_fields` - Modify allowed field names for a form
-
-    add_filter('mksddn_fh_allowed_fields', function($allowed_fields, $form_id, $form_slug) {
-        // Allow all fields for specific form
-        if ($form_slug === 'my-custom-form') {
-            return ['*'];
-        }
-        // Add specific fields
-        return array_merge($allowed_fields, ['custom_field_1', 'custom_field_2']);
-    }, 10, 3);
-
-`mksddn_fh_allowed_redirect_hosts` - Whitelist external domains for redirect URLs
-
-`mksddn_fh_max_html_template_size` - Maximum size in bytes for uploaded user reply HTML templates (default: 102400)
-
-`mksddn_fh_trusted_origins_bypass` - Skip trusted origins validation for a request (default: false)
-
-    add_filter('mksddn_fh_trusted_origins_bypass', function($bypass, $form_id, $mode) {
-        // Allow server-side proxy submissions for a specific form
-        if ($form_id === 123 && $mode === 'allowlist') {
-            return true;
-        }
-        return $bypass;
-    }, 10, 3);
-
-    add_filter('mksddn_fh_allowed_redirect_hosts', function($hosts) {
-        // Allow specific external domains for redirects
-        return array_merge($hosts, ['example.com', 'trusted-partner.com']);
-    });
-
-**Actions:**
-
-`mksddn_forms_handler_log_security` - Fired when unauthorized fields are detected
-`mksddn_forms_handler_log_submission` - Fired when form submission is processed
-
-== REST API ==
-
-Namespace: `mksddn-forms-handler/v1`
-
-= List Forms =
-* **Method**: GET
-* **Path**: `/wp-json/mksddn-forms-handler/v1/forms`
-* **Query Parameters**:
-  * `per_page` (1–100, default: 10)
-  * `page` (>=1, default: 1)
-  * `search` (string, optional)
-* **Response Headers**: `X-WP-Total`, `X-WP-TotalPages`
-
-= Get Single Form =
-* **Method**: GET
-* **Path**: `/wp-json/mksddn-forms-handler/v1/forms/{slug}`
-* **Response**: Includes `id`, `slug`, `title`, `submit_url`, `fields` (sanitized config)
-
-= Submit Form =
-* **Method**: POST
-* **Path**: `/wp-json/mksddn-forms-handler/v1/forms/{slug}/submit`
-* **Content Types**: JSON or multipart/form-data
-* **Body (JSON)**: Key/value pairs according to field configuration. The `mksddn_fh_hp` honeypot field may be present and must be empty (spam protection).
-* **Body (Multipart)**: Fields and file uploads supported. For multiple files, use `name[]`.
-
-= Validation & Limits =
-* Only configured fields accepted; unauthorized fields return `unauthorized_fields` error
-* Required fields, email, URL, number (min/max/step), tel (pattern), date, time, datetime-local are validated
-* Maximum 50 fields; total payload size ≤ 100 KB
-* Rate limiting: 1 request per 10 seconds per IP per form
-* Optional trusted origins check per form (see below); disabled by default (`off`)
-
-= Trusted Origins (opt-in) =
-
-Additional layer on top of nonce, honeypot, and rate limiting. Configure per form in **Advanced** tab.
-
-**Modes**
-* `off` (default) — no origin check; existing forms behave unchanged after plugin update
-* `same_site` — accept submissions only from the WordPress site origin (`home_url` / `site_url`)
-* `allowlist` — accept only origins listed in the form settings (one per line, e.g. `https://www.example.com`)
-
-**Headers**
-* Primary: `Origin`
-* Fallback: `Referer` when enabled (default on) for browser form posts without `Origin`
-
-**Errors**
-* Blocked requests return `origin_not_allowed` (HTTP 403) in REST and admin-post JSON responses
-
-**Notes**
-* Subdomains, `www`, and ports are distinct origins — list each explicitly in allowlist mode
-* No database migration: missing meta uses runtime defaults (`off`, referer fallback on)
-* Filter `mksddn_fh_trusted_origins_bypass` for infrastructure edge cases
-
-= Examples =
-
-**List forms:**
-
-    curl -s 'https://example.com/wp-json/mksddn-forms-handler/v1/forms'
-
-**Get single form:**
-
-    curl -s 'https://example.com/wp-json/mksddn-forms-handler/v1/forms/contact'
-
-**Submit form (JSON):**
-
-    curl -s -X POST \
-      -H 'Content-Type: application/json' \
-      -d '{"name":"John","email":"john@example.com","message":"Hi","mksddn_fh_hp":""}' \
-      'https://example.com/wp-json/mksddn-forms-handler/v1/forms/contact/submit'
-
-**Submit form with files (multipart):**
-
-    curl -s -X POST \
-      -F 'name=John' \
-      -F 'email=john@example.com' \
-      -F 'attachments[]=@/path/to/file1.pdf' \
-      -F 'attachments[]=@/path/to/file2.png' \
-      'https://example.com/wp-json/mksddn-forms-handler/v1/forms/contact/submit'
 
 == Frequently Asked Questions ==
 
@@ -387,7 +117,349 @@ Yes! Configure a redirect URL in form settings (Display tab). You can use:
 * Relative paths (e.g., `/thank-you`)
 External domains are blocked by default for security. To allow external redirects, use the `mksddn_fh_allowed_redirect_hosts` filter to whitelist specific domains.
 
-== Supported Field Types ==
+= For Developers =
+
+= Architecture =
+
+**Component-based structure** following SOLID principles with clear separation of concerns:
+
+**Core Components (includes/)**
+* `PostTypes` - custom post types registration (`mksddn_fh_forms`, `mksddn_fh_submits`)
+* `MetaBoxes` - form settings and submission data management
+* `FormsHandler` - main processing logic, REST API, per-form rate limiting, delivery orchestration
+* `Shortcodes` - form rendering with AJAX functionality
+* `AdminColumns` - admin interface customization
+* `ExportHandler` - CSV export with filtering
+* `Security` - admin restrictions for submissions (blocks manual create/edit in wp-admin)
+* `SpamProtection` - global rate limit, heuristics, Turnstile verification
+* `SpamSettingsAdmin` - global spam protection settings page
+* `Utilities` - helper functions and form creation utilities
+* `GoogleSheetsAdmin` - Google Sheets settings page and OAuth
+* `Assets` - asset registration and conditional enqueuing
+* `Template Functions` - global functions for PHP template integration
+
+**Traits (includes/traits/)**
+* `TelegramFormatterTrait` - HTML escaping and formatting for Telegram messages
+
+**Handlers (handlers/)**
+* `TelegramHandler` - Telegram Bot API integration
+* `GoogleSheetsHandler` - Google Sheets API integration
+* `TemplateParser` - placeholder parsing for Telegram and user reply emails
+
+**Assets (assets/)**
+* `css/admin.css` - Admin styles (form settings, export, Google Sheets and spam settings pages)
+* `js/admin.js` - Admin scripts (tabs, previews, user reply and trusted origins UI)
+* `js/form.js` - Frontend AJAX form submission (enqueued by shortcode or template helpers)
+* `js/turnstile-loader.js` - Local loader for Cloudflare Turnstile widget script
+
+= Technology Stack =
+
+* WordPress 5.3+ - core platform
+* PHP 8.0+ - server-side logic
+* jQuery - client-side form handling
+* REST API - form submission API
+* Google Sheets API - spreadsheet integration
+* Telegram Bot API - notifications
+
+= File Structure =
+
+    mksddn-forms-handler/
+    ├── mksddn-forms-handler.php     # Main plugin file
+    ├── includes/                     # Core components
+    │   ├── class-post-types.php
+    │   ├── class-meta-boxes.php
+    │   ├── class-forms-handler.php
+    │   ├── class-shortcodes.php
+    │   ├── class-admin-columns.php
+    │   ├── class-export-handler.php
+    │   ├── class-security.php
+    │   ├── class-utilities.php
+    │   ├── class-spam-protection.php
+    │   ├── class-spam-settings-admin.php
+    │   ├── class-google-sheets-admin.php
+    │   ├── class-assets.php
+    │   ├── template-functions.php
+    │   └── traits/
+    │       └── trait-telegram-formatter.php
+    ├── handlers/                     # External service handlers
+    │   ├── class-telegram-handler.php
+    │   ├── class-google-sheets-handler.php
+    │   └── class-template-parser.php
+    ├── templates/                    # Template files
+    │   ├── form-settings-meta-box.php
+    │   └── custom-form-examples.php
+    ├── assets/                       # Static resources
+    │   ├── css/
+    │   │   └── admin.css
+    │   └── js/
+    │       ├── admin.js
+    │       ├── form.js
+    │       └── turnstile-loader.js
+    ├── languages/                    # Translations
+    └── uninstall.php                # Cleanup script
+
+= Integration Methods =
+
+**1. Shortcode (Standard)**
+
+    [mksddn_fh_form slug="contact-form"]
+
+Plugin automatically generates HTML form based on configuration.
+
+**2. PHP Templates (Custom Forms)**
+Integrate pre-built forms in theme templates:
+
+    <form method="post" action="<?php echo mksddn_fh_get_form_action(); ?>">
+        <?php mksddn_fh_form_fields('contact-form'); ?>
+        <!-- Your custom fields -->
+        <input type="text" name="name" required>
+        <input type="email" name="email" required>
+        <button type="submit">Send</button>
+    </form>
+
+**Available Functions:**
+* `mksddn_fh_get_form_action()` - get form action URL
+* `mksddn_fh_form_fields($slug)` - output hidden fields (nonce, form_id, honeypot)
+* `mksddn_fh_get_form_config($slug)` - get form configuration
+* `mksddn_fh_get_rest_endpoint($slug)` - get REST API endpoint for AJAX
+* `mksddn_fh_form_has_files($slug)` - check for file fields
+* `mksddn_fh_enqueue_form_script()` - enqueue AJAX script
+* `mksddn_fh_render_turnstile($slug)` - output Turnstile widget markup (when required)
+* `mksddn_fh_enqueue_turnstile()` - enqueue Turnstile loader script
+* `mksddn_fh_form_requires_turnstile($slug)` - check if form requires Turnstile
+
+**Accept Any Fields (Advanced):**
+For custom forms where you control field names in templates, enable "Accept any fields from frontend" in form settings (Advanced tab) to skip field validation. Stored as post meta `_allow_any_fields` (`0` / `1`). This allows submitting ANY field names without defining them in Fields Configuration. All fields are still sanitized but type validation is skipped.
+
+See `/templates/custom-form-examples.php` for detailed examples.
+
+**User Reply Email (Email Settings tab):**
+Optional auto-reply to the user who submitted the form. Configure in the form Email Settings tab:
+
+* `_send_user_reply` — enable/disable auto-reply (`0` / `1`)
+* `_user_reply_email_field` — field name from Fields Configuration (`type: email`)
+* `_user_reply_type` — `text` (template with placeholders) or `html` (uploaded HTML file)
+* `_user_reply_subject` — reply subject with placeholders
+* `_user_reply_message` — text template body
+* `_user_reply_html_template` — HTML file content stored in post meta
+
+Placeholders: `{form_title}`, `{date}`, `{time}`, `{datetime}`, `{page_url}`, `{field:field_name}`, `{field_label:field_name}`.
+
+HTML template upload: `.html`/`.htm` only, max 100 KB (filter `mksddn_fh_max_html_template_size`). PHP code and script tags in templates are rejected.
+
+User reply can be the only enabled delivery channel — a successful auto-reply counts as a successful form submission. Auto-reply failure alone does not block submission when another channel succeeds; result is reported in `delivery_results.user_reply_email`.
+
+**3. REST API (AJAX)**
+Submit forms via REST API without page reload:
+
+    fetch('<?php echo mksddn_fh_get_rest_endpoint("contact-form"); ?>', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+    });
+
+= Development Standards =
+
+**Coding**
+* WordPress Coding Standards compliance
+* SOLID principles
+* DRY (Don't Repeat Yourself)
+* KISS (Keep It Simple)
+
+**Security**
+* Input validation for all data
+* Output sanitization
+* Nonce verification (CSRF protection)
+* Capability checks
+* Rate limiting (1 request per 10 seconds per IP per form)
+* Optional global rate limit across all forms (Forms → Spam Protection)
+* Optional spam heuristics and Cloudflare Turnstile (global defaults + per-form inherit / on / off)
+* Optional trusted origins check (Origin/Referer) per form — off by default
+
+**Performance**
+* Minimal database queries
+* Data caching
+* Lazy loading of resources
+* Conditional script enqueuing
+
+**Compatibility**
+* WordPress 5.3+ minimum
+* PHP 8.0+ minimum
+* Works on WordPress multisite (no network-specific settings UI)
+* Frontend forms use semantic HTML and ARIA attributes (aria-label, aria-busy, role="radiogroup"); theme styling and RTL layout depend on the active theme
+
+= WordPress Hooks & Filters =
+
+**Filters:**
+
+`mksddn_fh_allowed_fields` - Modify allowed field names for a form
+
+    add_filter('mksddn_fh_allowed_fields', function($allowed_fields, $form_id, $form_slug) {
+        // Allow all fields for specific form
+        if ($form_slug === 'my-custom-form') {
+            return ['*'];
+        }
+        // Add specific fields
+        return array_merge($allowed_fields, ['custom_field_1', 'custom_field_2']);
+    }, 10, 3);
+
+`mksddn_fh_allowed_redirect_hosts` - Whitelist external domains for redirect URLs
+
+    add_filter('mksddn_fh_allowed_redirect_hosts', function($hosts) {
+        return array_merge($hosts, ['example.com', 'trusted-partner.com']);
+    });
+
+`mksddn_fh_max_html_template_size` - Maximum size in bytes for uploaded user reply HTML templates (default: 102400)
+
+`mksddn_fh_max_template_size` - Maximum Telegram custom template size in characters (default: 10000)
+
+`mksddn_forms_telegram_message` - Modify the Telegram message before sending
+
+    add_filter('mksddn_forms_telegram_message', function($message, $form_data, $form_title, $fields_config) {
+        return $message . "\n— Sent via site";
+    }, 10, 4);
+
+`mksddn_fh_turnstile_verify_url` - Override the Cloudflare Turnstile siteverify endpoint URL
+
+`mksddn_fh_trusted_origins_bypass` - Skip trusted origins validation for a request (default: false)
+
+    add_filter('mksddn_fh_trusted_origins_bypass', function($bypass, $form_id, $mode) {
+        // Allow server-side proxy submissions for a specific form
+        if ($form_id === 123 && $mode === 'allowlist') {
+            return true;
+        }
+        return $bypass;
+    }, 10, 3);
+
+`mksddn_fh_before_submit` - Block or allow submission after validation, before delivery
+
+    add_filter('mksddn_fh_before_submit', function($allowed, $form_data, $form_config) {
+        if (isset($form_data['email']) && str_contains($form_data['email'], 'spam.example')) {
+            return new WP_Error('blocked', 'Blocked');
+        }
+        return $allowed;
+    }, 10, 3);
+
+`mksddn_fh_is_spam` - Custom spam decision when built-in heuristics are enabled (default: false)
+
+`mksddn_fh_spam_multi_select_threshold` - Minimum selected options count to treat as spam (default: 7)
+
+`mksddn_fh_client_ip` - Override client IP used for rate limiting and Turnstile (default: `REMOTE_ADDR`). Use this behind Cloudflare/a reverse proxy after you restore the real visitor IP; do not trust `X-Forwarded-For` from the client.
+
+**Actions:**
+
+`mksddn_forms_handler_log_security` - Fired when unauthorized fields are detected (hook for custom logging; no built-in log storage)
+`mksddn_forms_handler_log_submission` - Fired when form submission is processed (hook for custom logging)
+
+= REST API =
+
+Namespace: `mksddn-forms-handler/v1`
+
+= List Forms =
+* **Method**: GET
+* **Path**: `/wp-json/mksddn-forms-handler/v1/forms`
+* **Query Parameters**:
+  * `per_page` (1–100, default: 10)
+  * `page` (>=1, default: 1)
+  * `search` (string, optional)
+* **Response Headers**: `X-WP-Total`, `X-WP-TotalPages`
+
+= Get Single Form =
+* **Method**: GET
+* **Path**: `/wp-json/mksddn-forms-handler/v1/forms/{slug}`
+* **Response**: Includes `id`, `slug`, `title`, `submit_url`, `fields` (sanitized config), `require_turnstile`, and `turnstile_site_key` when Turnstile is required (never the secret key)
+
+= Submit Form =
+* **Method**: POST
+* **Path**: `/wp-json/mksddn-forms-handler/v1/forms/{slug}/submit`
+* **Content Types**: JSON or multipart/form-data
+* **Body (JSON)**: Key/value pairs according to field configuration. The `mksddn_fh_hp` honeypot field may be present and must be empty (spam protection).
+* **Body (Multipart)**: Fields and file uploads supported. For multiple files, use `name[]`.
+
+= Validation & Limits =
+* Only configured fields accepted; unauthorized fields return `unauthorized_fields` error
+* Required fields, email, URL, number (min/max/step), tel (pattern), date, time, datetime-local are validated
+* Maximum 50 fields; total payload size ≤ 100 KB
+* Rate limiting: 1 request per 10 seconds per IP per form
+* Optional global rate limit (all forms combined) — configure under Forms → Spam Protection
+* Optional trusted origins check per form (see below); disabled by default (`off`)
+
+= Spam Protection (opt-in) =
+
+Global settings: **Forms → Spam Protection**. Per-form overrides: **Advanced** tab on each form.
+
+**Global rate limit**
+* Off by default for backward compatibility
+* Limits total submissions per IP across all forms within a time window (default: 20 per hour)
+* Works together with the per-form 10-second limit
+* Blocked requests return `global_rate_limited` (HTTP 429)
+
+**Spam heuristics**
+* Global master switch + per-form mode: inherit / on / off
+* Detects common bot patterns: Latin-only name-like strings (15+ chars) with low vowel ratio or long consonant runs; selecting too many options on a multi-select or checkbox group (threshold filterable, default 7)
+* Does not flag `array_of_objects`, file fields, or free-text values outside configured name fields
+* Blocked requests return `spam_detected` (HTTP 400)
+
+**Cloudflare Turnstile**
+* Configure both site key and secret key globally — captcha is not enforced until both are saved
+* Global default: **Require Turnstile by default** on the Spam Protection page
+* Per-form mode in Advanced settings: inherit / on / off (legacy per-form checkbox values `1`/`0` map to on/inherit)
+* Shortcode forms render the widget automatically
+* Custom REST/AJAX forms must send `cf-turnstile-response` or `mksddn_fh_turnstile_response` in the request body
+* GET form meta includes `require_turnstile` and `turnstile_site_key` when enabled
+* Template helpers: `mksddn_fh_render_turnstile()`, `mksddn_fh_enqueue_turnstile()`, `mksddn_fh_form_requires_turnstile()`
+* Errors: `turnstile_required`, `turnstile_failed`, `turnstile_not_configured`
+* Rate limiting runs before Turnstile verification so failed captcha attempts cannot hammer Cloudflare
+* Behind a reverse proxy, restore the visitor IP (or use `mksddn_fh_client_ip`); `REMOTE_ADDR` alone may be the proxy IP
+
+= Trusted Origins (opt-in) =
+
+Additional layer on top of nonce, honeypot, and rate limiting. Configure per form in **Advanced** tab.
+
+**Modes**
+* `off` (default) — no origin check; existing forms behave unchanged after plugin update
+* `same_site` — accept submissions only from the WordPress site origin (`home_url` / `site_url`)
+* `allowlist` — accept only origins listed in the form settings (one per line, e.g. `https://www.example.com`)
+
+**Headers**
+* Primary: `Origin`
+* Fallback: `Referer` when enabled (default on) for browser form posts without `Origin`
+
+**Errors**
+* Blocked requests return `origin_not_allowed` (HTTP 403) in REST and admin-post JSON responses
+
+**Notes**
+* Subdomains, `www`, and ports are distinct origins — list each explicitly in allowlist mode
+* No database migration: missing meta uses runtime defaults (`off`, referer fallback on)
+* Filter `mksddn_fh_trusted_origins_bypass` for infrastructure edge cases
+
+= Examples =
+
+**List forms:**
+
+    curl -s 'https://example.com/wp-json/mksddn-forms-handler/v1/forms'
+
+**Get single form:**
+
+    curl -s 'https://example.com/wp-json/mksddn-forms-handler/v1/forms/contact'
+
+**Submit form (JSON):**
+
+    curl -s -X POST \
+      -H 'Content-Type: application/json' \
+      -d '{"name":"John","email":"john@example.com","message":"Hi","mksddn_fh_hp":""}' \
+      'https://example.com/wp-json/mksddn-forms-handler/v1/forms/contact/submit'
+
+**Submit form with files (multipart):**
+
+    curl -s -X POST \
+      -F 'name=John' \
+      -F 'email=john@example.com' \
+      -F 'attachments[]=@/path/to/file1.pdf' \
+      -F 'attachments[]=@/path/to/file2.png' \
+      'https://example.com/wp-json/mksddn-forms-handler/v1/forms/contact/submit'
+
+= Supported Field Types =
 
 Fields are configured as JSON in the form settings. Supported types:
 
@@ -516,7 +588,33 @@ The `array_of_objects` type allows you to define arrays with nested field valida
       ]
     }
 
+= External Services =
+
+This plugin can connect to external services when explicitly enabled in a form's settings:
+
+= Google OAuth2 and Google Sheets API =
+* **Purpose**: Authenticate and append rows to a spreadsheet
+* **When**: Only if "Send to Google Sheets" is enabled for a form and valid credentials are provided
+* **Data sent**: Form fields configured for the form, form title, timestamp
+* **Endpoints used**: `https://oauth2.googleapis.com/token`, `https://sheets.googleapis.com/v4/spreadsheets/...`
+* **Terms**: https://policies.google.com/terms
+* **Privacy**: https://policies.google.com/privacy
+
+= Telegram Bot API =
+* **Purpose**: Send a message with submission content to specified chat(s)
+* **When**: Only if "Send to Telegram" is enabled for a form and bot token + chat IDs are configured
+* **Data sent**: Form fields configured for the form, form title
+* **Endpoint used**: `https://api.telegram.org/bot<token>/sendMessage`
+* **Terms/Privacy**: https://telegram.org/privacy
+
+= Privacy Notes =
+* No IP address or user agent is transmitted to external services; only form field values are sent
+* External delivery is opt-in per form and disabled by default
+
 == Upgrade Notice ==
+
+= 2.7.0 =
+New feature: Spam Protection — optional global rate limit, bot heuristics, and Cloudflare Turnstile. All opt-in by default; enable under Forms → Spam Protection and per-form Advanced settings. Recommended update if your forms receive bot spam.
 
 = 2.6.0 =
 New feature: Trusted origins — optional per-form Origin/Referer protection in Advanced settings. Opt-in only; default is off, so existing forms keep working unchanged.
@@ -567,6 +665,19 @@ Security update: Fixed URL escaping in template examples. Recommended update for
 New feature: Template functions for custom forms integration. Bug fix: Improved Telegram message formatting. Fully backward compatible.
 
 == Changelog ==
+
+= 2.7.0 =
+* Feature: Spam Protection settings page (Forms → Spam Protection) — global rate limit, heuristics master switch, Turnstile keys
+* Feature: Per-form Advanced options — Require Turnstile, spam heuristics (inherit / on / off)
+* Feature: Cloudflare Turnstile verification for REST and admin-post submissions
+* Feature: Built-in spam heuristics (gibberish Latin name detection, excessive multi-select)
+* Feature: Global rate limit across all forms per IP (default off)
+* Filter: `mksddn_fh_before_submit` — block submission before delivery channels run
+* Filter: `mksddn_fh_is_spam` — custom spam rules when heuristics are enabled
+* Filter: `mksddn_fh_spam_multi_select_threshold` — adjust multi-select spam threshold
+* Helpers: `mksddn_fh_render_turnstile()`, `mksddn_fh_enqueue_turnstile()`, `mksddn_fh_form_requires_turnstile()`
+* Improved: Internal fields (honeypot, Turnstile token) stripped before field validation
+* Compatibility: All spam features are opt-in; existing forms behave unchanged after update
 
 = 2.6.0 =
 * Feature: Trusted origins — optional per-form Origin/Referer allowlist (`off` | `same_site` | `allowlist`) in Advanced settings
@@ -731,26 +842,3 @@ New feature: Template functions for custom forms integration. Bug fix: Improved 
 * Custom post types for forms and submissions
 * Security measures and validation
 * Clean, maintainable code structure
-
-== External Services ==
-
-This plugin can connect to external services when explicitly enabled in a form's settings:
-
-= Google OAuth2 and Google Sheets API =
-* **Purpose**: Authenticate and append rows to a spreadsheet
-* **When**: Only if "Send to Google Sheets" is enabled for a form and valid credentials are provided
-* **Data sent**: Form fields configured for the form, form title, timestamp
-* **Endpoints used**: `https://oauth2.googleapis.com/token`, `https://sheets.googleapis.com/v4/spreadsheets/...`
-* **Terms**: https://policies.google.com/terms
-* **Privacy**: https://policies.google.com/privacy
-
-= Telegram Bot API =
-* **Purpose**: Send a message with submission content to specified chat(s)
-* **When**: Only if "Send to Telegram" is enabled for a form and bot token + chat IDs are configured
-* **Data sent**: Form fields configured for the form, form title
-* **Endpoint used**: `https://api.telegram.org/bot<token>/sendMessage`
-* **Terms/Privacy**: https://telegram.org/privacy
-
-= Privacy Notes =
-* No IP address or user agent is transmitted to external services; only form field values are sent
-* External delivery is opt-in per form and disabled by default

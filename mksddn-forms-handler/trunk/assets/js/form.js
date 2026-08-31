@@ -18,6 +18,50 @@
         document.head.appendChild(style);
     }
 
+    function getTurnstileWidgets($form) {
+        return $form.find('.cf-turnstile, .mksddn-fh-turnstile');
+    }
+
+    function getTurnstileToken($form) {
+        var token = '';
+        $form.find('[name="cf-turnstile-response"], [name="mksddn_fh_turnstile_response"]').each(function() {
+            var value = $.trim($(this).val() || '');
+            if (value) {
+                token = value;
+            }
+        });
+        return token;
+    }
+
+    function resetTurnstile($form) {
+        if (typeof window.turnstile === 'undefined' || typeof window.turnstile.reset !== 'function') {
+            return;
+        }
+        getTurnstileWidgets($form).each(function() {
+            try {
+                window.turnstile.reset(this);
+            } catch (err) {
+                // Widget may not be mounted yet.
+            }
+        });
+    }
+
+    function extractErrorMessage(payload, fallback) {
+        if (!payload) {
+            return fallback;
+        }
+        if (typeof payload.data === 'string' && payload.data) {
+            return payload.data;
+        }
+        if (payload.data && payload.data.message) {
+            return payload.data.message;
+        }
+        if (payload.message) {
+            return payload.message;
+        }
+        return fallback;
+    }
+
     $(document).on('submit', '.mksddn-form', function(e){
         e.preventDefault();
 
@@ -26,10 +70,19 @@
         var $submitButton = $form.find('.submit-button');
         var originalButtonHtml = $submitButton.html();
         var originalButtonText = $.trim($submitButton.text());
+        var i18n = mksddn_fh_form || {};
+
+        if (getTurnstileWidgets($form).length && !getTurnstileToken($form)) {
+            $message
+                .removeClass('success')
+                .addClass('error')
+                .html(i18n.turnstile_required || 'Captcha verification is required.')
+                .show();
+            return;
+        }
 
         ensureLoaderStyles();
 
-        var i18n = mksddn_fh_form || {};
         $submitButton
             .prop('disabled', true)
             .attr('aria-busy', 'true')
@@ -78,7 +131,7 @@
                     $message.removeClass('error').addClass('success').html(message).show();
                     $form[0].reset();
                 } else {
-                    var errorMessage = (response && response.data && response.data.message) ? response.data.message : (i18n.error_default || 'Error');
+                    var errorMessage = extractErrorMessage(response, i18n.error_default || 'Error');
 
                     if (response && response.data && response.data.unauthorized_fields && response.data.unauthorized_fields.length > 0) {
                         errorMessage += '<br><br><strong>' + (i18n.unauthorized_fields_label || 'Unauthorized fields:') + '</strong> ' + response.data.unauthorized_fields.join(', ');
@@ -117,8 +170,10 @@
                     $message.removeClass('success').addClass('error').html(errorMessage).show();
                 }
             },
-            error: function() {
-                $message.removeClass('success').addClass('error').html(i18n.error_sending || 'An error occurred while sending the form').show();
+            error: function(xhr) {
+                var fallback = i18n.error_sending || 'An error occurred while sending the form';
+                var errorMessage = extractErrorMessage(xhr && xhr.responseJSON, fallback);
+                $message.removeClass('success').addClass('error').html(errorMessage).show();
             },
             complete: function() {
                 // Restore per-form button label from markup to keep custom text and locale.
@@ -127,6 +182,7 @@
                     .removeAttr('aria-busy')
                     .removeClass('is-loading')
                     .html(originalButtonHtml);
+                resetTurnstile($form);
             }
         };
 

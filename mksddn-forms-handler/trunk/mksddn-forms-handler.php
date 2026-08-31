@@ -3,8 +3,9 @@
  * Plugin Name: MksDdn Forms Handler
  * Plugin URI: https://github.com/mksddn/WP-MksDdn-Forms-Handler
  * Description: Advanced form processing system with REST API support, Telegram notifications, and Google Sheets integration. Create and manage forms with multiple delivery methods including email, Telegram, Google Sheets, and admin storage.
- * Version: 2.6.0
+ * Version: 2.7.0
  * Requires at least: 5.3
+ * Tested up to: 7.1
  * Requires PHP: 8.0
  * Author: mksddn
  * Author URI: https://github.com/mksddn
@@ -14,7 +15,7 @@
  * Domain Path: /languages
  * 
  * @package MksDdnFormsHandler
- * @version 2.6.0
+ * @version 2.7.0
  * @author mksddn
  * @license GPL v2 or later
 */
@@ -25,7 +26,7 @@ if (!defined('ABSPATH')) {
     }
 
 // Define plugin constants
-define('MKSDDN_FORMS_HANDLER_VERSION', '2.6.0');
+define('MKSDDN_FORMS_HANDLER_VERSION', '2.7.0');
 define('MKSDDN_FORMS_HANDLER_PLUGIN_DIR', __DIR__);
 define('MKSDDN_FORMS_HANDLER_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('MKSDDN_FORMS_HANDLER_PLUGIN_FILE', __FILE__);
@@ -43,6 +44,8 @@ require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/includes/class-admin-columns.ph
 require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/includes/class-export-handler.php';
 require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/includes/class-security.php';
 require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/includes/class-utilities.php';
+require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/includes/class-spam-protection.php';
+require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/includes/class-spam-settings-admin.php';
 require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/includes/class-google-sheets-admin.php';
 require_once MKSDDN_FORMS_HANDLER_PLUGIN_DIR . '/includes/class-assets.php';
 
@@ -67,6 +70,7 @@ add_action('plugins_loaded', function() {
     new MksDdn\FormsHandler\ExportHandler();
     new MksDdn\FormsHandler\Security();
     new MksDdn\FormsHandler\GoogleSheetsAdmin();
+    new MksDdn\FormsHandler\SpamSettingsAdmin();
     new MksDdn\FormsHandler\Assets();
     
     // Nothing else here
